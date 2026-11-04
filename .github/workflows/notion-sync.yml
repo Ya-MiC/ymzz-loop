@@ -1,0 +1,26 @@
+name: notion-sync
+on:
+  schedule:
+    - cron: "0 0,6,12 * * *"   # 09:00 / 15:00 / 21:00 首爾 Seoul (UTC+9)
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: notion-sync
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm install --no-audit --no-fund
+      - run: npm run sync
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+      - name: commit
+        run: |
+          git config user.name "Tully"; git config user.email "tully@yamic.de5.net"
+          git add notion
+          git diff --cached --quiet || (git commit -m "sync: notion $(date -u +%F_%H%M)Z" && git push)

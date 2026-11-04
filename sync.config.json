@@ -1,0 +1,6 @@
+{
+  "_comment": "一行一個來源 / one line per source. type: page | database",
+  "sources": [
+    { "name": "1102_客戶側寫", "type": "page", "id": "40ca6ce79bd4818d9286fa7ccf8de683", "sheetTab": "客戶側寫" }
+  ]
+}
