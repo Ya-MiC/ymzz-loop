@@ -14,3 +14,8 @@ test("gate skips when already ran", () => {
   const out = execFileSync("node", ["scripts/gate.mjs"], { env: { ...process.env, YMZZ_TZ: "UTC", YMZZ_REMIND_TIME: "00:00", GITHUB_EVENT_NAME: "schedule" } }).toString();
   assert.match(out, /\[gate\]/);
 });
+test("default zone is UTC", () => {
+  const out = execFileSync("node", ["--input-type=module", "-e", `import * as t from "./scripts/time.mjs"; console.log(t.TZ, t.slug, t.zoneLabel())`], { env: { ...process.env, YMZZ_TZ: "" } }).toString().trim();
+  assert.equal(out, "Etc/UTC utc UTC (UTC+0)");
+});
+test("pacific zone", () => { assert.equal(run("America/Los_Angeles", "console.log(t.slug)"), "los_angeles"); });

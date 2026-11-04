@@ -2,6 +2,15 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.1.0] - 2026-11-04
+### Changed
+- Default time zone is now **UTC** (`Etc/UTC`, 07:00); filename zone slug `utc`. Set `YMZZ_TZ` (e.g. `America/Los_Angeles`) to change it.
+- README is English by default, with 繁體中文 / 简体中文 / 한국어 versions.
+- Website rebuilt: product introduction, before/after, mockups, FAQ, i18n (en, zh-Hant, zh-CN, ko, ar beta), RTL-ready logical CSS, Tabler icons (no emoji), CSP, no third-party requests.
+- Pages workflow: `configure-pages` with `enablement: true`; Node 22 in workflows.
+### Added
+- THIRD_PARTY.md, TRADEMARK.md.
+
 ## [1.0.0] - 2026-11-04
 ### 新增 Added
 - 任意時區與提醒時間：repo Variables `YMZZ_TZ`、`YMZZ_REMIND_TIME` 或 `sync.config.json`（預設 Asia/Seoul 07:00）。Any time zone / reminder time.

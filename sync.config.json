@@ -1,6 +1,6 @@
 {
   "_comment": "setup.sh 會自動填入 / filled by setup.sh",
-  "timezone": "Asia/Seoul",
+  "timezone": "Etc/UTC",
   "remind_time": "07:00",
   "sinks": [
     "markdown",

@@ -1,0 +1,98 @@
+<p align="center"><img src="assets/banner.svg" alt="ymzz-notion · 每日復盤 Daily Review" width="100%"></p>
+
+<p align="center"><a href="README.md">English</a> · <b>繁體中文</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko.md">한국어</a></p>
+
+<p align="center">
+<a href="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
+<img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
+<img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
+<a href="https://ya-mic.github.io/ymzz-notion/"><img src="https://img.shields.io/badge/官網-guided%20setup-F4DDE7" alt="website"></a>
+</p>
+
+<h1 align="center">ymzz-notion · 每日復盤</h1>
+<p align="center"><b>每天早上，復盤頁已在 Notion 等你；昨天的內容已同步到 Google Sheet 與 Git。<br>Your daily review is waiting in Notion every morning — yesterday already synced to Google Sheets and Git.</b><br>零成本 · 任意時區 · 無伺服器 · 無 AI 額度 / $0 · any time zone · serverless · no AI quota</p>
+
+<p align="center"><a href="https://ya-mic.github.io/ymzz-notion/">🌐 官網與互動教學 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
+
+---
+
+## 它做什麼 What it does
+每天在**你設定的時區與時間**（預設 **07:00 UTC**），GitHub Actions 自動：
+1. 在 Notion 建今天的空白復盤頁（含 ①–⑩ 段落）/ creates today's blank review page in Notion
+2. 寄信給你，附今日頁面連結 / emails you the link
+3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）與本倉庫 `notion/YYYY/MMDD_HHMM_<時區>.md`（例如 `1105_0705_utc.md`，檔內寫明時區）/ syncs yesterday to Google Sheets and a markdown snapshot
+
+不用 Grok / AI 額度，只用 GitHub 免費分鐘。長期免維護：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
+No AI quota; free GitHub minutes only. Built to run unattended.
+
+| | ymzz-notion | 一般 Notion 模板 | 付費日記 App |
+|---|---|---|---|
+| 每日自動建頁 + 提醒信 | ✅ | ❌ | ⚠️ |
+| 同步 Google Sheet + Git 歷史 | ✅ | ❌ | ❌ |
+| 持倉表（IBKR 等）| ✅ | ⚠️ | ❌ |
+| 任意時區 | ✅ | — | ✅ |
+| 費用 | **$0** | $0–$20 | 訂閱制 |
+
+## 模板 Template
+- **每日復盤 Daily Review**：日期、評分、心情、精力、Keep 做得好、Problem 問題、Try 教訓、決策、明日三件事、資訊輸入、平台、市場/持倉筆記、深度工作時數、完成
+- **持倉 Holdings**（IBKR 等）：代號、平台、類別、數量、成本價、現價、市值、幣別、佔比、論點、停損/目標、更新日期、備註
+- 方法來源 Frameworks: **KPT** (Keep/Problem/Try, Agile retrospectives) · **曾國藩日課・三省** · **柳比歇爾時間統計法** (Lyubishchev time log) · **交易日誌每日復盤** (Brett Steenbarger, *The Daily Trading Coach*)
+
+## 時區 Time zone
+| 設定方式 | 範例 | 優先 |
+|---|---|---|
+| Repo Variables `YMZZ_TZ` / `YMZZ_REMIND_TIME` | `America/Los_Angeles` / `21:30` | 1 |
+| `sync.config.json` `timezone` / `remind_time` | `Asia/Taipei` / `07:00` | 2 |
+| 預設 default | `Etc/UTC` / `07:00` | 3 |
+
+GitHub 排程只支援 UTC，所以 workflow 每小時醒來一次：閘門不安裝任何套件、數秒結束；只有「本地時間 ≥ 提醒時間 且 今天還沒跑過」才真正執行（`.ymzz/last-run` 去重）。排程延遲或漏跑會在下一小時補上。公開倉庫 Actions 免費；私人倉庫約 720 分鐘/月，低於免費 2,000 分鐘。
+Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds unless local time ≥ your reminder time and today hasn't run yet.
+
+## 設定步驟 Setup（一次就好 / once）
+1. **Notion integration**：到 https://www.notion.so/profile/integrations → New integration（Internal）名稱 `ymzz` → 複製 token。打開你要放復盤的 Notion 頁面 → 右上 `⋯` → Connections → 加入 `ymzz`。
+2. **建立資料庫 Create databases**（在電腦上 / on your PC，需 Node.js 20+）：
+   ```bash
+   git clone https://github.com/Ya-MiC/ymzz-notion && cd ymzz-notion
+   NOTION_TOKEN=你的token ./setup.sh "https://www.notion.so/你的頁面網址"
+   git add sync.config.json && git commit -m "setup ids" && git push
+   ```
+   Windows PowerShell：`$env:NOTION_TOKEN="..."; npm install; node scripts/setup-notion.mjs "<頁面網址>"`
+3. **Google service account**：https://console.cloud.google.com → 新專案 → 啟用 Google Sheets API → IAM → Service accounts → 建立 → Keys → Add key → JSON（下載）。建一個 Google Sheet，**共用**給 service account 的 email（編輯者 Editor）。網址 `/d/<SHEET_ID>/edit` 中間那段就是 SHEET_ID。
+4. **Gmail 應用程式密碼 App password**：https://myaccount.google.com/apppasswords（需先開兩步驗證）→ 建立 → 16 位密碼。
+5. **GitHub Secrets**：倉庫 → Settings → Secrets and variables → Actions → New repository secret：
+
+   | Secret | 內容 |
+   |---|---|
+   | `NOTION_TOKEN` | Notion integration token |
+   | `GOOGLE_SERVICE_ACCOUNT_JSON` | 整個 JSON 檔內容 whole JSON |
+   | `SHEET_ID` | Google Sheet ID |
+   | `SMTP_USER` | 你的 Gmail |
+   | `SMTP_PASS` | 16 位應用程式密碼 |
+   | `MAIL_TO` | 收提醒的信箱 |
+   | `SMTP_HOST` / `SMTP_PORT` | 選填，預設 smtp.gmail.com / 465 |
+6. **時區與提醒時間 Time zone（選填 optional）**：Settings → Secrets and variables → Actions → **Variables** 分頁 → New repository variable：`YMZZ_TZ`（IANA 名稱，例如 `Asia/Taipei`、`America/New_York`）、`YMZZ_REMIND_TIME`（`HH:MM`，例如 `21:30`）。不設就是 `Etc/UTC` `07:00`。也可直接改 `sync.config.json` 的 `timezone` / `remind_time`。官網的[時區產生器](https://ya-mic.github.io/ymzz-notion/#setup)會幫你算好。
+7. **第一次手動執行 First run**：Actions → daily-review → Run workflow。收到信、Notion 出現今天的頁、Sheet 出現兩個分頁就成功。
+
+## 擴充 Extend
+新增同步目的地＝新增一個 sink 檔（`scripts/sinks/<name>.mjs`，實作 `{ name, enabled(env), write(ctx) }`）。詳見 [docs/architecture.md](docs/architecture.md)。
+Add a destination by dropping in one sink file — see the architecture doc.
+
+## 檔案 Files
+| 路徑 | 用途 |
+|---|---|
+| `.github/workflows/daily-review.yml` | 每小時閘門 + 每日流程 hourly gate + daily flow |
+| `.github/workflows/ci.yml` · `pages.yml` | lint/test · 官網部署 website deploy |
+| `setup.sh` → `scripts/setup-notion.mjs` | 建首頁說明＋資料庫 |
+| `scripts/schema.mjs` | 欄位與頁面骨架（改模板只改這裡）|
+| `scripts/time.mjs` · `gate.mjs` | 時區 time zone · 閘門與去重 gate & dedupe |
+| `scripts/sinks/` | 同步目的地 sinks（markdown、sheets）+ email |
+| `scripts/create-today.mjs` · `send-reminder.mjs` · `sync-yesterday.mjs` · `write-log.mjs` | 每日步驟 |
+| `notion/YYYY/MMDD_HHMM_<tz>.md` | 每日快照（內含時區）|
+| `site/` | 官網（GitHub Pages）|
+
+## 社群 Community
+[貢獻 Contributing](CONTRIBUTING.md) · [行為準則 Code of Conduct](CODE_OF_CONDUCT.md) · [安全 Security](SECURITY.md) · [研究 Research](docs/research.md)
+
+## 授權 License
+[MIT](LICENSE) © 2026 YanMing Cao 曹晏銘 · **晏銘湛箴** — 小軟體，大秩序。

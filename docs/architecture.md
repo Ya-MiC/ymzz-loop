@@ -15,7 +15,7 @@
 ```
 
 ## 時間 Time (`scripts/time.mjs`)
-唯一時間來源。優先序：環境變數 `YMZZ_TZ` / `YMZZ_REMIND_TIME`（GitHub repo Variables）→ `sync.config.json` 的 `timezone` / `remind_time` → 預設 `Asia/Seoul` / `07:00`。
+唯一時間來源。優先序：環境變數 `YMZZ_TZ` / `YMZZ_REMIND_TIME`（GitHub repo Variables）→ `sync.config.json` 的 `timezone` / `remind_time` → 預設 `Etc/UTC` / `07:00`（例如太平洋時間設 `America/Los_Angeles`）。
 所有日期、「昨天」、檔名、信件與 Notion 紀錄都用它。檔名 `MMDD_HHMM_<slug>`，slug 取 IANA 名稱最後一段小寫（`America/New_York` → `new_york`），檔內寫完整時區與 UTC 偏移。
 
 ## 閘門與去重 Gate & dedupe (`scripts/gate.mjs`)
