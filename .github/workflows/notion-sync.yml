@@ -1,34 +1,45 @@
-name: notion-sync
+name: daily-review
 on:
   schedule:
-    - cron: "0 0 * * *"   # 每天 09:00 首爾 Seoul (UTC+9)
+    - cron: "0 12 * * *"   # 每天 21:00 首爾 Seoul (UTC+9)：建今日頁 + 寄提醒 + 同步
   workflow_dispatch:
 permissions:
   contents: write
-concurrency: notion-sync
+concurrency: daily-review
 jobs:
-  sync:
+  run:
     runs-on: ubuntu-latest
+    env:
+      NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 20 }
       - run: npm install --no-audit --no-fund
-      - run: npm run sync
+      - name: today's blank review page
+        run: npm run daily
+      - name: email reminder
+        run: npm run remind
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+      - name: sync to md + sheet
+        run: npm run sync
+        env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
       - name: commit
+        id: commit
         run: |
           git config user.name "Tully"; git config user.email "tully@yamic.de5.net"
           git add notion
           git diff --cached --name-status > /tmp/changes.txt
-          if [ -s /tmp/changes.txt ]; then git commit -m "sync: notion $(TZ=Asia/Seoul date +%F_%H%M) KST" && git push; fi
+          if [ -s /tmp/changes.txt ]; then git commit -m "sync: $(TZ=Asia/Seoul date +%F_%H%M) KST" && git push; fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
-        id: commit
-      - name: notion log
-        run: node scripts/log.mjs
+      - name: notion sync log
+        run: npm run log
         env:
-          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
           COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ steps.commit.outputs.sha }}

@@ -1,13 +1,21 @@
 {
-  "_comment": "一行一個來源 / one line per source. type: page | database",
+  "_comment": "setup.sh 會自動填 review/holdings 的 id；sources 一行一個 / setup.sh fills the db ids; one line per source",
+  "review_db_id": "",
+  "holdings_db_id": "",
+  "notion_log_page_id": "",
+  "parent_page_id": "",
   "sources": [
     {
-      "name": "1102_客戶側寫",
-      "type": "page",
-      "id": "40ca6ce79bd4818d9286fa7ccf8de683",
-      "sheetTab": "客戶側寫"
+      "name": "每日復盤 Daily Review",
+      "type": "database",
+      "id": "$review_db_id",
+      "sheetTab": "每日復盤"
+    },
+    {
+      "name": "持倉 Holdings",
+      "type": "database",
+      "id": "$holdings_db_id",
+      "sheetTab": "持倉"
     }
-  ],
-  "notion_log_page_id": "",
-  "_comment_log": "留空＝第一次自動在 1102 頁面下建立「同步紀錄 Sync Log」/ empty = auto-create under the first source on first run; then paste its id here"
+  ]
 }

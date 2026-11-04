@@ -42,7 +42,9 @@ async function childDbs(pageId) {
   return ids;
 }
 const tables = {}; const sheetCounts = {};
-for (const s of cfg.sources) {
+for (const s0 of cfg.sources) {
+  const s = { ...s0, id: s0.id.startsWith("$") ? cfg[s0.id.slice(1)] : s0.id };
+  if (!s.id) { console.log(`skip (no id): ${s.name}`); continue; }
   const dir = path.join("notion", safe(s.name));
   const dbIds = s.type === "database" ? [s.id] : (await pageToMd(s.id, dir), await childDbs(s.id));
   for (const db of dbIds) {

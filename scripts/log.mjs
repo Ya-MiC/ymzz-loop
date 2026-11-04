@@ -5,7 +5,7 @@ const notion = new Client({ auth: process.env.NOTION_TOKEN });
 const TITLE = "同步紀錄 Sync Log";
 let logId = cfg.notion_log_page_id;
 if (!logId) { // find or create under first source page (adds a new child page; existing content untouched)
-  const parent = cfg.sources[0].id; let cursor;
+  const parent = cfg.parent_page_id; let cursor;
   do { const r = await notion.blocks.children.list({ block_id: parent, start_cursor: cursor });
     const hit = r.results.find(b => b.type === "child_page" && b.child_page.title === TITLE); if (hit) logId = hit.id;
     cursor = !logId && r.has_more ? r.next_cursor : undefined; } while (cursor);
