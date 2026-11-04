@@ -1,5 +1,11 @@
 {
   "_comment": "setup.sh 會自動填入 / filled by setup.sh",
+  "timezone": "Asia/Seoul",
+  "remind_time": "07:00",
+  "sinks": [
+    "markdown",
+    "sheets"
+  ],
   "parent_page_id": "",
   "review_db_id": "",
   "holdings_db_id": "",

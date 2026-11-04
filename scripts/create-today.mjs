@@ -2,7 +2,7 @@
 import fs from "node:fs";
 import { notion, cfg, findReview, pageUrl } from "./notion-client.mjs";
 import { dailyBody } from "./schema.mjs";
-import { isoDate } from "./seoul-time.mjs";
+import { isoDate } from "./time.mjs";
 const c = cfg(), date = isoDate();
 let page = await findReview(c.review_db_id, date);
 if (!page) page = await notion.pages.create({

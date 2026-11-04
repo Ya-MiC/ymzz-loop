@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ymzz-notion · 每日復盤 Daily Review — 晏銘湛箴</title>
+<meta name="description" content="每天早上，復盤頁已在 Notion 等你。零成本、任意時區，GitHub Actions 自動建頁、寄信、同步 Google Sheet 與 Git。">
+<meta property="og:title" content="ymzz-notion · 每日復盤 Daily Review">
+<meta property="og:description" content="Your daily review, already waiting. $0 · any time zone · Notion · Email · Sheets · Git">
+<meta property="og:image" content="og.svg">
+<meta name="theme-color" content="#F8F6EF">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main" data-en="Skip to content">跳到內容</a>
+<header class="nav">
+  <a class="brand" href="#top" aria-label="ymzz-notion"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>notion</span></a>
+  <nav aria-label="主選單">
+    <a href="#features" data-en="Features">功能</a>
+    <a href="#flow" data-en="How it works">運作</a>
+    <a href="#tutorial" data-en="Setup">教學</a>
+    <a href="https://github.com/Ya-MiC/ymzz-notion" rel="noopener">GitHub</a>
+  </nav>
+  <div class="tools">
+    <button id="lang" class="chip" aria-label="Switch language">EN</button>
+    <button id="theme" class="chip" aria-label="Toggle theme" data-en="Dark">暗色</button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="blobs" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  <p class="eyebrow reveal" data-en="Open source · by 晏銘湛箴">開源 · 晏銘湛箴 出品</p>
+  <h1 class="blur-in" data-en="Your daily review,|already waiting.">每日復盤，|自動就位。</h1>
+  <p class="lede reveal" data-en="Every morning in your time zone, GitHub Actions creates today's blank review in Notion, emails you the link, and syncs yesterday to Google Sheets and Git. Zero cost, no servers, no AI quota.">每天在你的時區，GitHub Actions 自動在 Notion 建好今天的空白復盤頁、寄信提醒你，並把昨天的內容同步到 Google Sheet 與 Git。零成本、無伺服器、不用 AI 額度。</p>
+  <div class="cta reveal">
+    <a class="btn primary" href="#tutorial" data-en="Start the 15‑min setup →">開始 15 分鐘設定 →</a>
+    <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-notion/generate" rel="noopener" data-en="Use this template">使用此模板</a>
+  </div>
+  <ul class="stats reveal" aria-label="數字">
+    <li><b class="count" data-to="0">0</b><span>$ / 月 month</span></li>
+    <li><b class="count" data-to="600">0</b><span data-en="days unattended">天免維護</span></li>
+    <li><b class="count" data-to="400">0</b><span data-en="+ time zones">+ 時區可選</span></li>
+    <li><b class="count" data-to="4">0</b><span data-en="destinations">個同步端</span></li>
+  </ul>
+</section>
+
+<section class="marquee" aria-hidden="true"><div><span>Keep · 保持</span><span>Problem · 問題</span><span>Try · 嘗試</span><span>決策 Decisions</span><span>持倉 Holdings</span><span>深度工作 Deep work</span><span>明日三件事 Top 3</span><span>Keep · 保持</span><span>Problem · 問題</span><span>Try · 嘗試</span><span>決策 Decisions</span><span>持倉 Holdings</span><span>深度工作 Deep work</span><span>明日三件事 Top 3</span></div></section>
+
+<section id="features" class="section">
+  <h2 class="reveal" data-en="Small software, big order.">小軟體，大秩序。</h2>
+  <div class="grid">
+    <article class="card c1 reveal"><span class="ic">📓</span><h3 data-en="A template worth writing in">值得寫的模板</h3><p data-en="KPT retrospective + trading‑journal daily review: score, mood, energy, decisions, top 3 for tomorrow, deep‑work hours.">KPT 回顧 + 交易日誌式復盤：評分、心情、精力、決策、明日三件事、深度工作時數。</p></article>
+    <article class="card c2 reveal"><span class="ic">💼</span><h3 data-en="Holdings, IBKR‑ready">持倉表，IBKR 適用</h3><p data-en="Ticker, platform, cost, value, weight, thesis, stop/target — snapshotted daily so you see how it changed.">代號、平台、成本、市值、佔比、論點、停損/目標，每天快照，變化一目了然。</p></article>
+    <article class="card c3 reveal"><span class="ic">✉️</span><h3 data-en="A nudge, on time">準時的提醒</h3><p data-en="One email with today's page link, at the hour you choose, in your own time zone.">在你選的時區與時間，寄一封附今日頁面連結的信。</p></article>
+    <article class="card c4 reveal"><span class="ic">📊</span><h3 data-en="Sheets + Git history">Sheet + Git 歷史</h3><p data-en="Yesterday lands in Google Sheets for charts, and as Markdown in your repo for a permanent, diffable archive.">昨天的內容進 Google Sheet 方便做圖，也以 Markdown 存進倉庫，永久可追溯。</p></article>
+    <article class="card c5 reveal"><span class="ic">🌏</span><h3 data-en="Any time zone">任意時區</h3><p data-en="Seoul 07:00 by default. Set two repo Variables and it's yours: filenames carry your zone.">預設首爾 07:00。設兩個 repo Variables 就換成你的，檔名也帶時區。</p></article>
+    <article class="card c6 reveal"><span class="ic">🧩</span><h3 data-en="Pluggable sinks">可插拔同步端</h3><p data-en="Add Obsidian, Telegram, CSV… by dropping one file that implements { name, enabled, write }.">要接 Obsidian、Telegram、CSV？放一個實作 { name, enabled, write } 的檔案即可。</p></article>
+  </div>
+</section>
+
+<section id="flow" class="section flow-wrap">
+  <h2 class="reveal" data-en="How it works">運作方式</h2>
+  <ol class="flow">
+    <li class="reveal"><b>⓪</b><h3 data-en="Hourly gate">每小時閘門</h3><p data-en="Wakes every hour, exits in seconds unless it's your time and today hasn't run.">每小時醒來，不到時間或今天已執行就數秒結束。</p></li>
+    <li class="reveal"><b>①</b><h3 data-en="Notion page">Notion 建頁</h3><p data-en="Today's blank review with ①–⑩ sections.">建好今天含 ①–⑩ 段落的空白頁。</p></li>
+    <li class="reveal"><b>②</b><h3 data-en="Email">寄信</h3><p data-en="Link straight to today's page.">直接連到今天的頁面。</p></li>
+    <li class="reveal"><b>③</b><h3 data-en="Sync yesterday">同步昨天</h3><p data-en="Sinks: Google Sheets + Markdown.">Sinks：Google Sheet + Markdown。</p></li>
+    <li class="reveal"><b>④</b><h3 data-en="Commit & log">提交與紀錄</h3><p data-en="Snapshot committed, line added to Notion Sync Log.">快照提交，Notion 同步紀錄追加一行。</p></li>
+  </ol>
+</section>
+
+<section id="tutorial" class="section tut">
+  <h2 class="reveal" data-en="Guided setup">引導教學</h2>
+  <p class="sub reveal" data-en="About 15 minutes, once. Your progress is saved in this browser.">約 15 分鐘，只做一次。進度會存在這個瀏覽器。</p>
+  <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="進度 progress"><i></i><span id="pct">0%</span></div>
+  <div class="tut-body">
+    <ol class="steps" id="steps"></ol>
+    <div class="panel" id="panel" tabindex="-1" aria-live="polite"></div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="swatches" aria-label="品牌色票 brand palette">
+    <span style="--c:#B9DDF1" title="#B9DDF1 淺天空藍"></span><span style="--c:#F4DDE7" title="#F4DDE7 荷花粉"></span><span style="--c:#F8F6EF" title="#F8F6EF 暖紙白"></span><span style="--c:#CDBFE0" title="#CDBFE0 淡紫"></span><span style="--c:#B7C8A8" title="#B7C8A8"></span><span style="--c:#E8E3CC" title="#E8E3CC"></span><span style="--c:#CBBF9E" title="#CBBF9E"></span><span style="--c:#A38E7A" title="#A38E7A"></span>
+  </div>
+  <p><b>晏銘湛箴</b> · <span data-en="Small software, big order.">小軟體，大秩序。</span> · MIT © 2026 YanMing Cao</p>
+  <p><a href="https://github.com/Ya-MiC/ymzz-notion">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-notion/blob/main/docs/architecture.md" data-en="Architecture">架構</a> · <a href="https://github.com/Ya-MiC/ymzz-notion/issues" data-en="Feedback">回饋</a></p>
+</footer>
+<script src="app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+name: ✨ 功能建議 Feature request
+description: 新的 sink、模板欄位或想法 / new sink, template field, idea
+labels: [enhancement]
+body:
+  - type: textarea
+    attributes: { label: 你想解決什麼 Problem }
+    validations: { required: true }
+  - type: textarea
+    attributes: { label: 建議做法 Proposal, description: "若是新同步目的地，請描述 sink 的 enabled/write / for a new sink, describe enabled/write" }

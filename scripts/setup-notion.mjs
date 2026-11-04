@@ -6,6 +6,8 @@ const m = url.replace(/-/g, "").match(/[0-9a-f]{32}/i);
 if (!m) { console.error("用法 usage: NOTION_TOKEN=xxx ./setup.sh <Notion 頁面網址 page URL>"); process.exit(1); }
 const parent = m[0];
 const c = cfg();
+if (process.env.YMZZ_TZ) c.timezone = process.env.YMZZ_TZ;
+if (process.env.YMZZ_REMIND_TIME) c.remind_time = process.env.YMZZ_REMIND_TIME;
 if (c.review_db_id) { console.log("已設定過，略過 / already set up:", c.review_db_id); process.exit(0); }
 await notion.blocks.children.append({ block_id: parent, children: homeGuide() });
 const mk = (title, properties, emoji) => notion.databases.create({ parent: { page_id: parent }, icon: { emoji }, title: [{ text: { content: title } }], properties });

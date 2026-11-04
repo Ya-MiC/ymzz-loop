@@ -1,0 +1,11 @@
+name: 🐛 錯誤回報 Bug report
+description: 某一步沒跑成功 / something didn't work
+labels: [bug]
+body:
+  - type: textarea
+    attributes: { label: 發生了什麼 What happened, description: "請貼 Actions log 連結（先遮蔽任何金鑰）/ link the Actions run (redact secrets)" }
+    validations: { required: true }
+  - type: input
+    attributes: { label: 時區與提醒時間 YMZZ_TZ / YMZZ_REMIND_TIME, placeholder: "Asia/Seoul 07:00" }
+  - type: dropdown
+    attributes: { label: 哪一步 Step, options: ["⓪ gate", "① create today", "② email", "③ sync (sheets/markdown)", "④ commit", "⑤ notion log", "setup.sh"] }

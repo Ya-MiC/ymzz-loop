@@ -1,13 +1,18 @@
 name: daily-review
+# 每小時醒來一次，閘門 <10 秒；只有「本地時間 ≥ 提醒時間 且 今天還沒跑過」才繼續。
+# Wakes hourly; a <10s gate continues only when local time ≥ REMIND_TIME and today hasn't run yet.
+# 時區/時間 time zone & time: repo Settings → Variables → YMZZ_TZ (e.g. Asia/Seoul), YMZZ_REMIND_TIME (e.g. 07:00)
 on:
   schedule:
-    - cron: "0 22 * * *"   # 每天 07:00 首爾時間 (UTC+9) = 22:00 UTC 前一天
+    - cron: "5 * * * *"
   workflow_dispatch:
 permissions:
   contents: write
   actions: write
 concurrency: daily-review
 env:
+  YMZZ_TZ: ${{ vars.YMZZ_TZ }}
+  YMZZ_REMIND_TIME: ${{ vars.YMZZ_REMIND_TIME }}
   NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
   SMTP_HOST: ${{ secrets.SMTP_HOST }}
   SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -20,39 +25,51 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with: { fetch-depth: 1 }
+      - name: ⓪ 閘門 gate (no npm install)
+        id: gate
+        run: node scripts/gate.mjs
       - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm install --no-audit --no-fund
+        if: steps.gate.outputs.go == 'true'
+        with: { node-version: 20, cache: npm, cache-dependency-path: package.json }
+      - if: steps.gate.outputs.go == 'true'
+        run: npm install --no-audit --no-fund
       - name: ① 建今日空白頁 create today's page
+        if: steps.gate.outputs.go == 'true'
         run: npm run create-today
       - name: ② 寄提醒信 email reminder
+        if: steps.gate.outputs.go == 'true'
         run: npm run send-reminder
-      - name: ③ 同步昨日到 Sheet + md / sync yesterday
+      - name: ③ 同步昨日到 sinks / sync yesterday
+        if: steps.gate.outputs.go == 'true'
         run: npm run sync-yesterday
         env:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHEET_ID: ${{ secrets.SHEET_ID }}
-      - name: ④ commit snapshot
+      - name: ④ commit snapshot + dedupe mark
+        if: steps.gate.outputs.go == 'true'
         id: commit
         run: |
-          git config user.name "Tully"; git config user.email "tully@yamic.de5.net"
-          git add notion
-          if ! git diff --cached --quiet; then git commit -m "sync: $(TZ=Asia/Seoul date +%m%d_%H%M)_seoul" && git push; fi
+          node scripts/gate.mjs --mark > /dev/null
+          git config user.name "ymzz-bot"; git config user.email "ymzz-bot@users.noreply.github.com"
+          git add notion .ymzz
+          if ! git diff --cached --quiet; then git commit -m "sync: ${{ steps.gate.outputs.today }}" && git push; fi
           echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
       - name: ⑤ Notion 同步紀錄 sync log
+        if: steps.gate.outputs.go == 'true'
         run: npm run write-log
         env:
           COMMIT_URL: ${{ github.server_url }}/${{ github.repository }}/commit/${{ steps.commit.outputs.sha }}
       - name: keepalive (GitHub 60-day inactivity guard)
-        if: always()
+        if: always() && steps.gate.outputs.go == 'true'
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           gh api -X PUT repos/${{ github.repository }}/actions/workflows/daily-review.yml/enable || true
           last=$(git log -1 --format=%ct); now=$(date +%s)
           if [ $(( (now-last)/86400 )) -ge 45 ]; then
-            git config user.name "Tully"; git config user.email "tully@yamic.de5.net"
-            git commit --allow-empty -m "keepalive $(TZ=Asia/Seoul date +%m%d_%H%M)_seoul" && git push || true
+            git config user.name "ymzz-bot"; git config user.email "ymzz-bot@users.noreply.github.com"
+            git commit --allow-empty -m "keepalive" && git push || true
           fi
       - name: email on failure
         if: failure()
-        run: node -e "require('nodemailer').createTransport({host:process.env.SMTP_HOST||'smtp.gmail.com',port:+(process.env.SMTP_PORT||465),secure:true,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}).sendMail({from:process.env.SMTP_USER,to:process.env.MAIL_TO,subject:'⚠️ 每日復盤失敗 Daily review failed',text:'${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'})"
+        run: npm install --no-audit --no-fund nodemailer >/dev/null 2>&1; node -e "require('nodemailer').createTransport({host:process.env.SMTP_HOST||'smtp.gmail.com',port:+(process.env.SMTP_PORT||465),secure:true,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}).sendMail({from:process.env.SMTP_USER,to:process.env.MAIL_TO,subject:'⚠️ 每日復盤失敗 Daily review failed',text:'${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'})"
