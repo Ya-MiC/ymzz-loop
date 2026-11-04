@@ -1,21 +1,7 @@
 {
-  "_comment": "setup.sh 會自動填 review/holdings 的 id；sources 一行一個 / setup.sh fills the db ids; one line per source",
+  "_comment": "setup.sh 會自動填入 / filled by setup.sh",
+  "parent_page_id": "",
   "review_db_id": "",
   "holdings_db_id": "",
-  "notion_log_page_id": "",
-  "parent_page_id": "",
-  "sources": [
-    {
-      "name": "每日復盤 Daily Review",
-      "type": "database",
-      "id": "$review_db_id",
-      "sheetTab": "每日復盤"
-    },
-    {
-      "name": "持倉 Holdings",
-      "type": "database",
-      "id": "$holdings_db_id",
-      "sheetTab": "持倉"
-    }
-  ]
+  "notion_log_page_id": ""
 }

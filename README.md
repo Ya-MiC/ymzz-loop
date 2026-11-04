@@ -1,55 +1,48 @@
-# ymzz-notion — 每日復盤 + 持倉 Daily Review + Holdings
+# ymzz-notion · 每日復盤 Daily Review
 
-全自動、免費（GitHub Actions），不用 Grok Bot 額度。每天首爾 21:00：
-Fully automatic and free (GitHub Actions), zero Grok Bot quota. Every day at 21:00 Seoul:
-1. 在 Notion「每日復盤」資料庫建今天的**空白**頁（已存在就跳過）/ creates today's **blank** review row in Notion
-2. 寄 email 提醒你寫，附頁面連結 / emails you a reminder with the link
-3. 把「每日復盤」與「持倉」同步到 Google 表格和本倉庫 `notion/` 的 md / syncs both databases to Google Sheets + md in `notion/`
-4. 在 Notion「同步紀錄 Sync Log」**只追加**一筆紀錄 / **appends** one entry to a Notion Sync Log page
+每天 **07:00 首爾時間 (UTC+9)** GitHub Actions 自動：
+1. 在 Notion 建今天的空白復盤頁（含 ①–⑩ 段落）/ creates today's blank review page in Notion
+2. 寄信給你，附今日頁面連結 / emails you the link
+3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）與本倉庫 `notion/YYYY/MMDD_HHMM_seoul.md` / syncs yesterday to Google Sheets and a markdown snapshot
 
-你只在 Notion 填寫。持倉有變就直接改「持倉 Holdings」那一列；模板全是空白欄位，不寫死任何持倉。
-You only edit in Notion. Change a Holdings row whenever positions change; templates are blank, nothing hard-coded.
-欄位在 `scripts/templates.mjs`，想加欄位改那裡。Fields live in `scripts/templates.mjs`.
-（GitHub 排程可能延遲幾分鐘到一小時 / scheduled runs may be delayed by GitHub.）
+不用 Grok / AI 額度，只用 GitHub 免費分鐘（每天約 1–2 分鐘）。600 天免維護：每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
+No AI quota; ~1–2 free GitHub minutes/day. Built to run unattended 600+ days.
 
-## 你要做的事 / Your steps (one time)
-1. **Notion 整合 / integration**：權限只勾「讀取內容 Read content」+「插入內容 Insert content」（不勾 Update）。https://developers.notion.com/docs/create-a-notion-integration
-2. 在 Notion 建一個空白頁（例如「復盤中心」），把它**連接**到這個整合 / create an empty page and connect it to the integration: https://www.notion.com/help/add-and-manage-connections-with-the-api
-3. **一鍵建資料庫 / one command**（電腦需 Node.js 20+ 與 git）：
+## 模板 Template
+- **每日復盤 Daily Review**：日期、評分、心情、精力、Keep 做得好、Problem 問題、Try 教訓、決策、明日三件事、資訊輸入、平台、市場/持倉筆記、深度工作時數、完成
+- **持倉 Holdings**（IBKR 等）：代號、平台、類別、數量、成本價、現價、市值、幣別、佔比、論點、停損/目標、更新日期、備註
+- 方法來源 Frameworks: **KPT** (Keep/Problem/Try, Agile retrospectives) · **曾國藩日課・三省** · **柳比歇爾時間統計法** (Lyubishchev time log) · **交易日誌每日復盤** (Brett Steenbarger, *The Daily Trading Coach*)
+
+## 設定步驟 Setup（一次就好 / once）
+1. **Notion integration**：到 https://www.notion.so/profile/integrations → New integration（Internal）名稱 `ymzz` → 複製 token。打開你要放復盤的 Notion 頁面 → 右上 `⋯` → Connections → 加入 `ymzz`。
+2. **建立資料庫 Create databases**（在電腦上 / on your PC，需 Node.js 20+）：
    ```bash
    git clone https://github.com/Ya-MiC/ymzz-notion && cd ymzz-notion
-   NOTION_TOKEN=你的整合金鑰 ./setup.sh "https://www.notion.so/你的頁面網址"
+   NOTION_TOKEN=你的token ./setup.sh "https://www.notion.so/你的頁面網址"
    git add sync.config.json && git commit -m "setup ids" && git push
    ```
-   會在該頁下建「每日復盤 Daily Review」和「持倉 Holdings」兩個空白資料庫，並把 ID 寫進 `sync.config.json`。
-4. **Google 表格 / Sheet**：建服務帳號＋JSON 金鑰、啟用 Sheets API，把表格「共用」給服務帳號 email（編輯者）。表格 ID ＝網址 `/d/` 與 `/edit` 之間。
-   https://cloud.google.com/iam/docs/service-accounts-create · https://cloud.google.com/iam/docs/keys-create-delete · https://developers.google.com/workspace/sheets/api/quickstart/nodejs
-5. **Email 提醒 / reminder**：Gmail 開兩步驟驗證後建「應用程式密碼」/ create a Gmail app password: https://support.google.com/accounts/answer/185833
-6. **倉庫 Secrets**：https://docs.github.com/en/actions/security-for-github-actions/security-guides/using-secrets-in-github-actions
+   Windows PowerShell：`$env:NOTION_TOKEN="..."; npm install; node scripts/setup-notion.mjs "<頁面網址>"`
+3. **Google service account**：https://console.cloud.google.com → 新專案 → 啟用 Google Sheets API → IAM → Service accounts → 建立 → Keys → Add key → JSON（下載）。建一個 Google Sheet，**共用**給 service account 的 email（編輯者 Editor）。網址 `/d/<SHEET_ID>/edit` 中間那段就是 SHEET_ID。
+4. **Gmail 應用程式密碼 App password**：https://myaccount.google.com/apppasswords（需先開兩步驗證）→ 建立 → 16 位密碼。
+5. **GitHub Secrets**：倉庫 → Settings → Secrets and variables → Actions → New repository secret：
 
-   | Secret | 內容 / Value |
+   | Secret | 內容 |
    |---|---|
-   | `NOTION_TOKEN` | 整合金鑰 / integration secret |
-   | `GOOGLE_SERVICE_ACCOUNT_JSON` | 服務帳號 JSON 全文 / full JSON |
-   | `SHEET_ID` | 表格 ID |
-   | `SMTP_USER` | 寄件 Gmail 地址 / sending Gmail |
-   | `SMTP_PASS` | Gmail 應用程式密碼 / app password |
-   | `MAIL_TO` | 收提醒的信箱 / where reminders go |
-   | `SMTP_HOST`, `SMTP_PORT` | 選填，預設 smtp.gmail.com / 465 (optional) |
+   | `NOTION_TOKEN` | Notion integration token |
+   | `GOOGLE_SERVICE_ACCOUNT_JSON` | 整個 JSON 檔內容 whole JSON |
+   | `SHEET_ID` | Google Sheet ID |
+   | `SMTP_USER` | 你的 Gmail |
+   | `SMTP_PASS` | 16 位應用程式密碼 |
+   | `MAIL_TO` | 收提醒的信箱 |
+   | `SMTP_HOST` / `SMTP_PORT` | 選填，預設 smtp.gmail.com / 465 |
+6. **第一次手動執行 First run**：Actions → daily-review → Run workflow。收到信、Notion 出現今天的頁、Sheet 出現兩個分頁就成功。
 
-7. Actions → **daily-review** → Run workflow 跑第一次。https://docs.github.com/en/actions/managing-workflow-runs-and-deployments/managing-workflow-runs/manually-running-a-workflow
-   第一次會在你的頁面下建「同步紀錄 Sync Log」，記錄裡印出的 ID 可填回 `notion_log_page_id`（不填也會自動找到）。
-
-金鑰只放 GitHub Secrets 和你自己的終端機，不要貼給任何人或 AI。缺 Google 或 SMTP secrets 時該步驟自動跳過。
-Keys only go in GitHub Secrets and your own terminal — never paste them to anyone or any AI. Missing Google/SMTP secrets just skip that step.
-
-## 費用 / Cost
-每次約 1–2 分鐘，每月約 60 分鐘，在私人倉庫免費額度內。≈60 min/month, within private-repo free minutes. https://docs.github.com/en/billing/managing-billing-for-your-products/managing-billing-for-github-actions/about-billing-for-github-actions
-
-## 參考 / Prior art
-每日建頁的做法參考 / daily-page approach similar to [azujuuuuuun/notion-diary-page-creator](https://github.com/azujuuuuuun/notion-diary-page-creator)；它不含持倉、表格、email，所以自建。It lacks holdings, Sheets and email, so this repo is self-built.
-
-## 600 天免維護 / Runs 600+ days unattended
-- 只用 GitHub Actions 免費額度（每天約 1–2 分鐘），不用 Grok 額度。Free GitHub Actions minutes only (~1–2 min/day); no Grok quota.
-- 每次執行都會重新啟用排程，且 45 天無提交自動空提交，避開 GitHub 60 天停用規則。Each run re-enables the schedule and adds an empty commit after 45 quiet days, beating GitHub's 60-day auto-disable.
-- 失敗會寄信給你。You get an email if a run fails.
+## 檔案 Files
+| 路徑 | 用途 |
+|---|---|
+| `.github/workflows/daily-review.yml` | 每日排程 daily schedule |
+| `setup.sh` → `scripts/setup-notion.mjs` | 建首頁說明＋資料庫 |
+| `scripts/schema.mjs` | 欄位與頁面骨架（改模板只改這裡）|
+| `scripts/create-today.mjs` · `send-reminder.mjs` · `sync-yesterday.mjs` · `write-log.mjs` | 每日步驟 |
+| `scripts/seoul-time.mjs` · `notion-client.mjs` | 共用 helpers |
+| `notion/YYYY/MMDD_HHMM_seoul.md` | 每日快照（內含首爾時間 (UTC+9)）|

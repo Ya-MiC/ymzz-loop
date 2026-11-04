@@ -3,11 +3,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "setup": "node scripts/setup.mjs",
-    "daily": "node scripts/daily.mjs",
-    "sync": "node scripts/sync.mjs",
-    "remind": "node scripts/remind.mjs",
-    "log": "node scripts/log.mjs"
+    "setup": "node scripts/setup-notion.mjs",
+    "create-today": "node scripts/create-today.mjs",
+    "send-reminder": "node scripts/send-reminder.mjs",
+    "sync-yesterday": "node scripts/sync-yesterday.mjs",
+    "write-log": "node scripts/write-log.mjs"
   },
   "dependencies": {
     "@notionhq/client": "^2.2.15",
