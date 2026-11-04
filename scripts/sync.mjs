@@ -41,7 +41,7 @@ async function childDbs(pageId) {
     cursor = r.has_more ? r.next_cursor : undefined; } while (cursor);
   return ids;
 }
-const tables = {};
+const tables = {}; const sheetCounts = {};
 for (const s of cfg.sources) {
   const dir = path.join("notion", safe(s.name));
   const dbIds = s.type === "database" ? [s.id] : (await pageToMd(s.id, dir), await childDbs(s.id));
@@ -65,5 +65,8 @@ if (process.env.GOOGLE_SERVICE_ACCOUNT_JSON && process.env.SHEET_ID) {
     await sheets.spreadsheets.values.clear({ spreadsheetId: sid, range: `'${tab}'` });
     await sheets.spreadsheets.values.update({ spreadsheetId: sid, range: `'${tab}'!A1`, valueInputOption: "RAW", requestBody: { values } });
     console.log(`sheet: ${tab} (${values.length - 1} rows)`);
+    sheetCounts[tab] = values.length - 1;
   }
 } else console.log("skip sheet: GOOGLE_SERVICE_ACCOUNT_JSON / SHEET_ID not set");
+
+fs.writeFileSync("/tmp/sync-stats.json", JSON.stringify({ sheetCounts, sheet: !!process.env.SHEET_ID }));
