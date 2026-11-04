@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: { name: github-pages, url: "${{ steps.d.outputs.page_url }}" }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       # Pages 必須先在 Settings → Pages → Source 選「GitHub Actions」；免費方案的私人倉庫不支援 Pages。
       # Pages must be enabled (Settings → Pages → Source: GitHub Actions). Free plans need a PUBLIC repo.
       - uses: actions/configure-pages@v5
