@@ -148,5 +148,11 @@
  "foot.arch": "架构",
  "foot.fb": "回馈",
  "foot.priv": "隐私：没有 Cookie、没有追踪、没有第三方请求。",
- "foot.tm": "ymzz-notion 为独立项目，与 Notion、Google、GitHub、Interactive Brokers 无关联，亦未获其背书。所有商标属其各自所有者。"
+ "foot.tm": "ymzz-notion 为独立项目，与 Notion、Google、GitHub、Interactive Brokers 无关联，亦未获其背书。所有商标属其各自所有者。",
+ "dial.local": "你的当地时间",
+ "dial.next": "距离下次复盘",
+ "dial.at": "提醒时间",
+ "story.k": "每天，自己运行",
+ "bento.h": "它做的一切，一眼看完",
+ "tz.cities": "同一刻，世界各地"
 }

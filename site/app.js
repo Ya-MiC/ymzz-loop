@@ -11,16 +11,57 @@
   const t = k => dict[k] ?? en[k] ?? k;
   const icon = (n, cls = "") => `<svg class="i ${cls}" aria-hidden="true"><use href="icons.svg#i-${n}"/></svg>`;
   const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
-  const pre = s => `<pre dir="ltr"><button class="copy" type="button">${icon("copy")}<span>${t("ui.copy")}</span></button><code>${esc(s)}</code></pre>`;
+  const pre = (s) => `<pre dir="ltr"><button class="copy" type="button">${icon("copy")}<span>${t("ui.copy")}</span></button><code>${esc(s)}</code></pre>`;
   const load = async l => { const r = await fetch(`i18n/${l}.json`); return r.json(); };
 
-  // features / flow / faq built from keys
-  const FEATS = [["notebook", "c1"], ["briefcase", "c2"], ["mail", "c3"], ["table", "c4"], ["world", "c5"], ["puzzle", "c6"]];
+  // story / faq built from keys
   const renderStatic = () => {
-    $("#feats").innerHTML = FEATS.map(([ic, c], i) => `<article class="card ${c} reveal in">${icon(ic)}<h3>${t(`f${i + 1}.t`)}</h3><p class="meta">${t(`f${i + 1}.m`)}</p><p>${t(`f${i + 1}.p`)}</p></article>`).join("");
-    $("#flowList").innerHTML = ["⓪", "①", "②", "③", "④"].map((n, i) => `<li class="reveal in"><span class="n" aria-hidden="true">${n}</span><h3><span class="vh">${i}. </span>${t(`s${i}.t`)}</h3><p>${t(`s${i}.p`)}</p></li>`).join("");
+    $("#flowList").innerHTML = ["⓪", "①", "②", "③", "④"].map((n, i) => `<li data-n="${n}" data-i="${i}"><span class="n" aria-hidden="true">${n}</span><h3><span class="vh">${i}. </span>${t(`s${i}.t`)}</h3><p>${t(`s${i}.p`)}</p></li>`).join("");
     $("#faqList").innerHTML = [1, 2, 3, 4, 5].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
+    observeStory();
   };
+  // sticky story: active step
+  let sio;
+  function observeStory() {
+    sio?.disconnect();
+    sio = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const li = e.target, i = +li.dataset.i;
+      $$("#flowList li").forEach(x => x.classList.toggle("on", x === li)); $("#bigN").textContent = li.dataset.n; $("#sprog").style.inlineSize = ((i + 1) / 5 * 100) + "%"; }), { rootMargin: "-45% 0px -45% 0px" });
+    $$("#flowList li").forEach(li => sio.observe(li));
+    if (reduce) $$("#flowList li").forEach(li => li.classList.add("on"));
+  }
+
+  // live 24h dial (visitor's own zone) — reminder default 07:00 UTC
+  const NS = "http://www.w3.org/2000/svg";
+  function drawDial() {
+    const svg = $("#dialSvg"), now = new Date(), localMin = now.getHours() * 60 + now.getMinutes();
+    const remUTC = 7 * 60, remLocal = ((remUTC - now.getTimezoneOffset()) % 1440 + 1440) % 1440;
+    const ang = m => (m / 1440) * 360 - 90, pt = (a, r) => [Math.cos(a * Math.PI / 180) * r, Math.sin(a * Math.PI / 180) * r];
+    let h = `<defs><linearGradient id="arcg" x1="0" x2="1"><stop offset="0" stop-color="#B9DDF1"/><stop offset=".5" stop-color="#CDBFE0"/><stop offset="1" stop-color="#F4DDE7"/></linearGradient></defs>`;
+    for (let i = 0; i < 96; i++) { const m = i * 15, a = ang(m), hour = i % 4 === 0, [x1, y1] = pt(a, hour ? 70 : 76), [x2, y2] = pt(a, 84); h += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" class="${hour ? "h" : ""}"/>`;
+      if (hour && (i / 4) % 3 === 0) { const [tx, ty] = pt(a, 94); h += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}">${String(i / 4).padStart(2, "0")}</text>`; } }
+    // arc from now to next reminder
+    let span = (remLocal - localMin + 1440) % 1440 || 1440; const a0 = ang(localMin), a1 = ang(localMin + span), [sx, sy] = pt(a0, 58), [ex, ey] = pt(a1, 58);
+    h += `<path class="arc" d="M${sx.toFixed(2)} ${sy.toFixed(2)} A58 58 0 ${span > 720 ? 1 : 0} 1 ${ex.toFixed(2)} ${ey.toFixed(2)}"/>`;
+    const [nx, ny] = pt(a0, 100), [rx, ry] = pt(ang(remLocal), 100), [rt, rty] = pt(ang(remLocal), 106);
+    h += `<line class="now" x1="${(nx*.62).toFixed(2)}" y1="${(ny*.62).toFixed(2)}" x2="${nx.toFixed(2)}" y2="${ny.toFixed(2)}"/><line class="rem" x1="${(rx * .66).toFixed(2)}" y1="${(ry * .66).toFixed(2)}" x2="${rx.toFixed(2)}" y2="${ry.toFixed(2)}"/><text class="rem" x="${rt.toFixed(1)}" y="${rty.toFixed(1)}">●</text>`;
+    svg.innerHTML = h;
+    $("#clock").textContent = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    $("#tzName").textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
+    $("#nextIn").textContent = `${Math.floor(span / 60)}h ${String(span % 60).padStart(2, "0")}m`;
+    // cities tile
+    const zones = [["UTC", "UTC"], ["America/Los_Angeles", "Los Angeles"], ["Asia/Seoul", "Seoul"], [Intl.DateTimeFormat().resolvedOptions().timeZone, "You"]];
+    $("#cities").innerHTML = zones.map(([z, n], i) => `<li class="${i === 3 ? "me" : ""}"><span>${n}</span><b>${new Intl.DateTimeFormat("en-GB", { timeZone: z, hour: "2-digit", minute: "2-digit" }).format(now)}</b></li>`).join("");
+  }
+  drawDial(); setInterval(drawDial, 30000);
+
+  // pointer tilt + glow (fine pointers only)
+  if (!reduce && matchMedia("(pointer:fine)").matches) {
+    $$(".tilt").forEach(el => {
+      el.addEventListener("pointermove", e => { const r = el.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+        el.style.setProperty("--ry", ((x - .5) * 6).toFixed(2) + "deg"); el.style.setProperty("--rx", ((.5 - y) * 6).toFixed(2) + "deg"); el.style.setProperty("--mx", x * 100 + "%"); el.style.setProperty("--my", y * 100 + "%"); });
+      el.addEventListener("pointerleave", () => { el.style.setProperty("--rx", "0deg"); el.style.setProperty("--ry", "0deg"); });
+    });
+  }
 
   const apply = async () => {
     if (!Object.keys(en).length) en = await load("en");
@@ -47,7 +88,7 @@
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add("in"); io.unobserve(e.target);
     $$(".count", e.target).forEach(c => { const to = +c.dataset.to, t0 = performance.now(), dur = reduce ? 0 : 1200; const tick = n => { const p = dur ? Math.min(1, (n - t0) / dur) : 1; c.textContent = Math.round(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
   }), { threshold: .12 });
-  $$(".reveal").forEach((el, i) => { el.style.transitionDelay = `${(i % 4) * 60}ms`; io.observe(el); });
+  $$(".reveal, .tile").forEach((el, i) => { el.style.setProperty("--i", i % 4); io.observe(el); });
 
   // guided setup
   const SECRETS = ["NOTION_TOKEN", "GOOGLE_SERVICE_ACCOUNT_JSON", "SHEET_ID", "SMTP_USER", "SMTP_PASS", "MAIL_TO"];
