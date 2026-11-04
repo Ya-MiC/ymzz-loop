@@ -48,3 +48,8 @@ Keys only go in GitHub Secrets and your own terminal — never paste them to any
 
 ## 參考 / Prior art
 每日建頁的做法參考 / daily-page approach similar to [azujuuuuuun/notion-diary-page-creator](https://github.com/azujuuuuuun/notion-diary-page-creator)；它不含持倉、表格、email，所以自建。It lacks holdings, Sheets and email, so this repo is self-built.
+
+## 600 天免維護 / Runs 600+ days unattended
+- 只用 GitHub Actions 免費額度（每天約 1–2 分鐘），不用 Grok 額度。Free GitHub Actions minutes only (~1–2 min/day); no Grok quota.
+- 每次執行都會重新啟用排程，且 45 天無提交自動空提交，避開 GitHub 60 天停用規則。Each run re-enables the schedule and adds an empty commit after 45 quiet days, beating GitHub's 60-day auto-disable.
+- 失敗會寄信給你。You get an email if a run fails.
