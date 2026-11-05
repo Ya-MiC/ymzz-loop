@@ -34,6 +34,15 @@ CJK / 韓文 / 阿拉伯文回退系統字（若已安裝則優先 Noto）；**�
 
 飛書 / Lark 目的地使用官方 HTTPS Open API（無額外 SDK 依賴）。
 
+
+## 捐款 QR · Donate QR (static asset)
+
+| 資產 | 授權 | 來源 | 商用 |
+|---|---|---|---|
+| `site/donate-usdc-arb.svg` | 產出物隨本專案 MIT 散布；**產生工具** [segno](https://github.com/heuer/segno) 1.6.x 為 **BSD-3-Clause**（僅離線產生靜態 SVG，**未**打包進瀏覽器執行） | https://github.com/heuer/segno · https://pypi.org/project/segno/ | ✅ |
+
+QR 內容為收款地址原文，無外部 API、無錢包連線腳本。
+
 ## 本專案授權 · This project
 
 | | |

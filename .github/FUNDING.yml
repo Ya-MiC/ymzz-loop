@@ -1,0 +1,5 @@
+# GitHub Sponsors button — enable Sponsors on the Ya-MiC account first, then uncomment:
+# github: Ya-MiC
+# Until then, the custom link points at the site's receive-only donate section.
+custom:
+  - "https://ya-mic.github.io/ymzz-loop/#donate"

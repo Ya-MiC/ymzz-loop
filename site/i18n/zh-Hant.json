@@ -201,5 +201,17 @@
  "foot.credits": "致謝",
  "f7.t": "飛書 / Lark",
  "f7.m": "目的地 · 多維表格 · 文件",
- "f7.p": "可選：把昨天同步進你的飛書多維表格（與 Docx）。設定 FEISHU_APP_ID／SECRET 前會自動略過。"
+ "f7.p": "可選：把昨天同步進你的飛書多維表格（與 Docx）。設定 FEISHU_APP_ID／SECRET 前會自動略過。",
+ "nav.donate": "贊助",
+ "donate.k": "贊助",
+ "donate.h": "Donate / 贊助",
+ "donate.p": "ymzz-loop 維持免費、MIT 開源。若對你有幫助，可以隨意打賞——不必註冊帳號。",
+ "donate.warn": "USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.",
+ "donate.qr": "掃描 · Arbitrum One · USDC",
+ "donate.network": "網路 · Arbitrum One",
+ "donate.token": "代幣 · 僅 USDC",
+ "donate.explorer": "在 ArbiScan 查看",
+ "donate.nosign": "僅收款地址。本站絕不會要求連接錢包、簽名或授權。",
+ "donate.copied": "已複製地址。",
+ "donate.copyfail": "無法複製——請手動選取地址。"
 }

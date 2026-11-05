@@ -2,6 +2,12 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.7.1] - 2026-11-05
+### Added
+- Donations: `.github/FUNDING.yml` custom link to site `#donate` (commented `github: Ya-MiC` until the owner enables Sponsors).
+- Site + README **Donate / 贊助** section — receive-only USDC address on Arbitrum One, copy button, static QR (`site/donate-usdc-arb.svg`, generated offline with segno BSD-3-Clause; no wallet connect / sign / approve).
+- Warning copy fixed: "USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds."
+
 ## [1.7.0] - 2026-11-05
 ### Added
 - **Feishu / Lark sink** (`scripts/sinks/feishu.mjs`): optional Bitable upsert for yesterday's review (+ holdings table, optional Docx). Enabled only when `FEISHU_APP_ID` / `FEISHU_APP_SECRET` / `FEISHU_BITABLE_APP_TOKEN` / `FEISHU_BITABLE_TABLE_ID` are set; otherwise skipped. Setup guide `docs/feishu.md`; unit tests `test/feishu.test.mjs`. Workflow passes the new secrets. 600-day lifespan unchanged.

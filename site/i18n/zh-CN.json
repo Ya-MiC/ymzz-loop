@@ -201,5 +201,17 @@
  "foot.credits": "致谢",
  "f7.t": "飞书 / Lark",
  "f7.m": "目的地 · 多维表格 · 文档",
- "f7.p": "可选：把昨天同步进你的飞书多维表格（与 Docx）。设置 FEISHU_APP_ID／SECRET 前会自动跳过。"
+ "f7.p": "可选：把昨天同步进你的飞书多维表格（与 Docx）。设置 FEISHU_APP_ID／SECRET 前会自动跳过。",
+ "nav.donate": "赞助",
+ "donate.k": "赞助",
+ "donate.h": "Donate / 赞助",
+ "donate.p": "ymzz-loop 保持免费、MIT 开源。若对你有帮助，可以随意打赏——不必注册账号。",
+ "donate.warn": "USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.",
+ "donate.qr": "扫描 · Arbitrum One · USDC",
+ "donate.network": "网络 · Arbitrum One",
+ "donate.token": "代币 · 仅 USDC",
+ "donate.explorer": "在 ArbiScan 查看",
+ "donate.nosign": "仅收款地址。本站绝不会要求连接钱包、签名或授权。",
+ "donate.copied": "已复制地址。",
+ "donate.copyfail": "无法复制——请手动选取地址。"
 }

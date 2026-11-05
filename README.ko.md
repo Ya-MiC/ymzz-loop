@@ -63,3 +63,16 @@ GitHub 무료 Actions 시간과 무료 Notion/Google API만 사용합니다. 실
 ## 라이선스
 [MIT](LICENSE) © 2026 YanMing Cao · **晏銘湛箴** — 작은 소프트웨어, 큰 질서.
 ymzz-loop은 독립 프로젝트이며 Notion, Google, GitHub, Interactive Brokers와 제휴하지 않았습니다.
+
+## Donate / 贊助
+
+ymzz-loop는 **무료 MIT**입니다. 팁 환영.
+
+**USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
+
+```
+0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
+```
+
+수신 전용: https://ya-mic.github.io/ymzz-loop/#donate
+

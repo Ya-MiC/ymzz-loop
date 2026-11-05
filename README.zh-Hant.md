@@ -90,6 +90,19 @@ Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds un
 6. **時區與提醒時間 Time zone（選填 optional）**：Settings → Secrets and variables → Actions → **Variables** 分頁 → New repository variable：`YMZZ_TZ`（IANA 名稱，例如 `Asia/Taipei`、`America/New_York`）、`YMZZ_REMIND_TIME`（`HH:MM`，例如 `21:30`）。不設就是 `Etc/UTC` `07:00`。也可直接改 `sync.config.json` 的 `timezone` / `remind_time`。官網的[時區產生器](https://ya-mic.github.io/ymzz-loop/#setup)會幫你算好。
 7. **第一次手動執行 First run**：Actions → daily-review → Run workflow。收到信、Notion 出現今天的頁、Sheet 出現兩個分頁就成功。
 
+
+## Donate / 贊助
+
+ymzz-loop **維持免費、MIT 開源**。若對你有幫助，歡迎打賞。
+
+**USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
+
+```
+0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
+```
+
+僅收款地址（官網不會要求連接錢包）。QR 與複製按鈕：https://ya-mic.github.io/ymzz-loop/#donate · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
+
 ## 擴充 Extend
 新增同步目的地＝新增一個 sink 檔（`scripts/sinks/<name>.mjs`，實作 `{ name, enabled(env), write(ctx) }`）。詳見 [docs/architecture.md](docs/architecture.md)。
 Add a destination by dropping in one sink file — see the architecture doc.

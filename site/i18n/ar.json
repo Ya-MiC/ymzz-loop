@@ -75,5 +75,10 @@
  "ui.cloud": "سحابة",
  "ui.earth": "شاي",
  "stat.days": "يوم حد العمر",
- "foot.credits": "Credits"
+ "foot.credits": "Credits",
+ "nav.donate": "تبرّع",
+ "donate.k": "تبرّع",
+ "donate.h": "Donate / 贊助",
+ "donate.warn": "USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.",
+ "donate.copied": "تم نسخ العنوان."
 }

@@ -508,3 +508,14 @@ h1 .l2{background:linear-gradient(95deg,var(--accent-warm),var(--accent-soft),va
 /* facts must stay readable before/after i18n */
 .fact{min-block-size:5.5rem;background:color-mix(in srgb,#fff 80%,var(--ground));color:var(--ink)}
 [data-theme=dark] .fact{background:#2A241D}
+
+/* v1.7.1 donate — receive-only, no wallet chrome */
+.donate{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:clamp(1.5rem,4vw,4rem);align-items:start}
+.donate .warn{color:var(--ink);background:color-mix(in srgb,var(--accent-soft) 45%,var(--panel));padding:var(--s4);border-radius:var(--Ri);font-weight:500}
+.donate-box{display:grid;grid-template-columns:auto minmax(0,1fr);gap:var(--s5);align-items:center}
+.donate-qr{margin:0;text-align:center}
+.donate-qr img{border-radius:var(--Ri);box-shadow:var(--sh);background:var(--panel);max-inline-size:100%}
+.addrrow{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;margin-block:var(--s3)}
+.addr{font-family:var(--f-code);font-size:var(--t-sm);word-break:break-all;padding:var(--s3) var(--s4);border-radius:.9rem;background:color-mix(in srgb,var(--ink) 5%,var(--panel));box-shadow:inset 0 0 0 1px var(--line);flex:1 1 16rem}
+#donateCopy{flex:none}
+@media (max-width:48rem){.donate,.donate-box{grid-template-columns:1fr}.donate-qr{justify-self:center}}

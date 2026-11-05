@@ -193,6 +193,20 @@
     out();
   }
 
+
+  // donate: copy receive-only address (never wallet connect / sign / approve)
+  const DONATE_ADDR = "0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A";
+  (() => {
+    const btn = $("#donateCopy"), msg = $("#donateMsg"), code = $("#donateAddr");
+    if (!btn || !code) return;
+    if (code.textContent.trim() !== DONATE_ADDR) code.textContent = DONATE_ADDR; // hard guarantee
+    btn.addEventListener("click", async () => {
+      try { await navigator.clipboard?.writeText(DONATE_ADDR); if (msg) { msg.textContent = t("donate.copied"); msg.dataset.ok = "1"; }
+        const span = btn.querySelector("span"); if (span) { span.textContent = t("ui.copied"); setTimeout(() => { span.textContent = t("ui.copy"); }, 1600); }
+      } catch { if (msg) { msg.textContent = t("donate.copyfail"); msg.dataset.ok = "0"; } }
+    });
+  })();
+
   setTheme(store.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
   apply();
 })();

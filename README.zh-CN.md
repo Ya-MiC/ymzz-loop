@@ -112,3 +112,16 @@ Add a destination by dropping in one sink file — see the architecture doc.
 
 ## 授权 License
 [MIT](LICENSE) © 2026 YanMing Cao 曹晏铭 · **晏銘湛箴** — 小软件，大秩序。
+
+## Donate / 赞助
+
+ymzz-loop **保持免费、MIT**。欢迎打赏。
+
+**USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
+
+```
+0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
+```
+
+仅收款：https://ya-mic.github.io/ymzz-loop/#donate
+

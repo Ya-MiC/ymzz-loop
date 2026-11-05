@@ -76,6 +76,19 @@ Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in 
 6. **Time zone (optional)** — Variables tab → `YMZZ_TZ` (IANA name, e.g. `America/Los_Angeles`) and `YMZZ_REMIND_TIME` (`HH:MM`). The website's picker generates both.
 7. **First run** — Actions → daily-review → Run workflow. You should get an email, today's page in Notion, and two tabs in the Sheet.
 
+
+## Donate / 贊助
+
+ymzz-loop stays **free and MIT**. If it helps you, tips are welcome.
+
+**USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
+
+```
+0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
+```
+
+Receive-only address (no wallet connect on the site). QR and copy button: https://ya-mic.github.io/ymzz-loop/#donate · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
+
 ## Extend
 Optional Feishu secrets: `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_BITABLE_APP_TOKEN`, `FEISHU_BITABLE_TABLE_ID` (off when unset). Credits / font licenses: [CREDITS.md](CREDITS.md).
 
