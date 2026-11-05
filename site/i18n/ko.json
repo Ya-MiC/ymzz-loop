@@ -158,7 +158,7 @@
  "mq.label": "하이라이트",
  "mq.1": "월 $0",
  "mq.2": "모든 시간대",
- "mq.3": "Notion · 이메일 · 시트 · Git",
+ "mq.3": "Notion · Email · Sheets · Feishu · Git",
  "mq.4": "최대 600일, 이후 종료",
  "mq.5": "MIT 오픈소스",
  "mq.6": "Notion → Sheets + GitHub, 매일",
@@ -197,5 +197,9 @@
  "stat.days": "일 수명 상한",
  "ui.palette": "팔레트",
  "ui.cloud": "구름",
- "ui.earth": "차"
+ "ui.earth": "차",
+ "foot.credits": "크레딧",
+ "f7.t": "Feishu / Lark",
+ "f7.m": "Sink · Bitable · Docx",
+ "f7.p": "선택: 어제 기록을 Feishu Bitable(및 Docx)로. FEISHU_APP_ID/SECRET 없으면 건너뜀."
 }

@@ -16,7 +16,8 @@
  */
 import markdown from "./markdown.mjs";
 import sheets from "./sheets.mjs";
-export const registry = { markdown, sheets };
+import feishu from "./feishu.mjs";
+export const registry = { markdown, sheets, feishu };
 export async function runSinks(names, ctx) {
   for (const n of names) {
     const s = registry[n];

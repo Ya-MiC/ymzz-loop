@@ -158,7 +158,7 @@
  "mq.label": "亮點",
  "mq.1": "每月 $0",
  "mq.2": "任何時區",
- "mq.3": "Notion · 郵件 · 試算表 · Git",
+ "mq.3": "Notion · 信箱 · Sheets · 飛書 · Git",
  "mq.4": "最多 600 天，到期停止",
  "mq.5": "MIT 開源",
  "mq.6": "Notion → Sheets + GitHub，每天",
@@ -197,5 +197,9 @@
  "stat.days": "天壽命上限",
  "ui.palette": "色系",
  "ui.cloud": "雲箋",
- "ui.earth": "陶土"
+ "ui.earth": "陶土",
+ "foot.credits": "致謝",
+ "f7.t": "飛書 / Lark",
+ "f7.m": "目的地 · 多維表格 · 文件",
+ "f7.p": "可選：把昨天同步進你的飛書多維表格（與 Docx）。設定 FEISHU_APP_ID／SECRET 前會自動略過。"
 }

@@ -4,7 +4,8 @@
   "remind_time": "07:00",
   "sinks": [
     "markdown",
-    "sheets"
+    "sheets",
+    "feishu"
   ],
   "parent_page_id": "",
   "review_db_id": "",

@@ -1,6 +1,8 @@
 # Third-party notices
 
-Checked 2026-11-04.
+Full bilingual credits: **[CREDITS.md](CREDITS.md)** (致謝).
+
+Checked 2026-11-05.
 
 | Name | Version | License (SPDX) | URL | Used in |
 |---|---|---|---|---|
@@ -14,3 +16,5 @@ Checked 2026-11-04.
 | nodemailer | ^6.9 | MIT-0 | https://nodemailer.com | Actions runtime |
 
 The website loads no fonts, scripts or styles from third parties; Latin fonts are self-hosted (≈150 KB total); CJK/Arabic use system fonts (Noto if installed). No React Bits, GSAP or award-site code is included; effects are re-implemented.
+
+| Feishu / Lark Open API | — | proprietary API ToS (no SDK vendored) | https://open.feishu.cn/ | optional sink `scripts/sinks/feishu.mjs` |

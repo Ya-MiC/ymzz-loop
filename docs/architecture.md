@@ -9,6 +9,7 @@
           │ ③ sync-yesterday.mjs: Notion (source) ─► SyncContext ─► sinks[]
           │        sinks: markdown → notion/YYYY/MMDD_HHMM_<tz>.md
           │               sheets   → Google Sheets 「每日復盤」「持倉」
+          │               feishu  → Feishu/Lark Bitable (+ optional Docx)  docs/feishu.md
           │ ④ commit snapshot + .ymzz/last-run (dedupe)
           │ ⑤ write-log.mjs ──► Notion 「同步紀錄 Sync Log」
           └────────────────────────────────────────────────────────┘
@@ -19,6 +20,8 @@
 所有日期、「昨天」、檔名、信件與 Notion 紀錄都用它。檔名 `MMDD_HHMM_<slug>`，slug 取 IANA 名稱最後一段小寫（`America/New_York` → `new_york`），檔內寫完整時區與 UTC 偏移。
 
 ## 閘門與去重 Gate & dedupe (`scripts/gate.mjs`)
+自首次成功起最多 **600** 個日曆天（`.ymzz/started`）；到期停止並停用排程。Lifespan hard-cap: 600 days from first success.
+
 GitHub cron 只支援 UTC，因此每小時喚醒一次。閘門零依賴、只讀 `.ymzz/last-run`：
 - 手動執行 `workflow_dispatch`：一定執行。
 - 排程：本地時間 ≥ `REMIND_TIME` 且今天未執行過 → 執行；否則立即結束。

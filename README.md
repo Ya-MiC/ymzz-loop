@@ -33,7 +33,7 @@ flowchart LR
 At the time you choose (default **07:00 UTC**), GitHub Actions:
 1. creates today's blank review page in Notion (sections ①–⑩);
 2. emails you a link to that page;
-3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」) and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
+3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」), optionally to **Feishu / Lark Bitable** (see [docs/feishu.md](docs/feishu.md)), and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
 
 It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Lifespan: at most 600 calendar days from the first successful run**, then the gate stops and the schedule is disabled (so you can move to a newer release). Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
 
@@ -77,6 +77,8 @@ Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in 
 7. **First run** — Actions → daily-review → Run workflow. You should get an email, today's page in Notion, and two tabs in the Sheet.
 
 ## Extend
+Optional Feishu secrets: `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_BITABLE_APP_TOKEN`, `FEISHU_BITABLE_TABLE_ID` (off when unset). Credits / font licenses: [CREDITS.md](CREDITS.md).
+
 A new destination is one file: `scripts/sinks/<name>.mjs` implementing `{ name, enabled(env), write(ctx) }`. See [docs/architecture.md](docs/architecture.md).
 
 ## Community

@@ -11,7 +11,7 @@
 </p>
 
 <h1 align="center">ymzz-loop · 每日复盘</h1>
-<p align="center"><b>每日复盘，自动循环：在 Notion 写，存到 Google Sheets 与你自己的 GitHub。</b><br>Notion、Google、邮箱只绑定一次。之后每天由你自己 fork 的仓库里的 GitHub Actions 把新的每日复盘模板送进 Notion 并发邮件提醒；下一次运行再把你写好的内容备份到 Google Sheets 与仓库的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>每日复盘，自动循环：在 Notion 写，存到 Google Sheet（可選飛書，見 docs/feishu.md）s 与你自己的 GitHub。</b><br>Notion、Google、邮箱只绑定一次。之后每天由你自己 fork 的仓库里的 GitHub Actions 把新的每日复盘模板送进 Notion 并发邮件提醒；下一次运行再把你写好的内容备份到 Google Sheets 与仓库的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
 
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官网与交互教学 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架构 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 

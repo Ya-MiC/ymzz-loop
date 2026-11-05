@@ -13,7 +13,7 @@
 <h1 align="center">ymzz-loop · 每日復盤</h1>
 <p align="center"><b>每日復盤，自動循環：在 Notion 寫，存到 Google Sheets 與你自己的 GitHub。</b><br>Notion、Google、郵箱只綁定一次。之後每天由你自己 fork 的倉庫裡的 GitHub Actions 把新的每日復盤模板送進 Notion 並寄信提醒；下一次運行再把你寫好的內容備份到 Google Sheets 與倉庫的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
 
-<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官網與互動教學 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官網與互動教學 Website & guided setup</a> · <a href="CREDITS.md">致謝 Credits</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
 ---
 
@@ -37,7 +37,7 @@ flowchart LR
 每天在**你設定的時區與時間**（預設 **07:00 UTC**），GitHub Actions 自動：
 1. 在 Notion 建今天的空白復盤頁（含 ①–⑩ 段落）/ creates today's blank review page in Notion
 2. 寄信給你，附今日頁面連結 / emails you the link
-3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）與本倉庫 `notion/YYYY/MMDD_HHMM_<時區>.md`（例如 `1105_0705_utc.md`，檔內寫明時區）/ syncs yesterday to Google Sheets and a markdown snapshot
+3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）、可選**飛書多維表格**（見 [docs/feishu.md](docs/feishu.md)）與本倉庫 `notion/YYYY/MMDD_HHMM_<時區>.md`（例如 `1105_0705_utc.md`，檔內寫明時區）/ syncs yesterday to Google Sheets and a markdown snapshot
 
 不用 Grok / AI 額度，只用 GitHub 免費分鐘。**壽命上限：自首次成功運行起最多 600 個日曆天**，到期閘門停止並停用排程（方便換上更新版本）。到期前：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
 No AI quota; free GitHub minutes only. Hard-capped at 600 days from first success, then stops.

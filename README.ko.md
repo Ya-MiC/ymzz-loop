@@ -10,7 +10,7 @@
 </p>
 
 <h1 align="center">ymzz-loop</h1>
-<p align="center"><b>매일의 회고를 순환으로: Notion에서 쓰고, Google Sheets와 내 GitHub에 보관.</b><br>Notion, Google, 이메일은 한 번만 연결하세요. 그 뒤로 매일 내 포크에서 실행되는 GitHub Actions가 새 회고 템플릿을 Notion에 넣고 메일로 알려 주며, 다음 실행 때 작성한 내용을 Google Sheets와 저장소의 Markdown으로 백업합니다.<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>매일의 회고를 순환으로: Notion에서 쓰고, Google Sheets(선택: Feishu, docs/feishu.md)와 내 GitHub에 보관.</b><br>Notion, Google, 이메일은 한 번만 연결하세요. 그 뒤로 매일 내 포크에서 실행되는 GitHub Actions가 새 회고 템플릿을 Notion에 넣고 메일로 알려 주며, 다음 실행 때 작성한 내용을 Google Sheets와 저장소의 Markdown으로 백업합니다.<br>$0 · any time zone · no servers · no AI quota</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
 
 

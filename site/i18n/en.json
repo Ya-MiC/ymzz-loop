@@ -158,7 +158,7 @@
  "mq.label": "Highlights",
  "mq.1": "$0 per month",
  "mq.2": "Any time zone",
- "mq.3": "Notion · Email · Sheets · Git",
+ "mq.3": "Notion · Email · Sheets · Feishu · Git",
  "mq.4": "Up to 600 days, then stops",
  "mq.5": "MIT open source",
  "mq.6": "Notion → Sheets + GitHub, daily",
@@ -197,5 +197,9 @@
  "stat.days": "day lifespan",
  "ui.palette": "Palette",
  "ui.cloud": "Cloud",
- "ui.earth": "Tea"
+ "ui.earth": "Tea",
+ "foot.credits": "Credits",
+ "f7.t": "Feishu / Lark",
+ "f7.m": "Sink · Bitable · Docx",
+ "f7.p": "Optional: sync yesterday into your Feishu Bitable (and Docx). Off until you set FEISHU_APP_ID / SECRET."
 }

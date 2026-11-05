@@ -2,6 +2,11 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.7.0] - 2026-11-05
+### Added
+- **Feishu / Lark sink** (`scripts/sinks/feishu.mjs`): optional Bitable upsert for yesterday's review (+ holdings table, optional Docx). Enabled only when `FEISHU_APP_ID` / `FEISHU_APP_SECRET` / `FEISHU_BITABLE_APP_TOKEN` / `FEISHU_BITABLE_TABLE_ID` are set; otherwise skipped. Setup guide `docs/feishu.md`; unit tests `test/feishu.test.mjs`. Workflow passes the new secrets. 600-day lifespan unchanged.
+- **CREDITS.md（致謝）**: full commercial-use audit of Fraunces / Inter / JetBrains Mono (SIL OFL-1.1), Tabler Icons (MIT), runtime deps (MIT / Apache-2.0 / MIT-0); linked from the site footer and `THIRD_PARTY.md`.
+
 ## [1.6.0] - 2026-11-05
 ### Added
 - **Hard 600-day lifespan**: `scripts/gate.mjs` records `.ymzz/started` on first success and stops when calendar day count exceeds 600; workflow disables the schedule and emails once. Override for tests via `YMZZ_MAX_DAYS`.
