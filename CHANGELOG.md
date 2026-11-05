@@ -2,6 +2,15 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.5.0] - 2026-11-05
+### Changed
+- Design system pass: strict fluid type scale (`--t-xs` … `--t-6xl`), Fraunces for display only (≥ `--t-xl`), Inter for all UI/body/labels/numbers, JetBrains Mono only for code; weights limited to 400/500/600; line-height and tracking tokens per script.
+- Real 12-column layout grid (fluid gutters, logical properties) for hero, loop, intro, bento, story, setup, FAQ and sign-up; 8-pt spacing rhythm.
+- Numerals: tabular + lining everywhere; section indices 01–08, loop steps 01–03, setup steps 01–08, story 01–05, template sections 01–10 (replaces circled digits); isolated LTR in all locales.
+- "How the loop works" uses one palette family (sky → lilac) plus neutrals.
+### Docs
+- `docs/signup.md`: bilingual owner guide — separate Notion "Signups" DB, view/export/delete, Cloudflare free tier, zero Grok Bot usage.
+
 ## [1.4.0] - 2026-11-05
 ### Changed
 - **Renamed ymzz-notion → ymzz-loop** (the daily-review loop): repo, site, READMEs, locales, package name, docs, workflow display name. New URLs: https://github.com/Ya-MiC/ymzz-loop · https://ya-mic.github.io/ymzz-loop/ (GitHub redirects the old repo URL). `YMZZ_*` env vars and `.ymzz/` paths are unchanged, so existing forks keep working.

@@ -16,7 +16,7 @@
 
   // story / faq built from keys
   const renderStatic = () => {
-    $("#flowList").innerHTML = ["⓪", "①", "②", "③", "④"].map((n, i) => `<li data-n="${n}" data-i="${i}"><span class="n" aria-hidden="true">${n}</span><h3><span class="vh">${i}. </span>${t(`s${i}.t`)}</h3><p>${t(`s${i}.p`)}</p></li>`).join("");
+    $("#flowList").innerHTML = ["01", "02", "03", "04", "05"].map((n, i) => `<li data-n="${n}" data-i="${i}"><span class="n" aria-hidden="true">${n}</span><h3><span class="vh">${i}. </span>${t(`s${i}.t`)}</h3><p>${t(`s${i}.p`)}</p></li>`).join("");
     $("#faqList").innerHTML = [1, 2, 3, 4, 5].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
     observeStory();
   };
@@ -140,12 +140,12 @@
   const N = 8; const ID = i => "t" + (i + 1);
   let done = new Set(store.get("done", [])), cur = Math.min(store.get("cur", 0), N - 1);
   function renderSteps() {
-    $("#steps").innerHTML = Array.from({ length: N }, (_, i) => `<li class="${done.has(ID(i)) ? "done" : ""}"><button type="button" data-i="${i}" ${i === cur ? 'aria-current="step"' : ""}><span class="dot" aria-hidden="true">${done.has(ID(i)) ? icon("check") : `<bdi>${i + 1}</bdi>`}</span><span>${t(ID(i) + ".t")}${done.has(ID(i)) ? `<span class="vh"> ✓</span>` : ""}</span></button></li>`).join("");
+    $("#steps").innerHTML = Array.from({ length: N }, (_, i) => `<li class="${done.has(ID(i)) ? "done" : ""}"><button type="button" data-i="${i}" ${i === cur ? 'aria-current="step"' : ""}><span class="dot" aria-hidden="true">${done.has(ID(i)) ? icon("check") : `<bdi dir="ltr">${String(i + 1).padStart(2, "0")}</bdi>`}</span><span>${t(ID(i) + ".t")}${done.has(ID(i)) ? `<span class="vh"> ✓</span>` : ""}</span></button></li>`).join("");
     const p = Math.round(done.size / N * 100); $(".progress i").style.inlineSize = p + "%"; $("#pct").textContent = p + "%"; $(".progress").setAttribute("aria-valuenow", p);
   }
   function renderPanel() {
     const id = ID(cur), isDone = done.has(id);
-    $("#panel").innerHTML = `<p class="note">${t("setup.step")} <bdi>${cur + 1} / ${N}</bdi></p><h3>${t(id + ".t")}</h3>${t(id + ".b")}${EXTRA[cur + 1] ? EXTRA[cur + 1]() : ""}
+    $("#panel").innerHTML = `<p class="note">${t("setup.step")} <bdi dir="ltr">${String(cur + 1).padStart(2, "0")} / ${String(N).padStart(2, "0")}</bdi></p><h3>${t(id + ".t")}</h3>${t(id + ".b")}${EXTRA[cur + 1] ? EXTRA[cur + 1]() : ""}
       <p class="trouble">${icon("alert-triangle")}<span><b>${t("setup.trouble")}:</b> ${t(id + ".x")}</span></p>
       <div class="acts"><button type="button" class="mark">${icon("check")}<span>${isDone ? t("setup.undo") : t("setup.done")}</span></button>${cur < N - 1 ? `<button type="button" class="next"><span>${t("setup.next")}</span>${icon("arrow-right", "flip")}</button>` : ""}</div>`;
     if (cur === 6) bindTz();
