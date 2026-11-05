@@ -2,6 +2,16 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.3.0] - 2026-11-05
+### Added
+- Brief, skippable intro preloader (~1.4 s, once per session, off for reduced motion / no-JS; `?nopre` to skip).
+- Grail-style scrolling marquee strip (pauses on hover, reverses in RTL, static for reduced motion).
+- Email + tags sign-up form with consent note; posts to `SIGNUP_ENDPOINT` in `site/config.js`. Optional free backend: `integrations/signup-worker/` (Cloudflare Worker → Notion database), see `docs/signup.md`.
+### Changed
+- Hero: removed the live local-time 24h dial; replaced with a "today's page" date card (weekday, date, week strip) in the visitor's locale.
+- Sheet mockup rows are relative to the visitor's browser date; today's row is highlighted.
+- Motion tokens `cubic-bezier(.2,.7,.2,1)`, 300–900 ms; CSP `connect-src` allows the HTTPS signup endpoint.
+
 ## [1.2.0] - 2026-11-04
 ### Changed
 - Website redesign after a study of quynh.moe and grail-app.com (docs/design-study.md): framed panels, live 24-hour dial hero, floating layered mockups, bento grid with real content (Notion page, email, Sheet, holdings bars, world clocks, code), sticky dark storytelling section, pointer tilt + glow, grain, self-hosted Fraunces / Inter / JetBrains Mono (OFL).

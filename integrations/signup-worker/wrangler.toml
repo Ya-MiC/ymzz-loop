@@ -1,0 +1,11 @@
+name = "ymzz-signup"
+main = "worker.js"
+compatibility_date = "2026-11-01"
+
+[vars]
+# Origins allowed to post (comma-separated). Add your custom domain later.
+ALLOWED_ORIGIN = "https://ya-mic.github.io"
+
+# Secrets — set with `wrangler secret put`, never here:
+#   NOTION_TOKEN      Notion internal integration token
+#   NOTION_SIGNUP_DB  ID of the "Signups" database

@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'none'">
 <title>ymzz-notion — Your daily review, already waiting</title>
 <meta name="description" content="Free, open-source automation: every morning GitHub Actions creates your Notion daily review, emails you the link, and syncs yesterday to Google Sheets and Git.">
 <meta property="og:title" content="ymzz-notion — Your daily review, already waiting">
@@ -17,13 +17,14 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ymzz-notion","applicationCategory":"ProductivityApplication","operatingSystem":"GitHub Actions","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"YanMing Cao"}}</script>
 </head>
 <body>
+<div class="pre" id="pre" aria-hidden="true"><div class="pre-in"><p class="pre-word">ymzz<b>·</b>notion</p><p class="pre-n mono"><bdi dir="ltr" id="preN">00</bdi></p><span class="pre-bar"><i></i></span><p class="pre-t mono">小軟體，大秩序</p></div></div>
 <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <div class="grain" aria-hidden="true"></div>
 
 <header class="nav">
   <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>notion</span></a>
   <nav class="links" aria-label="Main">
-    <a href="#intro" data-i18n="nav.intro">Intro</a><a href="#features" data-i18n="nav.features">Features</a><a href="#flow" data-i18n="nav.flow">How it works</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a>
+    <a href="#intro" data-i18n="nav.intro">Intro</a><a href="#features" data-i18n="nav.features">Features</a><a href="#flow" data-i18n="nav.flow">How it works</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a>
   </nav>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
@@ -33,12 +34,21 @@
 </header>
 
 <main id="main">
-<!-- HERO: dial panel + headline panel -->
+<!-- HERO: today-page panel + headline panel -->
 <section class="hero" id="top">
-  <div class="panel dialp reveal">
-    <p class="mono" data-i18n="dial.local">Your local time</p>
-    <div class="dial" id="dial" aria-hidden="true"><svg viewBox="-110 -110 220 220" id="dialSvg"></svg><div class="dial-c"><bdi class="clock" id="clock">07:00</bdi><span class="mono tzname" id="tzName">UTC</span></div></div>
-    <dl class="dialfoot"><div><dt class="mono" data-i18n="dial.next">Next review in</dt><dd><bdi id="nextIn">—</bdi></dd></div><div><dt class="mono" data-i18n="dial.at">Reminder</dt><dd><bdi>07:00 UTC</bdi></dd></div></dl>
+  <div class="panel dayp reveal">
+    <p class="mono" data-i18n="day.k">Today's page</p>
+    <div class="daycard" aria-hidden="true">
+      <p class="dwk" id="dWk"></p>
+      <p class="dnum"><bdi dir="ltr" id="dNum"></bdi></p>
+      <p class="dmo" id="dMo"></p>
+      <ol class="week" id="week" dir="ltr"></ol>
+    </div>
+    <ul class="prompts">
+      <li><span class="pn" aria-hidden="true">①</span><span data-i18n="mock.keep"></span></li>
+      <li><span class="pn" aria-hidden="true">②</span><span data-i18n="day.p2">What did I learn?</span></li>
+      <li><span class="pn" aria-hidden="true">⑨</span><span data-i18n="mock.top3"></span></li>
+    </ul>
   </div>
   <div class="panel headp">
     <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
@@ -60,6 +70,11 @@
       <li><b><bdi dir="ltr"><span class="count" data-to="4">0</span></bdi></b><span data-i18n="stat.dest">destinations</span></li>
     </ul>
   </div>
+</section>
+
+<!-- MARQUEE -->
+<section class="marquee" aria-label="Highlights" data-i18n-aria="mq.label">
+  <div class="mq-track"><ul class="mq-list" id="mq"></ul></div>
 </section>
 
 <!-- INTRO -->
@@ -105,7 +120,7 @@
     </article>
     <article class="tile t-sheet sage tilt reveal">
       <header><p class="mono" data-i18n="f4.m"></p><h3 data-i18n="f4.t"></h3></header>
-      <div class="paper sheet"><table><thead><tr><th>Date</th><th>Score</th><th>Mood</th><th>Deep work</th></tr></thead><tbody dir="ltr"><tr><td>11-01</td><td>7</td><td>ok</td><td>3.5</td></tr><tr><td>11-02</td><td>6</td><td>tired</td><td>2</td></tr><tr class="new"><td class="yday"></td><td>8</td><td>calm</td><td>4</td></tr></tbody></table></div>
+      <div class="paper sheet"><table><thead><tr><th>Date</th><th>Score</th><th>Mood</th><th>Deep work</th></tr></thead><tbody dir="ltr" id="sheetRows"><tr><td><bdi class="rd" data-off="-3"></bdi></td><td>7</td><td>ok</td><td>3.5</td></tr><tr><td><bdi class="rd" data-off="-2"></bdi></td><td>6</td><td>tired</td><td>2</td></tr><tr><td><bdi class="rd" data-off="-1"></bdi></td><td>7</td><td>ok</td><td>3</td></tr><tr class="new" aria-current="date"><td><bdi class="rd" data-off="0"></bdi></td><td>8</td><td>calm</td><td>4</td></tr></tbody></table></div>
     </article>
     <article class="tile t-hold cream tilt reveal">
       <header><p class="mono" data-i18n="f2.m"></p><h3 data-i18n="f2.t"></h3></header>
@@ -166,6 +181,26 @@
   <div class="panel oss"><div class="glow g3" aria-hidden="true"></div><p class="mono">MIT</p><h2 class="reveal" data-i18n="oss.h"></h2><p class="reveal" data-i18n="oss.p"></p>
     <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-notion" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="ui.star">Star on GitHub</span></a></div>
 </section>
+<!-- SIGNUP -->
+<section id="join" class="sec">
+  <div class="panel join">
+    <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
+    <div class="prose"><p class="mono reveal">07 — <span data-i18n="join.k">Stay in the loop</span></p>
+      <h2 class="reveal" data-i18n="join.h">Get the next release in your inbox.</h2>
+      <p class="reveal" data-i18n="join.p"></p></div>
+    <form id="signup" class="signup reveal" novalidate>
+      <label class="fld"><span data-i18n="join.email">Email</span><input id="suEmail" type="email" name="email" autocomplete="email" inputmode="email" dir="ltr" required maxlength="254" placeholder="you@example.com"></label>
+      <fieldset class="tags"><legend data-i18n="join.tags">What describes you? (pick any)</legend>
+        <div class="tagrow" id="tagRow"></div>
+        <label class="fld"><span data-i18n="join.custom">Your own tag (optional)</span><input id="suCustom" type="text" maxlength="32" autocomplete="off"></label>
+      </fieldset>
+      <label class="consent"><input id="suOk" type="checkbox" required><span data-i18n="join.consent"></span></label>
+      <input type="text" name="website" id="suHp" class="vh" tabindex="-1" autocomplete="off" aria-hidden="true">
+      <button class="btn primary" type="submit"><span data-i18n="join.btn">Subscribe</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></button>
+      <p class="sumsg" id="suMsg" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
 </main>
 
 <footer class="foot">
@@ -173,11 +208,12 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.3.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="mono"><a href="https://github.com/Ya-MiC/ymzz-notion" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-notion/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-notion/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
 </footer>
+<script src="config.js"></script>
 <script src="app.js" defer></script>
 </body>
 </html>
