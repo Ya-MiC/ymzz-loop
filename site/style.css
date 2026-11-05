@@ -2206,3 +2206,36 @@ button.mark{
 @media (prefers-reduced-motion:reduce){
   .daycard{animation:none!important}
 }
+
+/* v1.14.1 · calm urgency — copy only, no redesign */
+.urgency{
+  margin:0 0 var(--s3);
+  max-inline-size:48ch;
+  font-size:var(--t-sm);
+  line-height:1.65;
+  color:var(--ink-2);
+  border-inline-start:2px solid color-mix(in srgb,var(--accent-warm, #CDBFE0) 55%,transparent);
+  padding-inline-start:var(--s3);
+}
+:lang(zh-Hant) .urgency,:lang(zh-CN) .urgency,:lang(ko) .urgency{line-height:1.75}
+.dayp-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--s3);
+  flex-wrap:wrap;
+}
+.chip-mock{
+  display:inline-flex;
+  align-items:baseline;
+  gap:.35rem;
+  margin:0;
+  padding:.35rem .65rem;
+  border-radius:99rem;
+  font:500 var(--t-xs)/1.4 var(--f-body);
+  color:var(--ink-2);
+  background:color-mix(in srgb,var(--panel) 70%,transparent);
+  box-shadow:inset 0 0 0 1px var(--line);
+}
+.chip-mock .mock-n{font-variant-numeric:tabular-nums;color:var(--ink)}
+.chip-mock .mock-note{color:var(--ink-3);font-size:.9em;margin-inline-start:.25rem}

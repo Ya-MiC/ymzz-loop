@@ -195,7 +195,7 @@
   "ui.menu": "메뉴",
   "ui.close": "닫기",
   "ui.readbar": "읽기 진행률",
-  "hero.pillars": "매일 명료 · 의지 없이 연속 · 데이터는 세 곳 · $0 셀프호스트",
+  "hero.pillars": "오늘 시작 · 돌아오지 않는 날들 · 데이터는 세 곳 · $0 셀프호스트",
   "fold.more": "펼치기",
   "fold.less": "접기",
   "diff.k": "오픈소스 우위",
@@ -204,7 +204,7 @@
   "diff.b1": "배포당 600일 챕터, 끝에 요약 — 일시정지 후 다음 장",
   "diff.b2": "기본 멀티엔드: Notion + Sheets + 내 GitHub Markdown (+ Feishu)",
   "diff.b3": "내 Fork·무료 Actions — SaaS 임대료·AI 쿼터 없음",
-  "hero.promise": "한 가지 약속: 오늘의 빈 회고 페이지가 이미 준비되어 있고, 어제도 이미 백업되어 있습니다.",
+  "hero.promise": "회고하지 않은 하루는 돌아오지 않습니다. 오늘 시작하세요.",
   "intro.clarity.h": "매일 명료하게",
   "intro.clarity.p": "메일함 링크를 여세요. 점수, 기분, 유지/문제/시도, 내일 세 가지. 정직한 10분이면 하루의 윤곽이 잡힙니다.",
   "intro.streak.h": "의지 없이 이어가기",
@@ -253,5 +253,9 @@
   "vs.mit.us": "MIT code; every forker is a product user",
   "vs.mit.day": "Closed-source app",
   "vs.mit.glue": "Proprietary glue on a SaaS plan",
-  "vs.mit.diy": "Free app, not an MIT automation product"
+  "vs.mit.diy": "Free app, not an MIT automation product",
+  "hero.urgency": "600→0은 위협이 아니라 이 챕터의 부드러운 시계입니다. 오늘이 흐려지기 전에 기록하세요.",
+  "day.left": "이번 장 남은",
+  "day.unit": "일",
+  "day.mock": "예시"
 }

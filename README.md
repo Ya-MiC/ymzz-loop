@@ -1,20 +1,19 @@
-<p align="center"><img src="assets/banner.svg" alt="ymzz-loop · Daily Review Loop" width="100%"></p>
+<p align="center"><img src="site/og.png" alt="ymzz-loop — a day you never review is a day you don’t get back" width="100%"></p>
 
 <p align="center"><b>English</b> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko.md">한국어</a></p>
+
+# ymzz-loop
+**A day you never review is a day you don’t get back. Start today.**  
+One deploy = one **600-day chapter** of daily review, counting **600→0** — a gentle clock, then a **600-day summary** and the loop pauses.  
+GitHub Actions in **your** fork opens today’s blank page in Notion, emails the link, and **auto-ingests yesterday** into Google Sheets + your GitHub Markdown (optional Feishu).  
+**$0 · MIT · multi-end · no AI quota · any time zone** — Notion write → Sheets + Git (+ Feishu).  
+**[Open the site & 15-min setup →](https://ya-mic.github.io/ymzz-loop/)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
 
 <p align="center">
 <a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
 <img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
-<img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
 </p>
-
-<h1 align="center">ymzz-loop</h1>
-<p align="center"><b>A multi-end data sync product for daily review (每日復盤).</b><br>
-As a product user you fork the template, bind Notion / Google / email once, and GitHub Actions — running in <em>your</em> fork — drops today's blank review into Notion, emails you the link, then <b>auto-ingests yesterday</b> into Google Sheets + Markdown (optional Feishu).<br>
-<strong>One deploy = a 600-day chapter</strong> (countdown 600→0), then a <strong>600-day summary</strong> and the daily loop pauses — redeploy for the next chapter.<br>
-$0 · any time zone · no servers · no AI quota · MIT</p>
-<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">Website & guided setup</a> · <a href="docs/architecture.md">Architecture</a> · <a href="CHANGELOG.md">Changelog</a></p>
 
 
 ## How the loop works

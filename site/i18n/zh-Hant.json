@@ -195,7 +195,7 @@
   "ui.menu": "選單",
   "ui.close": "關閉",
   "ui.readbar": "閱讀進度",
-  "hero.pillars": "每天看清 · 不靠意志連續 · 資料住三個家 · $0 自託管",
+  "hero.pillars": "從今天開始 · 拿不回來的日子 · 資料住三個家 · $0 自託管",
   "fold.more": "展開",
   "fold.less": "收合",
   "diff.k": "開源優勢",
@@ -204,7 +204,7 @@
   "diff.b1": "一次部署＝600 天篇章，結束時總結；暫停後可部署開啟下一章",
   "diff.b2": "預設多端：Notion + Sheets + 自有 GitHub Markdown（+ 飛書）",
   "diff.b3": "跑在你自己的 Fork、免費 Actions——無 SaaS 租金、無 AI 配額",
-  "hero.promise": "一個承諾：今天的空白復盤頁已經就位，昨天也已經備份完成。",
+  "hero.promise": "沒有復盤的一天，是拿不回來的一天。從今天開始。",
   "intro.clarity.h": "每天看清",
   "intro.clarity.p": "打開信箱裡的連結：評分、心情、保持／問題／嘗試、明日三件事。誠實十分鐘，這一天就有了形狀。",
   "intro.streak.h": "不靠意志連續",
@@ -253,5 +253,9 @@
   "vs.mit.us": "MIT 程式碼；每位 Fork 者都是產品使用者",
   "vs.mit.day": "閉源 App",
   "vs.mit.glue": "SaaS 方案上的專有膠水",
-  "vs.mit.diy": "免費 App，不是 MIT 自動化產品"
+  "vs.mit.diy": "免費 App，不是 MIT 自動化產品",
+  "hero.urgency": "600→0 不是威脅，是這一章的溫柔時鐘。趁今天還沒糊成一片，把它寫下來。",
+  "day.left": "本章還剩",
+  "day.unit": "天",
+  "day.mock": "示意"
 }

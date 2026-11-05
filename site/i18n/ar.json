@@ -82,7 +82,7 @@
   "ui.menu": "القائمة",
   "ui.close": "إغلاق",
   "ui.readbar": "تقدم القراءة",
-  "hero.pillars": "Clarity daily · Streak without willpower · Your data in 3 homes · $0 self-host",
+  "hero.pillars": "Start today · Days you don’t get back · Your data in 3 homes · $0 self-host",
   "intro.p2": "At your chosen time it creates today's blank review in Notion, emails you the link, and auto-backs up yesterday into Google Sheets, Markdown in your fork, and optionally Feishu / Lark.",
   "intro.who.p": "Anyone who wants a daily-review habit with multi-end backups — students, traders, builders. You are the product user; every setup step below is for you after you fork.",
   "intro.own.p": "Your fork, your Notion, your Sheet, your Markdown. No shared SaaS database. When remaining days hit 0, this chapter closes with a summary and the daily schedule pauses — redeploy for a new chapter.",
@@ -100,7 +100,7 @@
   "intro.who.h": "Who it's for",
   "intro.own.h": "Where your data lives",
   "intro.cost.h": "What it costs",
-  "hero.promise": "One promise: a blank review page is already waiting, and yesterday is already backed up.",
+  "hero.promise": "A day you never review is a day you don’t get back. Start today.",
   "intro.clarity.h": "Clarity, daily",
   "intro.clarity.p": "Open the link in your inbox. Score, mood, keep / problem / try, tomorrow’s three things — ten honest minutes and the day has a shape.",
   "intro.streak.h": "Streak without willpower",
@@ -149,5 +149,9 @@
   "vs.mit.us": "MIT code; every forker is a product user",
   "vs.mit.day": "Closed-source app",
   "vs.mit.glue": "Proprietary glue on a SaaS plan",
-  "vs.mit.diy": "Free app, not an MIT automation product"
+  "vs.mit.diy": "Free app, not an MIT automation product",
+  "hero.urgency": "600→0 is not a threat — it is the gentle clock on this chapter. Write the day before it becomes a blur.",
+  "day.left": "Left in chapter",
+  "day.unit": "days",
+  "day.mock": "mock"
 }

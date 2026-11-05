@@ -195,7 +195,7 @@
   "ui.menu": "Menu",
   "ui.close": "Close",
   "ui.readbar": "Reading progress",
-  "hero.pillars": "Clarity daily · Streak without willpower · Your data in 3 homes · $0 self-host",
+  "hero.pillars": "Start today · Days you don’t get back · Your data in 3 homes · $0 self-host",
   "fold.more": "Expand",
   "fold.less": "Collapse",
   "diff.k": "Open-source edge",
@@ -204,7 +204,7 @@
   "diff.b1": "Each deploy is a 600-day chapter ending in a summary — then pause; redeploy for the next chapter",
   "diff.b2": "Multi-end by default: Notion + Sheets + own GitHub Markdown (+ Feishu)",
   "diff.b3": "Runs in your fork on free Actions — no SaaS rent, no AI quota",
-  "hero.promise": "One promise: a blank review page is already waiting, and yesterday is already backed up.",
+  "hero.promise": "A day you never review is a day you don’t get back. Start today.",
   "intro.clarity.h": "Clarity, daily",
   "intro.clarity.p": "Open the link in your inbox. Score, mood, keep / problem / try, tomorrow’s three things — ten honest minutes and the day has a shape.",
   "intro.streak.h": "Streak without willpower",
@@ -253,5 +253,9 @@
   "vs.mit.us": "MIT code; every forker is a product user",
   "vs.mit.day": "Closed-source app",
   "vs.mit.glue": "Proprietary glue on a SaaS plan",
-  "vs.mit.diy": "Free app, not an MIT automation product"
+  "vs.mit.diy": "Free app, not an MIT automation product",
+  "hero.urgency": "600→0 is not a threat — it is the gentle clock on this chapter. Write the day before it becomes a blur.",
+  "day.left": "Left in chapter",
+  "day.unit": "days",
+  "day.mock": "mock"
 }

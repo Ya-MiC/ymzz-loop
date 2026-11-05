@@ -1,0 +1,30 @@
+# GitHub → Settings → Description (paste ONE line, ~78 chars)
+Daily review loop · Notion→Sheets+Git · 600→0 chapter → summary · $0 MIT
+
+# Alternative 繁中 (~ shorter)
+每日復盤自動迴圈：Notion→Sheets+Git，600→0 篇章總結，$0 MIT
+
+# Topics (Settings → Topics; 20 max)
+notion
+daily-review
+github-actions
+google-sheets
+feishu
+self-hosted
+obsidian-alternative
+productivity
+journaling
+markdown
+template
+mit
+zero-cost
+notion-api
+github-pages
+habit-tracker
+daily-journal
+automation
+lark
+review
+
+# Social preview
+Upload site/og.png (1200×630) as repository social preview image.

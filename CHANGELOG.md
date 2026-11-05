@@ -9,6 +9,12 @@
 
 
 
+## [1.14.1] — 2026-11-05
+
+### Changed
+- **Calm urgency copy:** hero + benefits — a day you never review is a day you don’t get back; 600→0 is the chapter’s gentle clock. Static mock「本章還剩 599」chip (clearly labelled 示意 / mock, not a live user counter).
+- README top rewritten as Trending hook. Added `.github/description-ready.txt`, `LAUNCH.md` (owner-only steps; no agent posting), social `site/og.png` (1200×630) wired to `og:image`.
+
 ## [1.14.0] — 2026-11-05
 
 ### Changed

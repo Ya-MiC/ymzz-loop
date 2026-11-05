@@ -8,7 +8,10 @@
 <title>ymzz-loop — Your daily review, on a loop</title>
 <meta name="description" content="Blank review already waiting. Yesterday already backed up. Notion write → Sheets + your GitHub. $0 self-host, MIT, 600-day chapter → summary.">
 <meta property="og:title" content="ymzz-loop — Your daily review, on a loop">
-<meta property="og:image" content="og.svg">
+<meta property="og:image" content="https://ya-mic.github.io/ymzz-loop/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#F8F6EF">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
@@ -45,6 +48,7 @@
     <p class="label eyebrow reveal" data-i18n="hero.eyebrow">Open source · by 晏銘湛箴</p>
     <h1><span class="l1" data-i18n="hero.h1a">Your daily review,</span> <span class="l2" data-i18n="hero.h1b">already waiting.</span></h1>
     <p class="promise reveal" data-i18n="hero.promise"></p>
+    <p class="urgency reveal" data-i18n="hero.urgency"></p>
     <p class="lede reveal" data-i18n="hero.identity"></p>
     <p class="pillars label reveal" data-i18n="hero.pillars"></p>
     <div class="cta reveal">
@@ -58,7 +62,7 @@
     </ul>
   </div>
   <div class="panel dayp reveal">
-    <p class="label" data-i18n="day.k">Today's page</p>
+    <div class="dayp-top"><p class="label" data-i18n="day.k">Today's page</p><p class="chip-mock" title="Static illustration — not a live counter"><span data-i18n="day.left">本章還剩</span> <bdi dir="ltr" class="mock-n">599</bdi> <span data-i18n="day.unit">天</span><span class="mock-note" data-i18n="day.mock">示意</span></p></div>
     <div class="daycard" aria-hidden="true">
       <p class="dwk" id="dWk"></p>
       <p class="dnum"><bdi dir="ltr" id="dNum"></bdi></p>
@@ -358,7 +362,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.14.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.14.1 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
