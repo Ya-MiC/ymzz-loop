@@ -68,3 +68,20 @@ No React Bits / GSAP / award-site source is vendored.
 - [`docs/feishu.md`](docs/feishu.md) — 飛書 sink 設定  
 
 核對日期 Checked: 2026-11-05 (Asia/Seoul).
+
+
+---
+
+## 網站動效 / 版型參考 · Site motion & layout references (v1.14)
+
+本版（v1.14.0）學習公開網站的**設計模式**，未引入其程式碼或框架；本站仍為 vanilla HTML/CSS/JS，無建置步驟，適合 GitHub Pages。
+
+| 參考 | 學到什麼 | 授權備註 |
+|---|---|---|
+| [Linear](https://linear.app/) | Hero 內放產品 mock、Fig. 編號、先承諾再展示產品 | 僅觀察公開頁面；未複製原始碼 |
+| [Raycast](https://www.raycast.com/) | 一句承諾 + 密集證據，而非功能長清單 | 同上 |
+| [Cal.com](https://cal.com/) | 開源／自託管的清楚敘事 | 同上 |
+| [Grail](https://grail-app.com/) / [Awwwards SOTD](https://www.awwwards.com/sites/grail) | 柔和上浮 reveal、單軸章節節奏 | 同上 |
+| MDN `IntersectionObserver` 模式 | 進場 class 切換；本站既有 `app.js` 已採此標準 API | Web 標準，無額外授權 |
+
+既有 `IntersectionObserver` reveal、`<details>` FAQ、CSS motion tokens 均沿用 Web 標準，不新增第三方 JS 依賴。

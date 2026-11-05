@@ -9,6 +9,14 @@
 
 
 
+## [1.14.0] — 2026-11-05
+
+### Changed
+- **Site as product, not brochure:** hero keeps today-page mock + one clear promise (blank review already waiting; yesterday already backed up). Benefits are outcomes — clarity daily, streak without willpower, data in 3 homes, $0 self-host.
+- **Open-source superiority table:** honest rows vs Day One / Notion+Zapier / Obsidian DIY — cost, ownership, multi-end default, auto previous-day ingest, 600-day chapter → summary, no AI quota, MIT fork-and-own. No invented benchmarks.
+- Cut duplicate Intro / Before-After / three-bullet Differentiation list in favour of Benefits + comparison table. Setup / FAQ / OSS / Join / Donate kept.
+- Calm section rhythm; focus-visible; reduced-motion; CJK table line-height. Brand, four palettes, fonts, 600→0 summary, donate USDC Arbitrum One, Feishu optional, zh-CN A-share egg, no IBKR, no sticky How-it-works all unchanged.
+
 ## [1.13.1] — 2026-11-05
 
 ### Fixed

@@ -1,6 +1,10 @@
 # ymzz-loop · 作品／產品簡介 Product brief
 
-> For the Google Doc the parent will author. Updated 2026-11-05 for **600-day chapter → summary** framing.
+> For the Google Doc the parent will author. Updated 2026-11-05 · **v1.14.0** site pass.
+
+## 品牌（不變）
+
+晏銘湛箴 · 小軟體，大秩序 · ymzz-loop · MIT code，品牌不在授權內。四色系 雲箋／陶土／暮靄／暮林 不混搭；Inter UI + Fraunces display + JetBrains Mono code + tabular nums 鎖定。
 
 ## 一句話 / One-liner
 
@@ -8,23 +12,33 @@
 
 **EN:** One deploy = one **600-day chapter** of daily review; countdown **600→0**, then a **600-day summary** and the daily loop pauses; Notion to write, Sheets + your GitHub (+ optional Feishu) auto-ingest yesterday.
 
-## 五點產品事實
+## Hero 承諾（above fold）
 
-1. **Multi-end data sync** for **daily review（每日復盤）**.
-2. **Auto previous-day ingest** every successful run.
-3. **One deploy = one 600-day chapter**: first success → 600 remaining → decrement daily → at 0 the daily loop **pauses** so you can close with a **600-day summary**.
-4. **Redeploy / newer version** = next chapter; archives stay yours.
-5. **Every forker is a product user.**
+**EN:** A blank review page is already waiting, and yesterday is already backed up.  
+**繁中：** 今天的空白復盤頁已經就位，昨天也已經備份完成。
 
-## 開發者介紹要點
+## 五點好處文案 / Benefits copy
 
-- 晏銘湛箴 / YanMing Cao · MIT code; brand out of license.
-- Free GitHub Actions in the user’s fork · $0 · any TZ · no servers · no AI quota.
-- Site https://ya-mic.github.io/ymzz-loop/ · https://github.com/Ya-MiC/ymzz-loop
-- Fonts locked; four palettes; Differentiation section on site (v1.13+).
-- Layout: Grail-inspired one-axis cadence — fewer competing cards, tighter vertical rhythm (v1.13).
-- Competitors notes: `docs/competitors.md` · `/workspace/site-research/competitors.md`
+1. **Clarity, daily / 每天看清** — 打開信箱連結，誠實十分鐘，這一天就有了形狀。
+2. **Streak without willpower / 不靠意志連續** — 頁面在動力之前送到；習慣靠排程，不靠熱情。
+3. **Your data in 3 homes / 資料住三個家** — Notion 書寫，Sheets 畫圖，Fork 內 Markdown 長存；昨日自動攝取。
+4. **$0 self-host / $0 自託管** — 免費 Actions 跑在自己帳號；無 SaaS 租金、無 AI 配額。
+5. **600-day chapter → summary / 600 天篇章 → 總結** — 不是無限訂閱日記，也不是湮滅敘事。
 
-## Site pillars line (EN)
+## 開源優勢對照（摘要）
 
-`Multi-end sync · Daily review · Auto previous-day ingest · 600-day chapter → summary`
+| 比較 | ymzz-loop 贏在哪 |
+|---|---|
+| Cost | $0 self-host；Day One 完整同步／AI 走付費；Zapier 按任務計費 |
+| Ownership | 你的 Fork，可讀可改可永續；不是 vendor 帳號裡的 Zap |
+| Multi-end 預設 | Notion→Sheets+Git(+Feishu) 開箱即用；Obsidian DIY 從不 turnkey |
+| 自動昨日 | 每次成功執行就攝取；不是手動匯出或另建付費 Zap |
+| 篇章紀律 | 600 天 → 總結；其他沒有這個產品概念 |
+| AI | 迴圈不用 AI，沒有配額可鎖 |
+| 授權 | MIT code；每位 Fork 者都是產品使用者 |
+
+不宣稱虛構跑分。對照為公開文件定性整理（2026-11）。
+
+## 網址
+
+Site https://ya-mic.github.io/ymzz-loop/ · Repo https://github.com/Ya-MiC/ymzz-loop

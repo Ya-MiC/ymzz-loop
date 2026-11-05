@@ -1882,3 +1882,327 @@ html .donate-qr figcaption{
   padding-block:0.15rem;
   line-height:1.7!important;
 }
+
+/* ===== v1.14.0 · product-as-hero · outcome benefits · honest OSS table =====
+   Learned from: Linear (product mock in hero, Fig numbering),
+   Raycast (one promise then dense proof), Cal.com (open-source clarity),
+   Grail (soft rise + one-axis cadence). Reused pattern, not framework code. */
+
+:root{
+  --frame:clamp(.75rem,1.8vw,1.5rem);
+  --pad:clamp(1.5rem,4vw,3.5rem);
+  --pad-card:clamp(1.1rem,2.2vw,1.75rem);
+  --rise:1rem;
+  --ease-grail:cubic-bezier(.22,1,.36,1);
+}
+
+/* Accessible focus everywhere */
+:focus-visible{
+  outline:2px solid var(--ink-2, #6E675E);
+  outline-offset:3px;
+  border-radius:0.35rem;
+}
+.btn:focus-visible,.chip:focus-visible,a:focus-visible,summary:focus-visible{
+  outline-color:var(--accent, #B9DDF1);
+}
+
+/* Hero: one promise above the lede */
+.promise{
+  margin:0 0 var(--s3);
+  max-inline-size:46ch;
+  font:500 clamp(1.05rem,1.6vw,1.35rem)/1.5 var(--f-body);
+  color:var(--ink);
+  letter-spacing:-0.01em;
+}
+.hero .lede{
+  max-inline-size:56ch;
+  color:var(--ink-2);
+  font-size:var(--t-base);
+  line-height:1.65;
+}
+.headp{justify-content:center!important;gap:var(--s4)!important}
+.headp h1{max-inline-size:20ch;letter-spacing:-0.035em}
+.hero{align-items:center!important}
+.dayp{align-self:center!important}
+@media (min-width:68.01rem){
+  .hero{
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important;
+    gap:clamp(1rem,3vw,2.5rem)!important;
+    min-block-size:min(44rem,calc(100svh - 5rem))!important;
+  }
+}
+
+/* Benefits: 4 outcome cards, hug content, no desert */
+.benefits-rail{
+  display:grid!important;
+  grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr)!important;
+  gap:clamp(1.5rem,4vw,3.5rem)!important;
+  align-items:start!important;
+}
+.benefits-rail > .prose{max-inline-size:52ch}
+.benefits-grid{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:var(--s3)!important;
+  max-inline-size:none!important;
+}
+.benefits-grid .fact{
+  min-block-size:0!important;
+  align-self:start;
+  padding:var(--s4)!important;
+  gap:var(--s2)!important;
+}
+.benefits-grid dt{
+  display:flex;
+  gap:var(--s3);
+  align-items:baseline;
+  font-size:var(--t-base);
+}
+.benefits-grid .bn{
+  font:500 var(--t-xs)/1 var(--f-body);
+  letter-spacing:.08em;
+  color:var(--ink-3);
+  font-variant-numeric:tabular-nums;
+}
+.benefits-grid dd{
+  font-size:var(--t-sm)!important;
+  line-height:1.65;
+  color:var(--ink-2);
+}
+
+/* Comparison table: clear win column, not another sparse list */
+.vs-rail{
+  display:block!important;
+  max-inline-size:none;
+}
+.vs-rail > .prose{
+  max-inline-size:64ch;
+  margin-block-end:var(--s5);
+}
+.vs-scroll{
+  overflow-x:auto;
+  border-radius:var(--Ri);
+  box-shadow:inset 0 0 0 1px var(--line);
+  background:var(--paper);
+}
+.vs-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:var(--t-sm);
+  line-height:1.55;
+  min-inline-size:52rem;
+  color:var(--ink);
+}
+.vs-table th,
+.vs-table td{
+  padding:var(--s3) var(--s4);
+  text-align:start;
+  vertical-align:top;
+  border-block-end:1px solid var(--line);
+}
+.vs-table thead th{
+  font:600 var(--t-xs)/1.35 var(--f-body);
+  letter-spacing:.06em;
+  color:var(--ink-2);
+  background:color-mix(in srgb,var(--panel) 70%,var(--paper));
+  position:sticky;
+  top:0;
+}
+.vs-table tbody th{
+  font-weight:600;
+  inline-size:11rem;
+  color:var(--ink);
+}
+.vs-table tbody tr:last-child th,
+.vs-table tbody tr:last-child td{border-block-end:0}
+.vs-table .is-us{
+  background:color-mix(in srgb,var(--accent) 18%,transparent);
+  color:var(--ink);
+  font-weight:500;
+}
+.vs-table thead .is-us{
+  background:color-mix(in srgb,var(--accent) 28%,var(--paper));
+  color:var(--ink);
+}
+.vs-table td:not(.is-us){
+  color:var(--ink-2);
+  font-size:calc(var(--t-sm) * .96);
+}
+.vs-note{
+  margin:var(--s4) 0 0!important;
+  color:var(--ink-3);
+  max-inline-size:72ch;
+  line-height:1.65;
+  letter-spacing:.02em!important;
+  text-transform:none!important;
+}
+:lang(zh-Hant) .vs-table,
+:lang(zh-CN) .vs-table,
+:lang(ko) .vs-table{line-height:1.7}
+
+/* Section cadence: calm, fewer types */
+.sec{margin-block-start:clamp(1.5rem,3vw,2.5rem)}
+.marquee{margin-block:var(--s3) 0}
+
+/* Mobile / tablet alignment pass */
+@media (max-width:68rem){
+  .benefits-rail{grid-template-columns:1fr!important}
+  .benefits-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .dayp{align-self:start!important}
+}
+@media (max-width:48rem){
+  .benefits-grid{grid-template-columns:1fr!important}
+  .vs-table{min-inline-size:46rem}
+  .promise{font-size:1.05rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .js .reveal,.js .tile,.js .lp,.js .fact,.js .fc{opacity:1!important;transform:none!important}
+}
+
+
+/* v1.14.0-hero-mock · today page beside headline, in first viewport */
+@media (min-width:68.01rem){
+  .hero{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) minmax(0,.88fr)!important;
+    align-items:center!important;
+    gap:var(--frame)!important;
+    min-block-size:calc(100svh - 6rem)!important;
+    max-block-size:52rem;
+  }
+  .hero > .headp{min-block-size:0!important;height:auto!important;align-self:center!important}
+  .hero > .dayp{
+    display:flex!important;
+    flex-direction:column!important;
+    align-self:center!important;
+    max-block-size:calc(100svh - 7rem);
+  }
+  .hero > .dayp .daycard{flex:0 0 auto!important}
+  .hero > .dayp .prompts-wrap{flex:0 0 auto!important}
+}
+
+/* v1.14.0b · use px breakpoint (68.01rem fractional could overlap / miss) */
+@media screen and (min-width:1089px){
+  main > .hero,
+  .hero{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr)!important;
+    grid-template-rows:auto!important;
+    align-items:center!important;
+    gap:var(--frame)!important;
+    min-block-size:min(48rem,calc(100svh - 5rem))!important;
+    height:auto!important;
+  }
+  .hero > .headp,
+  .hero > .dayp{
+    grid-column:auto!important;
+    grid-row:1!important;
+    min-block-size:0!important;
+    height:auto!important;
+    align-self:center!important;
+    inline-size:auto!important;
+    max-inline-size:none!important;
+  }
+  .hero > .dayp{
+    order:0!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+}
+
+/* v1.14.0c · copy left, product mock right; CJK-safe headline */
+@media screen and (min-width:1089px){
+  .hero > .headp{order:0!important;grid-column:1!important}
+  .hero > .dayp{order:0!important;grid-column:2!important}
+}
+/* Second line uses gradient text only when Latin renders well; CJK gets soft ink */
+.headp h1 .l2{
+  -webkit-text-fill-color:currentColor;
+}
+:lang(en) .headp h1 .l2{
+  -webkit-text-fill-color:transparent;
+}
+:lang(zh-Hant) .headp h1 .l2,
+:lang(zh-CN) .headp h1 .l2,
+:lang(ko) .headp h1 .l2{
+  background:none!important;
+  color:var(--ink-2)!important;
+  -webkit-text-fill-color:currentColor!important;
+}
+
+/* v1.14.0d · kill remaining sparse mock voids */
+/* Loop step cards: no tall empty bottom */
+.loop-rail .lp,
+.loop .lp{
+  min-block-size:0!important;
+  height:fit-content!important;
+  align-self:start!important;
+  padding:var(--s4)!important;
+  display:flex!important;
+  flex-direction:column!important;
+  gap:var(--s2)!important;
+}
+.loop .lp .lt{margin-block-start:var(--s2)!important}
+.loop .lp .ln{margin-block-end:var(--s1)}
+
+/* Feature tiles: paper + table hug, code tile no right desert on wide */
+.tile.t-sheet{align-self:start!important;height:fit-content!important}
+.tile.t-sheet .paper.sheet{padding:var(--s3)!important}
+.tile.t-sheet table{margin:0}
+.tile.t-code{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:stretch!important;
+}
+.tile.t-code .fold-body{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)!important;
+  gap:var(--s4)!important;
+  align-items:start!important;
+}
+.tile.t-code .code{margin:0}
+.tile.t-code .desc{margin:0!important}
+@media (max-width:48rem){
+  .tile.t-code .fold-body{grid-template-columns:1fr!important}
+}
+
+/* Notion paper: no gap before kw */
+.paper.notion .fields{gap:0.65rem!important}
+.paper.notion .kw{margin-top:0.5rem!important;padding-top:0.65rem!important}
+.tile.t-notion{height:fit-content!important}
+
+/* Hero: don't force equal-height cards; copy and mock each hug */
+@media screen and (min-width:1089px){
+  .hero{
+    align-items:start!important;
+    min-block-size:0!important;
+    max-block-size:none!important;
+    padding-block:clamp(1rem,4vh,3rem);
+  }
+  .hero > .headp{align-self:start!important}
+  .hero > .dayp{align-self:start!important}
+  .headp{justify-content:flex-start!important}
+}
+
+/* v1.14.0e · a11y contrast + layout stability */
+/* Keep palette hues; raise ink-3 so micro-labels clear WCAG AA on paper */
+:root{
+  --ink-3:#7A7268; /* was #9C948A — 2.86:1 on paper */
+}
+[data-theme=dark]{--ink-3:#B3AC9F}
+/* Primary actions: dark ink on soft fill, not near-white on mid lilac */
+.btn.primary,
+.acts .mark,
+button.mark{
+  color:#2A241D!important;
+  background:color-mix(in srgb,var(--accent-warm, #CDBFE0) 70%, #F8F6EF)!important;
+}
+.btn.primary:hover{filter:brightness(0.98)}
+/* Reserve mock card space before JS dates fill */
+.daycard{min-block-size:12rem}
+.stats .count{font-variant-numeric:tabular-nums}
+/* Don't animate layout-shifting properties on first paint */
+.js .reveal{will-change:opacity}
+@media (prefers-reduced-motion:reduce){
+  .daycard{animation:none!important}
+}
