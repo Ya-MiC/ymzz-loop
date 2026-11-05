@@ -258,5 +258,8 @@
   "day.left": "Left in chapter",
   "day.unit": "days",
   "day.mock": "mock",
-  "ui.secspy": "Section preview"
+  "ui.secspy": "Section preview",
+  "dial.local": "Your local time",
+  "dial.next": "Next review in",
+  "dial.at": "Reminder"
 }

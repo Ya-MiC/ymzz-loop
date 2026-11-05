@@ -154,5 +154,8 @@
   "day.left": "Left in chapter",
   "day.unit": "days",
   "day.mock": "mock",
-  "ui.secspy": "معاينة الأقسام"
+  "ui.secspy": "معاينة الأقسام",
+  "dial.local": "وقتك المحلي",
+  "dial.next": "حتى المراجعة التالية",
+  "dial.at": "التذكير"
 }

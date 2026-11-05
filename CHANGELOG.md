@@ -9,6 +9,17 @@
 
 
 
+## [1.15.0] — 2026-11-05
+
+### Changed
+- **Hero screen 1 = time urgency:** restored v1.2 live 24h dial (local zone, next-review arc, 07:00 UTC reminder). First viewport: dial + urgency copy + today page + 600→0 chip. Screen 2 begins when the reactbits nav starts shrinking.
+- **One content width:** `--content-w` (= `--nav-content`). Every post-hero section/card matches the shrunk top nav width.
+- **Value-contrast scale is king:** zero card borders at rest (no 1px rims / double edges). Depth via warm Morandi value steps (`--v-raised` / `--v-card` / `--v-inset`). Soft lift or focus-visible ring only on hover/focus/touch.
+- **Dark today-card:** stronger ink on labels/numbers; week dots and `.daycard` use clearer value steps (no white blast); inner date box no dim rim.
+
+### Kept
+- Brand, four palettes, fonts, 600-day chapter→summary (no annihilate), section spy, donate copy contrast, OSS table, Feishu, zh-CN egg, reduced-motion.
+
 ## [1.14.2] — 2026-11-05
 
 ### Changed

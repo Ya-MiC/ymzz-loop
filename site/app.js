@@ -27,6 +27,37 @@
   }
   drawCities(); if ($("#cities")) setInterval(drawCities, 60000);
 
+  // live 24h dial (visitor's own zone) — reminder default 07:00 UTC · restored from v1.2
+  const NS = "http://www.w3.org/2000/svg";
+  function drawDial() {
+    const svg = $("#dialSvg"); if (!svg) return;
+    const now = new Date(), localMin = now.getHours() * 60 + now.getMinutes();
+    const remUTC = 7 * 60, remLocal = ((remUTC - now.getTimezoneOffset()) % 1440 + 1440) % 1440;
+    const ang = m => (m / 1440) * 360 - 90, pt = (a, r) => [Math.cos(a * Math.PI / 180) * r, Math.sin(a * Math.PI / 180) * r];
+    const cs = getComputedStyle(document.documentElement);
+    const c1 = (cs.getPropertyValue("--accent").trim() || "#B9DDF1");
+    const c2 = (cs.getPropertyValue("--accent-warm").trim() || "#CDBFE0");
+    const c3 = (cs.getPropertyValue("--accent-soft").trim() || "#F4DDE7");
+    let h = `<defs><linearGradient id="arcg" x1="0" x2="1"><stop offset="0" stop-color="${c1}"/><stop offset=".5" stop-color="${c2}"/><stop offset="1" stop-color="${c3}"/></linearGradient></defs>`;
+    for (let i = 0; i < 96; i++) {
+      const m = i * 15, a = ang(m), hour = i % 4 === 0, [x1, y1] = pt(a, hour ? 70 : 76), [x2, y2] = pt(a, 84);
+      h += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" class="${hour ? "h" : ""}"/>`;
+      if (hour && (i / 4) % 3 === 0) { const [tx, ty] = pt(a, 94); h += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}">${String(i / 4).padStart(2, "0")}</text>`; }
+    }
+    let span = (remLocal - localMin + 1440) % 1440 || 1440;
+    const a0 = ang(localMin), a1 = ang(localMin + span), [sx, sy] = pt(a0, 58), [ex, ey] = pt(a1, 58);
+    h += `<path class="arc" d="M${sx.toFixed(2)} ${sy.toFixed(2)} A58 58 0 ${span > 720 ? 1 : 0} 1 ${ex.toFixed(2)} ${ey.toFixed(2)}"/>`;
+    const [nx, ny] = pt(a0, 100), [rx, ry] = pt(ang(remLocal), 100), [rt, rty] = pt(ang(remLocal), 106);
+    h += `<line class="now" x1="${(nx*.62).toFixed(2)}" y1="${(ny*.62).toFixed(2)}" x2="${nx.toFixed(2)}" y2="${ny.toFixed(2)}"/><line class="rem" x1="${(rx * .66).toFixed(2)}" y1="${(ry * .66).toFixed(2)}" x2="${rx.toFixed(2)}" y2="${ry.toFixed(2)}"/><text class="rem" x="${rt.toFixed(1)}" y="${rty.toFixed(1)}">●</text>`;
+    svg.innerHTML = h;
+    const clock = $("#clock"), tz = $("#tzName"), next = $("#nextIn");
+    if (clock) clock.textContent = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    if (tz) tz.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
+    if (next) next.textContent = `${Math.floor(span / 60)}h ${String(span % 60).padStart(2, "0")}m`;
+  }
+  drawDial(); setInterval(drawDial, reduce ? 60000 : 30000);
+
+
   // preloader: brief, skippable, reduced-motion aware; content stays in DOM for crawlers / no-JS
   (() => {
     const pre = $("#pre"); if (!pre) return;

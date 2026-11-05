@@ -2534,3 +2534,371 @@ html:not(.nav-scrolled) .nav,
   color:#F8F6EF!important;
   opacity:1!important;
 }
+
+/* ===== v1.15.0 · dial hero · --content-w align · value-contrast (no rest borders) · dark today ===== */
+
+:root{
+  /* ONE shared measure: shrunk nav bar == every post-hero card */
+  --content-w: min(72rem, calc(100% - (2 * var(--edge-x))));
+  --nav-content: var(--content-w);
+  /* warm Morandi value ladder (same hue family) */
+  --v-ground: var(--ground);
+  --v-raised: color-mix(in srgb, #fff 14%, var(--ground));
+  --v-card: color-mix(in srgb, #fff 22%, var(--ground));
+  --v-inset: color-mix(in srgb, #fff 32%, var(--ground));
+  --v-well: color-mix(in srgb, #000 6%, var(--ground));
+}
+html[data-theme=dark], [data-theme=dark]{
+  --v-ground: var(--ground);
+  --v-raised: color-mix(in srgb, #fff 7%, var(--ground));
+  --v-card: color-mix(in srgb, #fff 12%, var(--ground));
+  --v-inset: color-mix(in srgb, #fff 18%, var(--ground));
+  --v-well: color-mix(in srgb, #000 10%, var(--ground));
+  --ink-3: #C9C2B6;
+  --ink-2: #D4CEC3;
+}
+
+/* --- Live 24h dial (v1.2 restored) --- */
+.mono{font-family:var(--f-mono), ui-monospace, monospace;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.dialp{
+  display:flex;flex-direction:column;justify-content:space-between;gap:var(--s4);
+  background:var(--v-card)!important;
+}
+.dial{position:relative;inline-size:min(100%,22rem);aspect-ratio:1;margin-inline:auto}
+.dial svg{inline-size:100%;block-size:100%;overflow:visible}
+.dial line{stroke:var(--ink);stroke-width:.35;opacity:.32}
+.dial line.h{opacity:.62;stroke-width:.65}
+.dial line.now{stroke:var(--cocoa, var(--accent-warm));opacity:1;stroke-width:1.15}
+.dial line.rem{stroke:var(--accent-warm, #7d6aa8);opacity:1;stroke-width:1.15}
+.dial text{font:500 5px var(--f-mono);fill:var(--ink-3);text-anchor:middle;dominant-baseline:middle}
+.dial text.rem{fill:var(--accent-warm, #7d6aa8);font-weight:700}
+.dial .arc{fill:none;stroke:url(#arcg);stroke-width:6;stroke-linecap:round;opacity:.9}
+.dial-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:var(--s1);pointer-events:none}
+.clock{font:500 clamp(2.25rem,4.5vw,3.75rem)/1 var(--f-display);letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.tzname{justify-content:center;color:var(--ink-3);font-size:var(--t-xs)}
+.dialfoot{
+  display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:0;
+  padding-block-start:var(--s3);
+  /* value step, not a 1px border */
+  background:linear-gradient(180deg, transparent, var(--v-well) 0);
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, var(--ink) 8%, transparent)!important;
+}
+.dialfoot dd{margin:var(--s1) 0 0;font:500 1.25rem var(--f-display);font-variant-numeric:tabular-nums;color:var(--ink)}
+.dialfoot dt{color:var(--ink-3)}
+[data-theme=dark] .dial line{opacity:.42}
+[data-theme=dark] .dial line.h{opacity:.72}
+[data-theme=dark] .dial text{fill:var(--ink-2)}
+
+/* --- Hero = first screen (time urgency). Nav shrink starts on screen 2. --- */
+.hero.hero-urgency{
+  display:grid!important;
+  grid-template-columns:minmax(0,0.95fr) minmax(0,1.15fr) minmax(0,1.1fr);
+  gap:var(--frame)!important;
+  align-items:stretch!important;
+  min-block-size:calc(100svh - 5.5rem)!important;
+  max-block-size:none;
+  padding-block:clamp(0.5rem, 2vh, 1.25rem);
+  max-inline-size:none!important; /* hero may breathe full stage */
+  width:100%;
+  box-sizing:border-box;
+  padding-inline:var(--edge-x);
+}
+.hero.hero-urgency > .dialp{order:1}
+.hero.hero-urgency > .headp{order:2;justify-content:center}
+.hero.hero-urgency > .dayp{order:3}
+@media (max-width:68rem){
+  .hero.hero-urgency{
+    grid-template-columns:1fr!important;
+    min-block-size:0!important;
+  }
+  .hero.hero-urgency > .headp{order:1}
+  .hero.hero-urgency > .dayp{order:2}
+  .hero.hero-urgency > .dialp{order:3}
+}
+@media (min-width:68.01rem) and (max-width:1088px){
+  .hero.hero-urgency{
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;
+  }
+  .hero.hero-urgency > .headp{grid-column:1/-1;order:1}
+  .hero.hero-urgency > .dialp{order:2}
+  .hero.hero-urgency > .dayp{order:3}
+}
+
+/* --- Post-hero: EVERY card = shrunk-nav width (--content-w) --- */
+main > .sec,
+.sec > .panel,
+.foot,
+main > .sec.twin{
+  max-inline-size:var(--content-w)!important;
+  margin-inline:auto!important;
+  width:100%;
+  box-sizing:border-box;
+}
+.sec{
+  padding-inline:var(--edge-x);
+  box-sizing:border-box;
+}
+.sec > .panel{
+  /* panels already inside padded sec — cancel double edge by full width of content-w */
+  max-inline-size:var(--content-w)!important;
+}
+.foot{
+  margin-inline:auto!important;
+  max-inline-size:var(--content-w)!important;
+  width:calc(100% - 2 * var(--edge-x));
+}
+/* nav scrolled already uses --nav-content == --content-w */
+
+/* --- VALUE CONTRAST KING: zero borders at rest --- */
+.panel,.tile,.fact,.story li,.daycard,.paper,.fc,.code,.tpanel,.addr,
+.donate-qr img,.oss,.join,.donate,.ba,.loopp,.stage,.paper-stage,
+.chip-mock,.btn.ghost,.fld input,.row select,.row input,.bezel>div{
+  border:0!important;
+  box-shadow:none!important; /* kill inset rims */
+}
+.panel,.tile,.fact,.dayp,.headp,.dialp,.join,.donate,.diffp,.intro,
+.sec > .panel{
+  background:var(--v-card)!important;
+  box-shadow:none!important;
+}
+.daycard,.paper,.code,.story li.on,.tile .paper,.tpanel,.tpanel pre,
+.cities li,.fact{
+  background:var(--v-inset)!important;
+  box-shadow:none!important;
+}
+.prompts li,.week{
+  /* separators = value hairline via background, not stroke border */
+  box-shadow:none!important;
+  border:0!important;
+}
+.prompts li + li{
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, var(--ink) 10%, transparent)!important;
+}
+.week{
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, var(--ink) 12%, transparent)!important;
+  border-block-start:0!important;
+  padding-block-start:0.55rem!important;
+  margin-block-start:0.35rem!important;
+}
+/* interactive feedback ONLY */
+.panel:hover,.tile:hover,.fact:hover,.daycard:hover,.donate-box:hover,
+.btn.ghost:hover,.chip:hover{
+  box-shadow:0 0.55rem 1.4rem -0.6rem color-mix(in srgb, var(--ink) 18%, transparent)!important;
+}
+.panel:focus-within,.tile:focus-within,
+a:focus-visible,.btn:focus-visible,.chip:focus-visible,summary:focus-visible,
+#donateCopy:focus-visible,.fold-tog:focus-visible{
+  outline:2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  outline-offset:3px;
+}
+@media (hover:none){
+  .panel:hover,.tile:hover,.fact:hover{box-shadow:none!important}
+}
+@media (prefers-reduced-motion:reduce){
+  .panel:hover,.tile:hover{box-shadow:none!important}
+}
+
+/* --- Dark today-page: readable value steps (no white blast) --- */
+[data-theme=dark] .dayp,
+[data-theme=dark] .panel.dayp{
+  background:
+    radial-gradient(70% 65% at 88% 12%, color-mix(in srgb,var(--accent) 28%,transparent), transparent 68%),
+    radial-gradient(60% 55% at 10% 90%, color-mix(in srgb,var(--accent-soft) 22%,transparent), transparent 65%),
+    var(--v-raised)!important;
+}
+[data-theme=dark] .daycard{
+  background:var(--v-inset)!important;
+  color:var(--ink)!important;
+}
+[data-theme=dark] .dayp .label,
+[data-theme=dark] .chip-mock,
+[data-theme=dark] .dwk,
+[data-theme=dark] .dmo,
+[data-theme=dark] .week li,
+[data-theme=dark] .prompts li,
+[data-theme=dark] .mock-note{
+  color:var(--ink-2)!important;
+}
+[data-theme=dark] .dnum,
+[data-theme=dark] .dnum bdi{
+  color:#F0EBE0!important;
+}
+[data-theme=dark] .week b{
+  background:color-mix(in srgb, var(--accent) 35%, var(--v-card))!important;
+  color:#F0EBE0!important;
+}
+[data-theme=dark] .week li.on b{
+  background:color-mix(in srgb, var(--accent-warm) 55%, #6a5a48)!important;
+  color:#F8F6EF!important;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-warm) 35%, transparent)!important;
+}
+[data-theme=dark] .chip-mock{
+  background:var(--v-inset)!important;
+}
+[data-theme=dark] .prompts li + li,
+[data-theme=dark] .week{
+  box-shadow:inset 0 1px 0 0 color-mix(in srgb, #F0EBE0 16%, transparent)!important;
+}
+[data-theme=dark] .fold-tog{
+  background:var(--v-inset)!important;
+  color:var(--ink)!important;
+}
+
+/* keep donate copy readable (from 1.14.2) */
+[data-theme=dark] #donateCopy.btn.ghost{
+  color:#F8F6EF!important;
+  background:color-mix(in srgb,var(--accent-warm,#CDBFE0) 55%, #5a4a78)!important;
+  box-shadow:0 .35rem .9rem -.35rem rgba(0,0,0,.45)!important;
+}
+
+/* light daycard value step too */
+.daycard{background:var(--v-inset)!important}
+.dayp{background:var(--v-raised)!important}
+
+/* nav: ensure token alias */
+.nav{--nav-content:var(--content-w)}
+/* v1.15.0b · separators = gap/value only, never hairline borders */
+.prompts{display:grid;gap:0.35rem;list-style:none;margin:0;padding:0}
+.prompts li{
+  margin:0;padding:0.55rem 0.15rem;
+  background:transparent;
+  box-shadow:none!important;border:0!important;
+  border-radius:var(--Ri, 0.75rem);
+}
+.prompts li:hover{background:var(--v-inset)!important}
+.week{
+  box-shadow:none!important;border:0!important;
+  padding-block-start:0.45rem!important;
+  margin-block-start:0.25rem!important;
+}
+.dialfoot{
+  background:var(--v-well)!important;
+  border-radius:var(--Ri, 0.75rem);
+  padding:var(--s3)!important;
+  box-shadow:none!important;
+}
+/* v1.15.0c · beat legacy hero column spans so 3-col dial|copy|day works */
+.hero.hero-urgency > .dialp,
+.hero.hero-urgency > .headp,
+.hero.hero-urgency > .dayp{
+  grid-column:auto!important;
+  max-inline-size:none!important;
+  width:auto!important;
+  align-self:stretch!important;
+}
+@media screen and (min-width:1089px){
+  .hero.hero-urgency{
+    grid-template-columns:minmax(0,0.95fr) minmax(0,1.15fr) minmax(0,1.1fr)!important;
+  }
+  .hero.hero-urgency > .dialp{order:1!important;grid-column:1!important}
+  .hero.hero-urgency > .headp{order:2!important;grid-column:2!important}
+  .hero.hero-urgency > .dayp{order:3!important;grid-column:3!important}
+}
+/* v1.15.0d · true --content-w parity with scrolled nav; kill ALL rest insets */
+:root{
+  --content-w: min(72rem, calc(100vw - (2 * var(--edge-x))));
+  --nav-content: var(--content-w);
+}
+main > .sec,
+.sec{
+  max-inline-size:none!important;
+  padding-inline:0!important;
+  margin-inline:0!important;
+  width:100%!important;
+}
+main > .sec > .panel,
+.sec > .panel,
+.foot{
+  max-inline-size:var(--content-w)!important;
+  inline-size:var(--content-w)!important;
+  width:var(--content-w)!important;
+  margin-inline:auto!important;
+  box-sizing:border-box!important;
+}
+@media (max-width:72.5rem){
+  main > .sec > .panel,
+  .sec > .panel,
+  .foot{
+    inline-size:calc(100% - (2 * var(--edge-x)))!important;
+    width:calc(100% - (2 * var(--edge-x)))!important;
+    max-inline-size:var(--content-w)!important;
+  }
+}
+/* Nuclear: no inset rim / drop shadow at rest on cards */
+.panel,.tile,.fact,.story li,.daycard,.paper,.fc,.code,.tpanel,.addr,
+.donate-qr img,.oss,.join,.donate,.ba,.loopp,.stage,.paper-stage,
+.dayp,.headp,.dialp,.diffp,.intro,.chip-mock,.bezel,.bezel>div,
+.sec > .panel{
+  border:0!important;
+  outline:none;
+  box-shadow:none!important;
+  -webkit-box-shadow:none!important;
+}
+/* shadows only when interacting */
+@media (hover:hover){
+  .panel:hover,.tile:hover,.fact:hover,.daycard:hover,.dayp:hover,.dialp:hover,.diffp:hover,.donate:hover,.join:hover{
+    box-shadow:0 0.65rem 1.6rem -0.7rem color-mix(in srgb, var(--ink) 22%, transparent)!important;
+  }
+}
+a:focus-visible,.btn:focus-visible,.chip:focus-visible,summary:focus-visible,
+#donateCopy:focus-visible,.fold-tog:focus-visible,.panel:focus-within{
+  outline:2px solid color-mix(in srgb, var(--accent) 70%, transparent)!important;
+  outline-offset:3px;
+}
+/* nav scrolled width token — match panels exactly */
+.nav{
+  --nav-content:var(--content-w);
+}
+/* v1.15.0e · specificity beat: dark+panel selectors must also lose rest rims */
+html .panel, html .tile, html .fact, html .story li, html .daycard, html .paper,
+html .fc, html .code, html .tpanel, html .addr, html .dayp, html .headp, html .dialp,
+html .diffp, html .intro, html .join, html .donate, html .oss, html .stage,
+html .chip-mock, html .bezel, html .bezel > div, html .sec > .panel,
+html[data-theme=dark] .panel, html[data-theme=dark] .tile, html[data-theme=dark] .fact,
+html[data-theme=dark] .daycard, html[data-theme=dark] .dayp, html[data-theme=dark] .headp,
+html[data-theme=dark] .dialp, html[data-theme=dark] .paper, html[data-theme=dark] .fc,
+html[data-theme=dark] .code, html[data-theme=dark] .tpanel, html[data-theme=dark] .addr,
+html[data-theme=dark] .join, html[data-theme=dark] .donate, html[data-theme=dark] .chip-mock,
+[data-theme=dark] .panel, [data-theme=dark] .daycard, [data-theme=dark] .dayp,
+[data-theme=dark] .tile, [data-theme=dark] .fact, [data-theme=dark] .paper{
+  border:0!important;
+  box-shadow:none!important;
+  -webkit-box-shadow:none!important;
+}
+@media (hover:hover){
+  html .panel:hover, html .daycard:hover, html .dayp:hover, html .dialp:hover,
+  html .tile:hover, html .fact:hover, html .diffp:hover, html .donate:hover, html .join:hover,
+  html[data-theme=dark] .panel:hover, html[data-theme=dark] .daycard:hover, html[data-theme=dark] .dayp:hover{
+    box-shadow:0 0.65rem 1.6rem -0.7rem color-mix(in srgb, var(--ink) 22%, transparent)!important;
+  }
+}
+/* restore full-bleed flush nav at rest */
+html:not(.nav-scrolled) .nav,
+.nav:not(.is-scrolled){
+  width:100%!important;
+  max-inline-size:none!important;
+  margin-inline:0!important;
+  border-radius:0!important;
+  margin-block-start:0!important;
+}
+/* v1.15.0f · dark today week/label contrast bump (value, not weight) */
+[data-theme=dark] .dayp .label,
+[data-theme=dark] .dayp-top .label{color:#D8D2C6!important}
+[data-theme=dark] .chip-mock{
+  color:#E6E1D5!important;
+  background:color-mix(in srgb, #fff 14%, var(--ground))!important;
+}
+[data-theme=dark] .chip-mock .mock-n{color:#F8F6EF!important}
+[data-theme=dark] .week li{color:#D0C9BC!important}
+[data-theme=dark] .week b{
+  background:color-mix(in srgb, var(--accent) 42%, #3a3329)!important;
+  color:#F8F6EF!important;
+}
+[data-theme=dark] .week li.on b{
+  background:color-mix(in srgb, var(--accent-warm) 62%, #5a4a3a)!important;
+  color:#F8F6EF!important;
+  box-shadow:0 0 0 4px color-mix(in srgb, var(--accent-warm) 28%, transparent)!important;
+}
+[data-theme=dark] .prompts .pn{color:color-mix(in srgb, var(--accent-warm) 70%, #E6E1D5)!important}
+[data-theme=dark] .prompts li{color:#E6E1D5!important}
+[data-theme=dark] .dwk,[data-theme=dark] .dmo{color:#D8D2C6!important}

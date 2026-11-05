@@ -258,5 +258,8 @@
   "day.left": "이번 장 남은",
   "day.unit": "일",
   "day.mock": "예시",
-  "ui.secspy": "구역 미리보기"
+  "ui.secspy": "구역 미리보기",
+  "dial.local": "내 로컬 시간",
+  "dial.next": "다음 복기까지",
+  "dial.at": "알림"
 }

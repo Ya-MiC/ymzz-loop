@@ -258,5 +258,8 @@
   "day.left": "本章还剩",
   "day.unit": "天",
   "day.mock": "示意",
-  "ui.secspy": "章节预览"
+  "ui.secspy": "章节预览",
+  "dial.local": "你的本地时间",
+  "dial.next": "距离下次复盘",
+  "dial.at": "提醒时刻"
 }
