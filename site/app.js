@@ -207,6 +207,27 @@
     });
   })();
 
+
+  // nav opacity/blur from scroll progress (rAF); reduced-motion → steady frosted bar
+  (() => {
+    const nav = $(".nav"); if (!nav) return;
+    const root = document.documentElement;
+    let ticking = false;
+    const apply = () => {
+      ticking = false;
+      if (reduce) { root.style.setProperty("--nav-p", "0.85"); nav.style.setProperty("--nav-p", "0.85"); return; }
+      const max = Math.max(1, root.scrollHeight - innerHeight);
+      const p = Math.min(1, Math.max(0, scrollY / max));
+      const v = p.toFixed(4);
+      root.style.setProperty("--nav-p", v);
+      nav.style.setProperty("--nav-p", v);
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
+    addEventListener("scroll", onScroll, { passive: true });
+    addEventListener("resize", onScroll, { passive: true });
+    apply();
+  })();
+
   setTheme(store.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
   apply();
 })();

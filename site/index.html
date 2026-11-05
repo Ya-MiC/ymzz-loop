@@ -38,20 +38,6 @@
 <main id="main">
 <!-- HERO: today-page panel + headline panel -->
 <section class="hero" id="top">
-  <div class="panel dayp reveal">
-    <p class="label" data-i18n="day.k">Today's page</p>
-    <div class="daycard" aria-hidden="true">
-      <p class="dwk" id="dWk"></p>
-      <p class="dnum"><bdi dir="ltr" id="dNum"></bdi></p>
-      <p class="dmo" id="dMo"></p>
-      <ol class="week" id="week" dir="ltr"></ol>
-    </div>
-    <ul class="prompts">
-      <li><span class="pn" aria-hidden="true">01</span><span data-i18n="mock.keep"></span></li>
-      <li><span class="pn" aria-hidden="true">02</span><span data-i18n="day.p2">What did I learn?</span></li>
-      <li><span class="pn" aria-hidden="true">09</span><span data-i18n="mock.top3"></span></li>
-    </ul>
-  </div>
   <div class="panel headp">
     <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
     <p class="label eyebrow reveal" data-i18n="hero.eyebrow">Open source · by 晏銘湛箴</p>
@@ -65,6 +51,20 @@
       <li><b><bdi dir="ltr">$<span class="count" data-to="0">0</span></bdi></b><span data-i18n="stat.cost">per month</span></li>
       <li><b><bdi dir="ltr"><span class="count" data-to="600">600</span></bdi></b><span data-i18n="stat.days">day lifespan</span></li>
       <li><b><bdi dir="ltr"><span class="count" data-to="4">4</span></bdi></b><span data-i18n="stat.dest">destinations</span></li>
+    </ul>
+  </div>
+  <div class="panel dayp reveal">
+    <p class="label" data-i18n="day.k">Today's page</p>
+    <div class="daycard" aria-hidden="true">
+      <p class="dwk" id="dWk"></p>
+      <p class="dnum"><bdi dir="ltr" id="dNum"></bdi></p>
+      <p class="dmo" id="dMo"></p>
+      <ol class="week" id="week" dir="ltr"></ol>
+    </div>
+    <ul class="prompts">
+      <li><span class="pn" aria-hidden="true">01</span><span data-i18n="mock.keep"></span></li>
+      <li><span class="pn" aria-hidden="true">02</span><span data-i18n="day.p2">What did I learn?</span></li>
+      <li><span class="pn" aria-hidden="true">09</span><span data-i18n="mock.top3"></span></li>
     </ul>
   </div>
 </section>
@@ -172,9 +172,9 @@
   </div>
 </section>
 
-<!-- STORY (sticky, dark stage) -->
+<!-- STORY (sticky, light paper stage) -->
 <section id="flow" class="sec">
-  <div class="stage">
+  <div class="stage paper-stage">
     <div class="stage-glow" aria-hidden="true"></div>
     <div class="sticky">
       <p class="label">05 — <span data-i18n="story.k">Every day, by itself</span></p>
@@ -261,7 +261,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.7.1 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.8.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>

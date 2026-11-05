@@ -2,6 +2,13 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.8.0] - 2026-11-05
+### Changed
+- Site layout: one consistent vertical axis (centered column, shared paper family) — no left/right theme flip; fewer 1px borders, soft tonal surfaces and spacing instead.
+- **How it works**: replaced the clashing dark stage with a light MIT-like paper wash (soft accent gradients); numbers and copy stay dark ink. Dark theme uses warm Morandi surfaces, not a black well.
+- Hero stacks headline → today's page (same reading order on all breakpoints).
+- Nav bar: `--nav-p` scroll progress (rAF) drives background opacity and blur from near-transparent at the top to frosted at the bottom; `prefers-reduced-motion` keeps a steady bar.
+
 ## [1.7.1] - 2026-11-05
 ### Added
 - Donations: `.github/FUNDING.yml` custom link to site `#donate` (commented `github: Ya-MiC` until the owner enables Sponsors).
