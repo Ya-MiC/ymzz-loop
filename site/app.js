@@ -71,7 +71,16 @@
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 
   // theme (View Transitions when available)
-  function setTheme(th) { document.documentElement.dataset.theme = th; $("#themeIc").setAttribute("href", `icons.svg#i-${th === "dark" ? "sun" : "moon"}`); $("#themeTx").textContent = th === "dark" ? t("ui.light") : t("ui.dark"); $('meta[name=theme-color]').content = th === "dark" ? "#1F1B16" : (document.documentElement.dataset.palette === "earth" ? "#E8E3CC" : "#F8F6EF"); }
+  function setTheme(th) {
+    document.documentElement.dataset.theme = th;
+    $("#themeIc").setAttribute("href", `icons.svg#i-${th === "dark" ? "sun" : "moon"}`);
+    $("#themeTx").textContent = th === "dark" ? t("ui.light") : t("ui.dark");
+    const pal = document.documentElement.dataset.palette === "earth" ? "earth" : "cloud";
+    // soft Morandi theme-color — never charcoal
+    $('meta[name=theme-color]').content = th === "dark"
+      ? (pal === "earth" ? "#2F2A22" : "#2A241D")
+      : (pal === "earth" ? "#E8E3CC" : "#F8F6EF");
+  }
   $("#theme").onclick = () => { const th = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; store.set("theme", th);
     if (document.startViewTransition && !reduce) document.startViewTransition(() => setTheme(th)); else setTheme(th); };
 
@@ -80,7 +89,8 @@
     document.documentElement.dataset.palette = pal === "earth" ? "earth" : "cloud";
     const sel = $("#palette"); if (sel) sel.value = document.documentElement.dataset.palette;
     const th = document.documentElement.dataset.theme || "light";
-    $('meta[name=theme-color]').content = th === "dark" ? "#1F1B16" : (document.documentElement.dataset.palette === "earth" ? "#E8E3CC" : "#F8F6EF");
+    const pal2 = document.documentElement.dataset.palette === "earth" ? "earth" : "cloud";
+    $('meta[name=theme-color]').content = th === "dark" ? (pal2 === "earth" ? "#2F2A22" : "#2A241D") : (pal2 === "earth" ? "#E8E3CC" : "#F8F6EF");
   }
   const savedPal = store.get("palette", "cloud");
   setPalette(savedPal === "earth" ? "earth" : "cloud");
@@ -208,24 +218,48 @@
   })();
 
 
-  // nav opacity/blur from scroll progress (rAF); reduced-motion → steady frosted bar
+  // reading progress (top bar) + nav frost from scroll (rAF)
+  // reduced-motion: still update read position (snap), nav stays frosted
   (() => {
-    const nav = $(".nav"); if (!nav) return;
+    const nav = $(".nav");
+    const bar = $(".readbar");
     const root = document.documentElement;
     let ticking = false;
     const apply = () => {
       ticking = false;
-      if (reduce) { root.style.setProperty("--nav-p", "0.85"); nav.style.setProperty("--nav-p", "0.85"); return; }
       const max = Math.max(1, root.scrollHeight - innerHeight);
       const p = Math.min(1, Math.max(0, scrollY / max));
       const v = p.toFixed(4);
-      root.style.setProperty("--nav-p", v);
-      nav.style.setProperty("--nav-p", v);
+      root.style.setProperty("--read-p", v);
+      if (bar) {
+        bar.style.setProperty("--read-p", v);
+        bar.setAttribute("aria-valuenow", String(Math.round(p * 100)));
+      }
+      if (nav) {
+        if (reduce) {
+          root.style.setProperty("--nav-p", "0.85");
+          nav.style.setProperty("--nav-p", "0.85");
+        } else {
+          root.style.setProperty("--nav-p", v);
+          nav.style.setProperty("--nav-p", v);
+        }
+      }
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("resize", onScroll, { passive: true });
     apply();
+  })();
+
+  // mobile nav drawer
+  (() => {
+    const tog = $("#navToggle"), links = $("#navLinks"), header = $(".nav");
+    if (!tog || !links) return;
+    const close = () => { header.classList.remove("nav-open"); tog.setAttribute("aria-expanded", "false"); };
+    const open = () => { header.classList.add("nav-open"); tog.setAttribute("aria-expanded", "true"); };
+    tog.addEventListener("click", () => tog.getAttribute("aria-expanded") === "true" ? close() : open());
+    links.querySelectorAll("a").forEach(a => a.addEventListener("click", close));
+    addEventListener("keydown", e => { if (e.key === "Escape") close(); });
   })();
 
   setTheme(store.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));

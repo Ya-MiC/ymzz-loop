@@ -7,7 +7,7 @@
   --ground:#ECE7DC;--panel:var(--paper);--ink:#3D3833;--ink-2:#6E675E;--ink-3:#9C948A;--line:rgba(61,56,51,.08);--on:#3D3833;
   --stage:#E8E3CC;--stage-ink:#3D3833; /* soft paper; never black */
   --s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.5rem;--s6:2rem;--s7:3rem;--s8:4rem;--s9:6rem;--s10:8rem;
-  --frame:clamp(.375rem,.8vw,.75rem);--R:clamp(1.5rem,2.4vw,2.25rem);--pad-card:clamp(1rem,2vw,1.5rem);--rim:0;--Ri:calc(var(--R) - var(--pad-card));
+  --frame:clamp(.5rem,1.2vw,1rem);--edge-x:clamp(.75rem,2.5vw,1.5rem);--R:clamp(1.25rem,2vw,1.75rem);--pad-card:clamp(1rem,2vw,1.5rem);--rim:0;--Ri:calc(var(--R) - var(--pad-card));
   --sh:0 1.25rem 2.5rem -.95rem rgba(34,31,20,.08);--sh2:0 1.75rem 3.5rem -1rem rgba(34,31,20,.16);
   --e:cubic-bezier(.22,1,.36,1);--e2:cubic-bezier(.16,1,.3,1);
   --measure:62ch;--pad:clamp(1.25rem,4vw,4rem);
@@ -23,7 +23,7 @@
 [data-theme=dark]{--ground:#2A241D;--panel:#352E25;--ink:#E6E1D5;--ink-2:#B3AC9F;--ink-3:#7A7268;--line:rgba(230,225,213,.10);--stage:#352E25;--stage-ink:#E6E1D5;--sh:0 .5rem 1.5rem rgba(0,0,0,.35);--sh2:0 1rem 2.5rem rgba(0,0,0,.4);--wght-shift:-40}
 *,*::before,*::after{box-sizing:border-box}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;background:var(--ground)}
-body{margin:0;padding:var(--frame);background:var(--ground);color:var(--ink);font:var(--t-base)/var(--lh-body) var(--f-body);-webkit-font-smoothing:antialiased;text-wrap:pretty;font-optical-sizing:auto}
+body{margin:0;padding:0;padding-block-start:.2rem;background:var(--ground);color:var(--ink);font:var(--t-base)/var(--lh-body) var(--f-body);-webkit-font-smoothing:antialiased;text-wrap:pretty;font-optical-sizing:auto}
 a{color:inherit;text-underline-offset:.22em}img,svg{display:block}
 code,pre{font-family:var(--f-code);font-size:.875em}
 :focus-visible{outline:2px solid var(--ink);outline-offset:3px;border-radius:.5rem}
@@ -420,7 +420,8 @@ html[data-theme=dark]{
 }
 /* 暮林 dark + earth */
 html[data-theme=dark][data-palette=earth]{
-  --sky:var(--c-wood-sage);--lotus:var(--c-wood-linen);--lilac:var(--c-wood-cocoa-text);--paper:#2A241D;
+  --ground:#2F2A22;--panel:#3A3329;--paper:#3A3329;--stage:#3A3329;
+  --sky:var(--c-wood-sage);--lotus:var(--c-wood-linen);--lilac:var(--c-wood-cocoa-text);
   --accent:var(--c-wood-sage);--accent-soft:var(--c-wood-linen);--accent-warm:var(--c-wood-cocoa-text);
 }
 body{background:var(--ground);color:var(--ink)}
@@ -1183,4 +1184,233 @@ body{font-weight:var(--wght-body);font-variant-numeric:tabular-nums lining-nums!
     radial-gradient(55% 60% at 92% 8%, color-mix(in srgb,var(--sky) 22%,transparent), transparent 70%),
     radial-gradient(50% 55% at 8% 92%, color-mix(in srgb,var(--lotus) 18%,transparent), transparent 68%),
     var(--surf-1)!important;
+}
+
+/* ===== v1.10.0 · four locked palettes · full-bleed · readbar · micro edges · responsive ===== */
+
+/* FONTS LOCKED — Inter UI · Fraunces display · JetBrains Mono code · tabular lining nums
+   Do not change families (see site/config.js FONTS_LOCKED + CREDITS.md). */
+:root{
+  --f-display:"Fraunces","Noto Serif TC","Noto Serif SC","Noto Serif KR","Songti TC","Source Han Serif",ui-serif,Georgia,serif;
+  --f-body:"Inter","Noto Sans TC","Noto Sans SC","Noto Sans KR","PingFang TC","Apple SD Gothic Neo","Malgun Gothic","Microsoft YaHei",system-ui,sans-serif;
+  --f-code:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --read-p:0;
+  --edge-x:clamp(.75rem,2.5vw,1.5rem);
+  /* micro value-contrast edge (same family → beige / dark Morandi ground) */
+  --edge:color-mix(in srgb,var(--ink) 7%,transparent);
+  --edge-strong:color-mix(in srgb,var(--ink) 12%,transparent);
+}
+
+/* --- Four palettes, never mixed on one screen --- */
+/* Light A · 雲箋: blue + pink + purple + beige */
+html[data-palette=cloud],html:not([data-palette]){
+  --ground:#F1ECE0;
+  --paper:#F8F6EF;
+  --panel:color-mix(in srgb,#fff 70%,var(--paper));
+  --sky:var(--c-cloud-sky);--lotus:var(--c-cloud-pink);--lilac:var(--c-cloud-violet);
+  --accent:var(--c-cloud-sky);--accent-soft:var(--c-cloud-pink);--accent-warm:var(--c-cloud-violet);
+  --sage:var(--c-cloud-sky); /* do not leak earth greens into cloud glows */
+  --cream:var(--c-cloud-paper);--tea:var(--c-cloud-violet);--cocoa:#8F78B8;
+}
+/* Light B · 陶土: tea/green + brown + beige */
+html[data-palette=earth]{
+  --ground:#E8E3CC;
+  --paper:#F1ECDC;
+  --panel:color-mix(in srgb,#fff 62%,var(--paper));
+  --sky:var(--c-earth-sage);--lotus:var(--c-earth-linen);--lilac:var(--c-earth-cocoa);
+  --accent:var(--c-earth-sage);--accent-soft:var(--c-earth-linen);--accent-warm:var(--c-earth-cocoa);
+  --sage:var(--c-earth-sage);--cream:var(--c-earth-oat);--tea:var(--c-earth-linen);--cocoa:var(--c-earth-cocoa);
+}
+/* Dark A · 暮靄 (cloud family) */
+html[data-theme=dark],html[data-theme=dark][data-palette=cloud]{
+  --ground:#2A241D;--paper:#352E25;--panel:#352E25;--stage:#352E25;
+  --ink:#E6E1D5;--ink-2:#B3AC9F;--ink-3:#8A8278;--on:#E6E1D5;
+  --sky:var(--c-dusk-blue);--lotus:var(--c-dusk-pink);--lilac:var(--c-dusk-violet);
+  --accent:var(--c-dusk-blue);--accent-soft:var(--c-dusk-pink);--accent-warm:var(--c-dusk-violet);
+  --edge:rgba(230,225,213,.10);--edge-strong:rgba(230,225,213,.16);
+}
+/* Dark B · 暮林 (earth family) */
+html[data-theme=dark][data-palette=earth]{
+  --ground:#2F2A22;--paper:#3A3329;--panel:#3A3329;--stage:#3A3329;
+  --sky:var(--c-wood-sage);--lotus:var(--c-wood-linen);--lilac:var(--c-wood-cocoa-text);
+  --accent:var(--c-wood-sage);--accent-soft:var(--c-wood-linen);--accent-warm:var(--c-wood-cocoa-text);
+  --sage:var(--c-wood-sage);--cream:#3A3329;--tea:var(--c-wood-linen);--cocoa:var(--c-wood-cocoa-text);
+}
+
+/* Glows ONLY from active palette accents */
+.g1{background:var(--accent)!important}
+.g2{background:var(--accent-soft)!important}
+.g3{background:var(--accent-warm)!important}
+.headp,.hero > .headp,.panel.headp{
+  background:
+    radial-gradient(55% 60% at 92% 8%, color-mix(in srgb,var(--accent) 50%,transparent), transparent 70%),
+    radial-gradient(50% 55% at 8% 92%, color-mix(in srgb,var(--accent-soft) 42%,transparent), transparent 68%),
+    radial-gradient(40% 45% at 70% 55%, color-mix(in srgb,var(--accent-warm) 28%,transparent), transparent 70%),
+    var(--panel)!important;
+}
+.tile{
+  background:
+    radial-gradient(90% 70% at 100% 0%, color-mix(in srgb,var(--accent) 38%,transparent), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, color-mix(in srgb,var(--accent-soft) 24%,transparent), transparent 65%),
+    var(--panel)!important;
+}
+.marquee{
+  background:linear-gradient(90deg,
+    color-mix(in srgb,var(--accent) 22%,var(--paper)),
+    color-mix(in srgb,var(--accent-soft) 24%,var(--paper)) 50%,
+    color-mix(in srgb,var(--accent-warm) 20%,var(--paper)))!important;
+  color:var(--ink)!important;
+}
+.week li.on b{
+  background:linear-gradient(145deg,
+    color-mix(in srgb,var(--accent-warm) 65%,#fff),
+    color-mix(in srgb,var(--accent) 60%,#fff))!important;
+  color:var(--ink)!important;
+}
+.fc3{
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb,var(--accent-warm) 48%,transparent), transparent 60%),
+    radial-gradient(90% 80% at 0% 100%, color-mix(in srgb,var(--accent) 36%,transparent), transparent 65%),
+    var(--paper)!important;
+  color:var(--ink)!important;
+}
+
+/* --- Reading progress: thin top bar (start→end) --- */
+.readbar{
+  position:fixed;inset-block-start:0;inset-inline:0;z-index:80;
+  block-size:3px;inline-size:100%;
+  background:color-mix(in srgb,var(--ink) 6%,transparent);
+  pointer-events:none;
+  overflow:hidden;
+}
+.readbar > i{
+  display:block;block-size:100%;inline-size:100%;
+  transform-origin:left center;
+  transform:scaleX(var(--read-p,0));
+  background:linear-gradient(90deg,var(--accent),var(--accent-warm),var(--accent-soft));
+  transition:none; /* rAF continuous */
+}
+[dir=rtl] .readbar > i{transform-origin:right center}
+@media (prefers-reduced-motion:reduce){
+  .readbar > i{transition:transform .01ms linear} /* still shows position; snap ok */
+}
+
+/* --- Full-bleed stage --- */
+main,#main{
+  padding-inline:var(--edge-x);
+  padding-block-end:var(--frame);
+  max-inline-size:none;
+  inline-size:100%;
+  box-sizing:border-box;
+}
+.nav{
+  margin-inline:var(--edge-x);
+  margin-block:calc(var(--frame) + 2px) var(--frame);
+  inline-size:auto;
+  max-inline-size:none;
+}
+.hero,.bento,.syncstrip,.loop,.intro,.twin,.stage,.join,.tut,.donate,.foot,.marquee,.sec > .panel,.loopp{
+  max-inline-size:none;
+}
+.hero{min-block-size:min(56rem,calc(100svh - 4.5rem))}
+/* long-form measure only for prose, not the visual stage */
+.prose,.lede,details p,.fact dd{max-inline-size:var(--measure)}
+.foot .huge{max-inline-size:none!important}
+
+/* --- Micro value-contrast borders (one layer, same family) --- */
+.panel,.tile,.fact,.story li,.daycard,.fc,.code,.tpanel,.addr,.donate-box,.lp{
+  border:0!important;
+  box-shadow:var(--sh), inset 0 0 0 1px var(--edge)!important;
+  border-radius:var(--R)!important;
+}
+.tile .paper,.daycard,.story li,.fact,.code,.fc{
+  border-radius:var(--Ri)!important;
+  box-shadow:none!important; /* nested: value step only, no second rim */
+}
+.chip,.btn.ghost,.fld input,.row select,.row input{
+  box-shadow:inset 0 0 0 1px var(--edge)!important;
+  border:0!important;
+}
+.btn.primary,.btn.small,.mark{
+  background:var(--cocoa,#A38E7A)!important;
+  color:#F8F6EF!important;
+  box-shadow:0 .6rem 1.25rem -.6rem color-mix(in srgb,var(--cocoa,#A38E7A) 40%,transparent)!important;
+}
+html[data-palette=cloud] .btn.primary,
+html[data-palette=cloud] .btn.small,
+html:not([data-palette]) .btn.primary,
+html:not([data-palette]) .btn.small{
+  background:color-mix(in srgb,var(--accent-warm) 55%,#5a4a78)!important;
+}
+
+/* --- Responsive: phone / tablet / desktop --- */
+.nav-tog{display:none}
+.burger{display:grid;gap:4px;inline-size:1.1rem}
+.burger i{display:block;block-size:2px;inline-size:100%;background:var(--ink);border-radius:2px;transition:transform .25s var(--e),opacity .2s}
+
+/* tablet */
+@media (max-width:68rem){
+  .hero{grid-template-columns:1fr!important;min-block-size:0}
+  .hero > .dayp{order:2}
+  .bento{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .t-notion,.t-mail,.t-tz,.t-sheet,.t-hold,.t-code{grid-column:auto!important;grid-row:auto!important}
+  .t-code{grid-column:1/-1!important}
+  .loop{grid-template-columns:1fr!important}
+  .intro,.twin,.stage,.join,.tut-body{grid-template-columns:1fr!important}
+  .syncrow{grid-template-columns:1fr 1fr!important}
+  .float{display:none!important}
+  .bign{display:none!important}
+}
+
+/* phone */
+@media (max-width:48rem){
+  :root{--edge-x:clamp(.6rem,3.5vw,1rem);--R:1.15rem;--pad-card:1rem;--Ri:calc(var(--R) - var(--pad-card))}
+  .nav{
+    flex-wrap:wrap;gap:var(--s2);
+    border-radius:1.25rem!important;
+    padding:var(--s2)!important;
+  }
+  .nav-tog{display:inline-flex!important;margin-inline-start:auto}
+  .tools{order:3;inline-size:100%;justify-content:flex-end;flex-wrap:wrap}
+  .links{
+    display:none;
+    order:4;inline-size:100%;
+    flex-direction:column;align-items:stretch;
+    gap:0;padding:var(--s2) 0 0;
+  }
+  .nav-open .links{display:flex}
+  .links a{
+    min-block-size:2.75rem;padding:var(--s2) var(--s3);
+    border-radius:.75rem;
+  }
+  .links a:hover,.links a:focus-visible{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  .nav-open .burger i:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .nav-open .burger i:nth-child(2){opacity:0}
+  .nav-open .burger i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+  .bento,.syncrow,.bacols{grid-template-columns:1fr!important}
+  .hero .stats{gap:var(--s3)}
+  .marquee{border-radius:var(--R)}
+  .donate,.donate-box{grid-template-columns:1fr!important}
+}
+
+/* wide desktop — true full-bleed feeling */
+@media (min-width:90rem){
+  :root{--edge-x:clamp(1rem,3vw,2.5rem)}
+  .hero{min-block-size:min(58rem,calc(100svh - 5rem))}
+}
+
+/* keep nav frost + scroll opacity */
+.nav{
+  --nav-p:0;
+  --nav-alpha:calc(0.28 + (var(--nav-p) * 0.62));
+  --nav-blur:calc(2px + (var(--nav-p) * 12px));
+  background:color-mix(in srgb,var(--ground) calc(var(--nav-alpha) * 100%), transparent)!important;
+  backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.35))!important;
+  -webkit-backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.35))!important;
+}
+
+/* numbers locked tabular lining */
+body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.week b,.bign,.progress span,#pct{
+  font-variant-numeric:tabular-nums lining-nums!important;
+  font-feature-settings:"tnum" 1,"lnum" 1!important;
 }

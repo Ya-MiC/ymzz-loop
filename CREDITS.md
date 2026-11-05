@@ -9,6 +9,10 @@ All fonts, icons and libraries below allow commercial use under their licenses. 
 
 ## 網站字體 · Site fonts（self-hosted · `site/fonts/`）
 
+> **字體鎖定 · Fonts locked (v1.10+):** Inter = all UI; Fraunces = display headlines only; JetBrains Mono = code only. Numbers use `tabular-nums` + `lining-nums`. Do not swap families without a legal + design review. All three are SIL OFL-1.1 (commercial use OK).
+
+
+
 | 資產 | 授權 | 來源 | 商用 |
 |---|---|---|---|
 | **Fraunces** (variable, Latin opsz subset via Fontsource) | [SIL Open Font License 1.1](https://openfontlicense.org/) | https://github.com/undercasetype/Fraunces · 全文 `site/licenses/Fraunces-OFL.txt` | ✅ |

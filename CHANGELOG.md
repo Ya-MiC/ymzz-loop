@@ -4,6 +4,23 @@
 
 
 
+
+## [1.10.0] — 2026-11-05
+
+### Added
+- Top reading-progress bar (`--read-p`) that fills with scroll position (separate from nav frost). Reduced-motion still shows position.
+- Mobile nav drawer (hamburger) with Escape / link-close.
+
+### Changed
+- Four palettes locked and never mixed: 雲箋 (blue/pink/purple/beige), 陶土 (tea/green/brown/beige), 暮靄, 暮林. Soft glows use active palette only.
+- Micro value-contrast edges only (same-family shade/tint); one layer; concentric radii.
+- Full-bleed stage: body padding removed; content uses `--edge-x` gutters so hero/bento span the viewport.
+- Responsive breakpoints hardened (phone ≤48rem / tablet ≤68rem / wide ≥90rem).
+- Fonts locked forever: Inter UI · Fraunces display · JetBrains Mono code · tabular lining nums (`config.js` + CREDITS).
+
+### Kept
+- No charcoal/black cards, donate (Arbitrum USDC), 600-day, Feishu, signup, scroll-nav frost, MIT.
+
 ## [1.9.1] — 2026-11-05
 
 ### Fixed
