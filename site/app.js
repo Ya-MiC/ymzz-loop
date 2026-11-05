@@ -88,9 +88,17 @@
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
     $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
-    // holdings mock: zh-CN easter egg → A-share; others keep 2330.TW
-    (() => { const el = $("#holdTicker"); if (!el) return;
-      el.textContent = (lang === "zh-CN") ? "600519.SH" : (el.dataset.tickerDefault || "2330.TW");
+    // holdings 彩蛋: zh-CN locale AND UTC+8 zone → A-share 600519.SH; else 2330.TW (no IBKR)
+    (() => {
+      const el = $("#holdTicker"); if (!el) return;
+      const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })();
+      const utc8 = /^(Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar)|Etc\/GMT-8)$/.test(tz)
+        || (() => { try { // offset minutes east of UTC is negative for east… getTimezoneOffset: UTC+8 → -480
+          return new Date().getTimezoneOffset() === -480;
+        } catch { return false; } })();
+      const ashare = lang === "zh-CN" && utc8;
+      el.textContent = ashare ? "600519.SH" : (el.dataset.tickerDefault || "2330.TW");
+      el.dataset.egg = ashare ? "ashare" : "tw";
     })();
     renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
   };

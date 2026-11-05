@@ -9,6 +9,11 @@
 
 
 
+## [1.15.1] — 2026-11-05
+
+### Fixed
+- **Holdings 彩蛋 card restored** (removed when Features bento was cut in v1.14.2). Compact broker-agnostic mock: VT 46% / QQQ 28% / ticker 16% / Cash 10%. Easter egg: page locale `zh-CN` **and** browser timezone UTC+8 (`Asia/Shanghai|Chongqing|Urumqi` or `Etc/GMT-8`, or offset −480) → `600519.SH`; otherwise `2330.TW`. No IBKR. Matches `--content-w` and no-rest-border value contrast.
+
 ## [1.15.0] — 2026-11-05
 
 ### Changed
