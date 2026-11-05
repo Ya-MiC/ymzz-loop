@@ -70,6 +70,23 @@ jobs:
             git config user.name "ymzz-bot"; git config user.email "ymzz-bot@users.noreply.github.com"
             git commit --allow-empty -m "keepalive" && git push || true
           fi
+      - name: lifespan ended (max 600 days) — disable schedule
+        if: always() && steps.gate.outputs.expired == 'true'
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          echo "ymzz-loop lifespan ended (day ${{ steps.gate.outputs.day }}/${{ steps.gate.outputs.max_days }}, started ${{ steps.gate.outputs.started }})."
+          echo "Schedule will be disabled. Fork a newer release when you want to continue."
+          gh api -X PUT repos/${{ github.repository }}/actions/workflows/daily-review.yml/disable || true
+          mkdir -p .ymzz
+          echo "${{ steps.gate.outputs.today }}" > .ymzz/expired
+          git config user.name "ymzz-bot"; git config user.email "ymzz-bot@users.noreply.github.com"
+          git add .ymzz/expired
+          git diff --cached --quiet || git commit -m "lifespan: stopped after ${{ steps.gate.outputs.max_days }} days" && git push || true
+      - name: email on lifespan end
+        if: always() && steps.gate.outputs.expired == 'true'
+        run: |
+          npm install --no-audit --no-fund nodemailer >/dev/null 2>&1
+          node -e "require('nodemailer').createTransport({host:process.env.SMTP_HOST||'smtp.gmail.com',port:+(process.env.SMTP_PORT||465),secure:true,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}).sendMail({from:process.env.SMTP_USER,to:process.env.MAIL_TO,subject:'ymzz-loop · 600-day lifespan ended',text:'Your ymzz-loop run has reached its ${{ steps.gate.outputs.max_days }}-day limit (started ${{ steps.gate.outputs.started }}). The daily schedule has been disabled. Your Notion, Sheets and Markdown history stay in your accounts. When a newer release is ready, fork it and set up again.\n\n${{ github.server_url }}/${{ github.repository }}'}).catch(e=>{console.error(e); process.exit(0)})"
       - name: email on failure
         if: failure()
         run: npm install --no-audit --no-fund nodemailer >/dev/null 2>&1; node -e "require('nodemailer').createTransport({host:process.env.SMTP_HOST||'smtp.gmail.com',port:+(process.env.SMTP_PORT||465),secure:true,auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASS}}).sendMail({from:process.env.SMTP_USER,to:process.env.MAIL_TO,subject:'⚠️ 每日復盤失敗 Daily review failed',text:'${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}'})"

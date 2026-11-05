@@ -31,7 +31,7 @@ flowchart LR
 
 1. **送入**——在你选定的时间，Notion 自动建好空白的每日复盘模板，并发出带链接的提醒邮件。
 2. **书写**——任何设备都能填。
-3. **保存**——下一次运行把昨天的内容复制到 Google Sheets 与你 fork 里的 `notion/YYYY/*.md`。然后每天重复。
+3. **保存**——下一次运行把昨天的内容复制到 Google Sheets 与你 fork 里的 `notion/YYYY/*.md`。然后每天重复，最多 600 天。
 
 ## 它做什么 What it does
 每天在**你设置的时区与时间**（缺省 **07:00 UTC**），GitHub Actions 自动：
@@ -39,7 +39,7 @@ flowchart LR
 2. 寄信给你，附今日页面链接 / emails you the link
 3. 把**昨天**的复盘 + 目前持仓同步到 Google Sheet（分页「每日复盘」「持仓」）与本仓库 `notion/YYYY/MMDD_HHMM_<时区>.md`（例如 `1105_0705_utc.md`，档内写明时区）/ syncs yesterday to Google Sheets and a markdown snapshot
 
-不用 Grok / AI 额度，只用 GitHub 免费分钟。长期免维护：每小时闸门数秒结束、每天只真正运行一次（去重）、每次运行重新激活调度、45 天无提交自动补一次（避开 GitHub 60 天停用规则）、10 分钟逾时、失败寄信。
+不用 Grok / AI 额度，只用 GitHub 免费分钟。**寿命上限：自首次成功运行起最多 600 个日历天，到期自动停止**。长期免维护：每小时闸门数秒结束、每天只真正运行一次（去重）、每次运行重新激活调度、45 天无提交自动补一次（避开 GitHub 60 天停用规则）、10 分钟逾时、失败寄信。
 No AI quota; free GitHub minutes only. Built to run unattended.
 
 | | ymzz-loop | 一般 Notion 模板 | 付费日记 App |

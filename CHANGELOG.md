@@ -2,6 +2,15 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.6.0] - 2026-11-05
+### Added
+- **Hard 600-day lifespan**: `scripts/gate.mjs` records `.ymzz/started` on first success and stops when calendar day count exceeds 600; workflow disables the schedule and emails once. Override for tests via `YMZZ_MAX_DAYS`.
+- Site palette switch: 雲箋 (cloud) / 陶土 (earth) light themes with matching Morandi dark modes 暮靄 / 暮林 (wenrun design system v7.1).
+- Research pack: `site-research/notes.md`, `refs.md` (verified links), `prompt.md` (reusable design prompt).
+### Changed
+- Official site v1.6.0: wenrun four-palette tokens, surface-based intro/feature cards (no stacked overlapping colour blocks), hero stats show 600-day lifespan, copy and READMEs state the cap clearly.
+- Dark ground shifts to warm black `#1F1B16`; glass blur locked at 6px; ink easing `cubic-bezier(.16,1,.3,1)`.
+
 ## [1.5.1] - 2026-11-05
 ### Changed
 - "How the loop works": replaced flat cards with layered brand gradients (sky→paper, lotus→lilac, lilac→sky), blurred glow orbs, section mesh + grain, inner highlight and soft depth, gentle hover lift, gradient connectors; dark-mode variant; reduced-motion safe.

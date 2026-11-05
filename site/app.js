@@ -66,14 +66,25 @@
     const h = document.documentElement; h.lang = dict._lang || lang; h.dir = dict._dir || "ltr";
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
-    $("#lang").value = lang; renderDates(); renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
+    $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates(); renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
   };
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 
   // theme (View Transitions when available)
-  function setTheme(th) { document.documentElement.dataset.theme = th; $("#themeIc").setAttribute("href", `icons.svg#i-${th === "dark" ? "sun" : "moon"}`); $("#themeTx").textContent = th === "dark" ? t("ui.light") : t("ui.dark"); $('meta[name=theme-color]').content = th === "dark" ? "#191C29" : "#F8F6EF"; }
+  function setTheme(th) { document.documentElement.dataset.theme = th; $("#themeIc").setAttribute("href", `icons.svg#i-${th === "dark" ? "sun" : "moon"}`); $("#themeTx").textContent = th === "dark" ? t("ui.light") : t("ui.dark"); $('meta[name=theme-color]').content = th === "dark" ? "#1F1B16" : (document.documentElement.dataset.palette === "earth" ? "#E8E3CC" : "#F8F6EF"); }
   $("#theme").onclick = () => { const th = document.documentElement.dataset.theme === "dark" ? "light" : "dark"; store.set("theme", th);
     if (document.startViewTransition && !reduce) document.startViewTransition(() => setTheme(th)); else setTheme(th); };
+
+  // palette: cloud (雲箋) | earth (陶土) — dark maps to 暮靄 / 暮林
+  function setPalette(pal) {
+    document.documentElement.dataset.palette = pal === "earth" ? "earth" : "cloud";
+    const sel = $("#palette"); if (sel) sel.value = document.documentElement.dataset.palette;
+    const th = document.documentElement.dataset.theme || "light";
+    $('meta[name=theme-color]').content = th === "dark" ? "#1F1B16" : (document.documentElement.dataset.palette === "earth" ? "#E8E3CC" : "#F8F6EF");
+  }
+  const savedPal = store.get("palette", "cloud");
+  setPalette(savedPal === "earth" ? "earth" : "cloud");
+  $("#palette") && ($("#palette").onchange = e => { store.set("palette", e.target.value); setPalette(e.target.value); });
 
   // live data in mockups — all relative to the visitor's browser-local "today"
   const loc = () => dict._lang || lang;
@@ -122,12 +133,13 @@
       if (r.ok) { say("join.ok", true); $("#signup").reset(); picked.clear(); renderTags(); } else say(r.status === 429 ? "join.slow" : "join.err", false);
     } catch { say("join.err", false); } finally { btn.disabled = false; }
   });
-  if (Intl.supportedValuesOf) $("#tzCount").dataset.to = String(Math.floor(Intl.supportedValuesOf("timeZone").length / 10) * 10);
 
   // reveal + count up
   const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; e.target.classList.add("in"); io.unobserve(e.target);
-    $$(".count", e.target).forEach(c => { const to = +c.dataset.to, t0 = performance.now(), dur = reduce ? 0 : 1200; const tick = n => { const p = dur ? Math.min(1, (n - t0) / dur) : 1; c.textContent = Math.round(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); });
-  }), { threshold: .12 });
+    $$(".count", e.target).forEach(c => { const to = +c.dataset.to, t0 = performance.now(), dur = reduce ? 0 : 900;
+      const tick = n => { const p = dur ? Math.min(1, (n - t0) / dur) : 1; c.textContent = Math.round(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(tick); else c.textContent = String(to); };
+      requestAnimationFrame(tick); });
+  }), { threshold: .05, rootMargin: "0px 0px -5% 0px" });
   $$(".reveal, .tile").forEach((el, i) => { el.style.setProperty("--i", i % 4); io.observe(el); });
 
   // guided setup

@@ -5,5 +5,5 @@
 window.YMZZ_CONFIG = {
   SIGNUP_ENDPOINT: "",
   SIGNUP_MAILTO: "",
-  VERSION: "1.5.1"
+  VERSION: "1.6.0"
 };

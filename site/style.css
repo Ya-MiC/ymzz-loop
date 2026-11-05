@@ -379,3 +379,132 @@ button,input,select,textarea{font-family:inherit}
 .loop>.lp.lp.lp{overflow:visible}
 .lp::before{clip-path:none;inline-size:55%;inset-block-start:4%;inset-inline-end:4%;filter:blur(1.25rem);opacity:.75}
 .lp:not(:last-child)::after,[dir=rtl] .lp:not(:last-child)::after{block-size:.375rem}
+
+/* ===== v1.6.0 · wenrun four palettes + surface fix (no stacked colour blocks) ===== */
+:root{
+  /* 雲箋【鎖定】 */
+  --c-cloud-paper:#F8F6EF;--c-cloud-sky:#B9DDF1;--c-cloud-pink:#F4DDE7;--c-cloud-violet:#CDBFE0;
+  /* 陶土【鎖定】 */
+  --c-earth-oat:#E8E3CC;--c-earth-sage:#b7c8a8;--c-earth-linen:#CBBF9E;--c-earth-cocoa:#A38E7A;
+  /* 暮靄【鎖定】 */
+  --c-dusk-paper:#E6E1D5;--c-dusk-blue:#7C9DB5;--c-dusk-pink:#B394A3;--c-dusk-violet:#93879F;
+  /* 暮林【鎖定】 */
+  --c-wood-oat:#D9D3C0;--c-wood-sage:#7E8E6F;--c-wood-linen:#9E9073;--c-wood-cocoa:#7C6B59;--c-wood-cocoa-text:#9D8A76;
+  /* aliases kept for older rules */
+  --sky:var(--c-cloud-sky);--lotus:var(--c-cloud-pink);--paper:var(--c-cloud-paper);--lilac:var(--c-cloud-violet);
+  --sage:var(--c-earth-sage);--cream:var(--c-earth-oat);--tea:var(--c-earth-linen);--cocoa:var(--c-earth-cocoa);
+  /* neutrals · wenrun */
+  --ink:#3D3833;--ink-2:#6E675E;--ink-3:#9C948A;--line:rgba(61,56,51,.08);
+  --ground:var(--c-cloud-paper);--panel:rgba(255,255,255,.72);--on:#3D3833;
+  --stage:#1F1B16;--stage-ink:#E6E1D5;
+  --sh:0 .5rem 1.5rem rgba(61,56,51,.10);--sh2:0 1rem 3rem rgba(61,56,51,.16);
+  --ease-ink:cubic-bezier(.16,1,.3,1);--blur-glass:blur(6px);
+}
+/* 雲箋 light (default) — accent family = sky/pink/violet only */
+html[data-palette=cloud],html:not([data-palette]){
+  --ground:var(--c-cloud-paper);--accent:var(--c-cloud-sky);--accent-soft:var(--c-cloud-pink);--accent-warm:var(--c-cloud-violet);
+}
+/* 陶土 light — accent family = sage/linen/cocoa only; never mix with 雲箋 on one screen */
+html[data-palette=earth]{
+  --ground:var(--c-earth-oat);--paper:var(--c-earth-oat);--panel:rgba(255,255,255,.62);
+  --sky:var(--c-earth-sage);--lotus:var(--c-earth-linen);--lilac:var(--c-earth-cocoa);
+  --accent:var(--c-earth-sage);--accent-soft:var(--c-earth-linen);--accent-warm:var(--c-earth-cocoa);
+}
+/* 暮靄 dark */
+html[data-theme=dark]{
+  --ground:#1F1B16;--panel:#2A241D;--ink:#E6E1D5;--ink-2:#B3AC9F;--ink-3:#7A7268;
+  --line:rgba(230,225,213,.10);--stage:#14110E;--stage-ink:#E6E1D5;--on:#E6E1D5;
+  --sky:var(--c-dusk-blue);--lotus:var(--c-dusk-pink);--lilac:var(--c-dusk-violet);--paper:#2A241D;
+  --accent:var(--c-dusk-blue);--accent-soft:var(--c-dusk-pink);--accent-warm:var(--c-dusk-violet);
+  --sh:0 .5rem 1.5rem rgba(0,0,0,.45);--sh2:0 1rem 3rem rgba(0,0,0,.55);
+}
+/* 暮林 dark + earth */
+html[data-theme=dark][data-palette=earth]{
+  --sky:var(--c-wood-sage);--lotus:var(--c-wood-linen);--lilac:var(--c-wood-cocoa-text);--paper:#2A241D;
+  --accent:var(--c-wood-sage);--accent-soft:var(--c-wood-linen);--accent-warm:var(--c-wood-cocoa-text);
+}
+body{background:var(--ground);color:var(--ink)}
+.panel{background:var(--panel);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);box-shadow:var(--sh);border:0}
+.nav{background:color-mix(in srgb,var(--ground) 55%,transparent);backdrop-filter:var(--blur-glass);-webkit-backdrop-filter:var(--blur-glass);box-shadow:var(--sh)}
+
+/* Intro facts: flat surface cards — no nested bezel stacking */
+.facts{margin:0;display:grid;gap:var(--s3)}
+.fact{padding:var(--s5);border-radius:var(--Ri);background:var(--panel);box-shadow:var(--sh);display:grid;gap:var(--s2)}
+.fact dt{display:flex;align-items:center;gap:var(--s2);font-weight:600;margin:0;color:var(--ink)}
+.fact dd{margin:0;color:var(--ink-2);font-size:var(--t-base)}
+.intro .bezel{display:none} /* legacy */
+
+/* Features bento: one surface + one accent tip — no full-bleed competing gradients, no rotate overlap */
+.bento{align-items:stretch}
+.tile{
+  background:var(--panel)!important;color:var(--ink)!important;filter:none!important;
+  box-shadow:var(--sh);overflow:hidden;isolation:isolate;
+  border-block-start:.35rem solid var(--accent);
+  transform:none!important; /* kill tilt overlap */
+}
+.tile .label{color:var(--ink-3)!important}
+.tile .desc{color:var(--ink-2)!important;margin-top:auto}
+.tile[data-accent=sky]{border-block-start-color:var(--sky)}
+.tile[data-accent=lotus]{border-block-start-color:var(--lotus)}
+.tile[data-accent=lilac]{border-block-start-color:var(--lilac)}
+.tile[data-accent=sage]{border-block-start-color:var(--sage)}
+.tile[data-accent=cream]{border-block-start-color:var(--tea)}
+.tile[data-accent=ink]{border-block-start-color:var(--ink);background:var(--stage)!important;color:var(--stage-ink)!important}
+.tile[data-accent=ink] .label{color:var(--tea)!important}
+.tile[data-accent=ink] .desc{color:color-mix(in srgb,var(--stage-ink) 75%,transparent)!important}
+.tile::after{opacity:0!important} /* kill pointer glow wash that stacked */
+.paper{transform:none!important;margin-inline:0!important;background:color-mix(in srgb,#fff 88%,var(--ground));box-shadow:var(--sh)}
+[data-theme=dark] .paper{background:#352E25;color:var(--ink)}
+.notion,.mail{transform:none!important}
+
+/* Float cards: contained, no bobbing into headline */
+.float{pointer-events:none;block-size:auto;inset-block-start:clamp(1.5rem,4vh,3rem)}
+.fc{animation:none!important;position:relative;inset:auto!important;margin-block-end:var(--s3);transform:none!important;inline-size:100%;max-inline-size:15rem}
+.fc1,.fc2,.fc3{position:relative}
+.float{display:flex;flex-direction:column;align-items:flex-end;gap:var(--s3)}
+@media (max-width:68rem){.float{display:none}}
+
+/* Loop keeps layered gradients but only from active palette accents */
+.lp:nth-child(1){--g1:var(--sky);--g2:var(--paper);--orb:var(--lilac)}
+.lp:nth-child(2){--g1:var(--lotus);--g2:var(--lilac);--orb:var(--sky)}
+.lp:nth-child(3){--g1:var(--lilac);--g2:var(--sky);--orb:var(--lotus)}
+[data-palette=earth] .lp:nth-child(1){--g1:var(--sage);--g2:var(--cream);--orb:var(--tea)}
+[data-palette=earth] .lp:nth-child(2){--g1:var(--tea);--g2:var(--cream);--orb:var(--cocoa)}
+[data-palette=earth] .lp:nth-child(3){--g1:var(--cocoa);--g2:var(--sage);--orb:var(--tea)}
+
+/* Before/after: surface + single accent, no solid flat fight */
+.before{background:color-mix(in srgb,var(--ink) 4%,var(--panel));color:var(--ink-2)}
+.after{background:linear-gradient(150deg,color-mix(in srgb,var(--accent) 55%,var(--panel)),color-mix(in srgb,var(--accent-soft) 40%,var(--panel)));color:var(--ink)}
+
+/* Day card: soft wash from active accent family only */
+.dayp{background:
+  radial-gradient(80% 70% at 0% 0%,color-mix(in srgb,var(--accent) 45%,transparent),transparent 70%),
+  radial-gradient(70% 60% at 100% 100%,color-mix(in srgb,var(--accent-soft) 50%,transparent),transparent 70%),
+  var(--panel)}
+.daycard{animation:none;backdrop-filter:var(--blur-glass)}
+
+/* Motion: ink ease; reduced-motion already covered */
+.js .reveal{transition:opacity .7s var(--ease-ink),transform .9s var(--ease-ink)}
+.btn{transition:transform .35s var(--ease-ink),box-shadow .35s var(--ease-ink),background .2s}
+h1 .l2{background:linear-gradient(95deg,var(--accent-warm),var(--accent-soft),var(--accent));-webkit-background-clip:text;background-clip:text}
+
+/* Cities / sheet stay readable on surface tiles */
+.cities li{background:color-mix(in srgb,#fff 70%,transparent);color:#3D3833}
+.cities li.me{background:var(--ink);color:var(--ground)}
+[data-theme=dark] .cities li{background:#352E25;color:var(--ink)}
+[data-theme=dark] .cities li.me{background:var(--accent);color:#1F1B16}
+
+.oss{background:linear-gradient(160deg,var(--panel),color-mix(in srgb,var(--accent-warm) 28%,var(--panel)))}
+.join .glow,.headp .glow,.oss .glow{opacity:.35}
+[data-theme=dark] .glow{opacity:.2}
+
+/* v1.6.0 sync strip — replaces absolute float cards that overlapped the headline */
+.float{display:none!important}
+.syncstrip{margin-block-start:var(--frame)}
+.syncrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--gutter);padding:0}
+.syncrow .fc{position:relative;inset:auto;inline-size:auto;max-inline-size:none;margin:0;transform:none!important;animation:none!important}
+.headp h1{margin-block-start:clamp(2rem,8vh,4.5rem)!important}
+@media (max-width:48rem){.syncrow{grid-template-columns:1fr}}
+/* facts must stay readable before/after i18n */
+.fact{min-block-size:5.5rem;background:color-mix(in srgb,#fff 80%,var(--ground));color:var(--ink)}
+[data-theme=dark] .fact{background:#2A241D}

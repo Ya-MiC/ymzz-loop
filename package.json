@@ -1,16 +1,34 @@
 {
   "name": "ymzz-loop",
-  "version": "1.5.1",
-  "description": "Zero-cost daily review & holdings journal: GitHub Actions creates your Notion page, emails a reminder, and syncs yesterday to Google Sheets + Markdown. Any time zone. 每日復盤，零成本自動化。",
+  "version": "1.6.0",
+  "description": "Zero-cost daily review & holdings journal: GitHub Actions creates your Notion page, emails a reminder, and syncs yesterday to Google Sheets + Markdown. Any time zone. \u6bcf\u65e5\u5fa9\u76e4\uff0c\u96f6\u6210\u672c\u81ea\u52d5\u5316\u3002",
   "private": true,
   "type": "module",
   "license": "MIT",
-  "author": "YanMing Cao 曹晏銘 (晏銘湛箴) (https://github.com/Ya-MiC)",
+  "author": "YanMing Cao \u66f9\u664f\u9298 (\u664f\u9298\u6e5b\u7bb4) (https://github.com/Ya-MiC)",
   "homepage": "https://ya-mic.github.io/ymzz-loop/",
-  "repository": { "type": "git", "url": "git+https://github.com/Ya-MiC/ymzz-loop.git" },
-  "bugs": { "url": "https://github.com/Ya-MiC/ymzz-loop/issues" },
-  "keywords": ["notion", "github-actions", "journal", "daily-review", "google-sheets", "trading-journal", "kpt", "retrospective", "productivity", "ibkr"],
-  "engines": { "node": ">=20" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ya-MiC/ymzz-loop.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ya-MiC/ymzz-loop/issues"
+  },
+  "keywords": [
+    "notion",
+    "github-actions",
+    "journal",
+    "daily-review",
+    "google-sheets",
+    "trading-journal",
+    "kpt",
+    "retrospective",
+    "productivity",
+    "ibkr"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "setup": "node scripts/setup-notion.mjs",
     "gate": "node scripts/gate.mjs",

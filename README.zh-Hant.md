@@ -31,7 +31,7 @@ flowchart LR
 
 1. **送入**——在你選的時間，Notion 自動建好空白的每日復盤模板，並寄出附連結的提醒信。
 2. **書寫**——任何裝置都能填。
-3. **留存**——下一次運行把昨天的內容複製到 Google Sheets 與你 fork 裡的 `notion/YYYY/*.md`。然後每天重複。
+3. **留存**——下一次運行把昨天的內容複製到 Google Sheets 與你 fork 裡的 `notion/YYYY/*.md`。然後每天重複，最多 600 天。
 
 ## 它做什麼 What it does
 每天在**你設定的時區與時間**（預設 **07:00 UTC**），GitHub Actions 自動：
@@ -39,8 +39,8 @@ flowchart LR
 2. 寄信給你，附今日頁面連結 / emails you the link
 3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）與本倉庫 `notion/YYYY/MMDD_HHMM_<時區>.md`（例如 `1105_0705_utc.md`，檔內寫明時區）/ syncs yesterday to Google Sheets and a markdown snapshot
 
-不用 Grok / AI 額度，只用 GitHub 免費分鐘。長期免維護：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
-No AI quota; free GitHub minutes only. Built to run unattended.
+不用 Grok / AI 額度，只用 GitHub 免費分鐘。**壽命上限：自首次成功運行起最多 600 個日曆天**，到期閘門停止並停用排程（方便換上更新版本）。到期前：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
+No AI quota; free GitHub minutes only. Hard-capped at 600 days from first success, then stops.
 
 | | ymzz-loop | 一般 Notion 模板 | 付費日記 App |
 |---|---|---|---|

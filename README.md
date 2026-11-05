@@ -27,7 +27,7 @@ flowchart LR
 
 1. **In** — at your chosen time, a blank daily-review template is created in your Notion and you get an email with the link.
 2. **Write** — fill it in on any device.
-3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats, every day.
+3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats, every day, for up to 600 days.
 
 ## What it does
 At the time you choose (default **07:00 UTC**), GitHub Actions:
@@ -35,7 +35,7 @@ At the time you choose (default **07:00 UTC**), GitHub Actions:
 2. emails you a link to that page;
 3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」) and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
 
-It uses only GitHub's free Actions minutes and the free Notion/Google APIs. Each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
+It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Lifespan: at most 600 calendar days from the first successful run**, then the gate stops and the schedule is disabled (so you can move to a newer release). Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
 
 ## Template
 - **Daily Review**: date, score, mood, energy, Keep, Problem, Try, decisions, top 3 for tomorrow, inputs, platforms, market/holdings notes, deep-work hours, done.
