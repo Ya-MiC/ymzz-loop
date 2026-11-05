@@ -12,7 +12,7 @@
 <h1 align="center">ymzz-loop</h1>
 <p align="center"><b>매일 복기를 위한 멀티엔드 데이터 동기화 제품.</b><br>
 제품 사용자로서 템플릿을 Fork하고 Notion/Google/메일을 한 번 연결하면, GitHub Actions가 <em>내</em> Fork에서 오늘의 빈 복기를 만들고 링크를 보내며 <strong>전일을 자동 수집</strong>해 Sheets + Markdown(선택 Feishu)에 남깁니다.<br>
-<strong>하드 캡: 배포당 최대 600회 복기, 600→0 카운트다운 후 소멸</strong>(비트코인 2100만 비유). 새 버전으로 창을 다시 엽니다.<br>
+<strong>배포당 600일 챕터 → 요약</strong>. 600→0 후 일일 루프가 일시정지하고 장을 닫습니다. 새 버전으로 다음 장.<br>
 $0 · 모든 시간대 · 서버 없음 · AI 쿼터 없음 · MIT</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
 
@@ -30,10 +30,10 @@ flowchart LR
 
 1. **도착** — 정한 시간에 빈 회고 템플릿이 Notion에 만들어지고 링크가 담긴 메일이 옵니다.
 2. **작성** — 어떤 기기에서든 작성하세요.
-3. **보관** — 다음 실행 때 어제 기록이 Google Sheets와 내 포크의 `notion/YYYY/*.md`로 복사됩니다. 그리고 매일 반복하다 600→0에서 소멸합니다.
+3. **보관** — 다음 실행 때 어제 기록이 Google Sheets와 내 포크의 `notion/YYYY/*.md`로 복사됩니다. 그리고 매일 반복하다 600→0에서 요약으로 장을 닫습니다.
 
 
-**수명(600→0):** 첫 성공 시 남은 **600**일, 매일 감소, **0**에서 게이트가 스케줄을 소멸. 새 버전 배포 시 새 600→0 창. Notion·Sheets·Markdown은 그대로 당신의 것.
+**챕터(600→0):** 첫 성공 시 남은 **600**일, 매일 감소, **0**에서 일일 루프가 일시정지하고 **600일 요약**으로 장을 닫음. 새 버전으로 다음 장. Notion·Sheets·Markdown은 그대로 당신의 것.
 
 ## 하는 일
 정한 시각(기본 **07:00 UTC**)에 GitHub Actions가:

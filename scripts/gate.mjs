@@ -1,7 +1,8 @@
 // 每小時閘門（<1 秒，無依賴）/ hourly gate: proceed once per local day after REMIND_TIME
 // 輸出 output: go=true|false, expired=true|false, today=, day=, max_days= to $GITHUB_OUTPUT.
 // Dedupe: .ymzz/last-run holds the last local date that ran.
-// Lifespan: from first successful run (.ymzz/started) the loop may run at most MAX_DAYS (600) calendar days, then stops.
+// Chapter length: from first successful run (.ymzz/started) at most MAX_DAYS (600) calendar days,
+// then the daily loop pauses so the chapter can close with a 600-day summary. Redeploy = next chapter.
 import fs from "node:fs";
 import { TZ, REMIND_TIME, isoDate, hhmm, human } from "./time.mjs";
 
@@ -28,7 +29,7 @@ const expired = Boolean(started && day > MAX_DAYS);
 let go, why;
 if (expired) {
   go = false;
-  why = `lifespan ended: day ${day} > ${MAX_DAYS} (started ${started})`;
+  why = `chapter complete: day ${day} > ${MAX_DAYS} (started ${started}) — pause for summary`;
 } else if (manual) {
   go = true;
   why = "manual run";
@@ -44,7 +45,7 @@ if (expired) {
 }
 
 console.log(`[gate] ${human()} · TZ=${TZ} · REMIND_TIME=${REMIND_TIME} · day=${day || "—"}/${MAX_DAYS} → ${go ? "GO" : "skip"} (${why})`);
-if (expired) console.log(`[gate] ymzz-loop stops after ${MAX_DAYS} days from first run. Fork a newer release when you are ready.`);
+if (expired) console.log(`[gate] chapter complete after ${MAX_DAYS} days — daily loop paused for 600-day summary. Deploy a newer release to start the next chapter.`);
 
 if (process.env.GITHUB_OUTPUT) {
   fs.appendFileSync(

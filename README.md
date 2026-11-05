@@ -12,7 +12,7 @@
 <h1 align="center">ymzz-loop</h1>
 <p align="center"><b>A multi-end data sync product for daily review (每日復盤).</b><br>
 As a product user you fork the template, bind Notion / Google / email once, and GitHub Actions — running in <em>your</em> fork — drops today's blank review into Notion, emails you the link, then <b>auto-ingests yesterday</b> into Google Sheets + Markdown (optional Feishu).<br>
-<strong>Hard cap: 600 daily reviews per deploy, counting down 600→0 then annihilate</strong> (Bitcoin 21M analogy) — redeploy for a fresh window.<br>
+<strong>One deploy = a 600-day chapter</strong> (countdown 600→0), then a <strong>600-day summary</strong> and the daily loop pauses — redeploy for the next chapter.<br>
 $0 · any time zone · no servers · no AI quota · MIT</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">Website & guided setup</a> · <a href="docs/architecture.md">Architecture</a> · <a href="CHANGELOG.md">Changelog</a></p>
 
@@ -30,7 +30,7 @@ flowchart LR
 
 1. **In** — at your chosen time, a blank daily-review template is created in your Notion and you get an email with the link.
 2. **Write** — fill it in on any device.
-3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats every day until the counter hits 0 (600→0).
+3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats every day until the chapter ends with a summary (600→0).
 
 ## What it does
 At the time you choose (default **07:00 UTC**), GitHub Actions:
@@ -38,7 +38,7 @@ At the time you choose (default **07:00 UTC**), GitHub Actions:
 2. emails you a link to that page;
 3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」), optionally to **Feishu / Lark Bitable** (see [docs/feishu.md](docs/feishu.md)), and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
 
-It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Lifespan (600→0):** first success starts with **600 days remaining**; each calendar day decrements; at **0** the gate annihilates the schedule (Bitcoin-style hard cap). Deploy a newer ymzz-loop version for a fresh 600→0 window; your Notion / Sheets / Markdown stay yours either way. Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
+It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Chapter (600→0):** first success starts with **600 days remaining**; each calendar day decrements; at **0** the daily loop **pauses** so the chapter can close with a **600-day summary**. Deploy a newer ymzz-loop version for the next chapter; your Notion / Sheets / Markdown stay yours. Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
 
 ## Template
 - **Daily Review**: date, score, mood, energy, Keep, Problem, Try, decisions, top 3 for tomorrow, inputs, platforms, market/holdings notes, deep-work hours, done.

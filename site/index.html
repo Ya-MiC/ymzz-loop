@@ -92,7 +92,7 @@
 
 <!-- THE LOOP -->
 <section id="loop" class="sec">
-  <div class="panel loopp">
+  <div class="panel loopp loop-rail">
     <div class="prose"><p class="label reveal">01 — <span data-i18n="loop.k">The loop</span></p>
       <h2 class="reveal" data-i18n="loop.h">How the loop works</h2>
       <p class="reveal big" data-i18n="loop.p"></p></div>
@@ -105,16 +105,16 @@
   </div>
 </section>
 
-<!-- INTRO -->
+<!-- INTRO: one-axis — prose then compact fact strip -->
 <section id="intro" class="sec">
-  <div class="panel intro">
+  <div class="panel intro intro-rail">
     <div class="prose">
       <p class="label reveal">02 — <span data-i18n="nav.intro">Intro</span></p>
       <h2 class="reveal" data-i18n="intro.h">What is ymzz-loop?</h2>
       <p class="reveal big" data-i18n="intro.p1"></p>
       <p class="reveal" data-i18n="intro.p2"></p>
     </div>
-    <dl class="facts">
+    <dl class="facts facts-strip">
       <div class="fact reveal"><dt><svg class="i" aria-hidden="true"><use href="icons.svg#i-notebook"/></svg><span data-i18n="intro.who.h"></span></dt><dd data-i18n="intro.who.p"></dd></div>
       <div class="fact reveal"><dt><svg class="i" aria-hidden="true"><use href="icons.svg#i-shield-lock"/></svg><span data-i18n="intro.own.h"></span></dt><dd data-i18n="intro.own.p"></dd></div>
       <div class="fact reveal"><dt><svg class="i" aria-hidden="true"><use href="icons.svg#i-cloud-off"/></svg><span data-i18n="intro.cost.h"></span></dt><dd data-i18n="intro.cost.p"></dd></div>
@@ -128,7 +128,7 @@
     <p class="label reveal">03 — <span data-i18n="nav.features">Features</span></p>
     <h2 class="reveal" data-i18n="feat.h">Small software, big order.</h2>
   </div>
-  <div class="bento">
+  <div class="bento bento-rail">
     <article class="tile t-notion reveal" data-accent="sky">
       <header><p class="label" data-i18n="f1.m"></p><h3 data-i18n="f1.t"></h3></header>
       <div class="paper notion"><p class="mt"><bdi class="today"></bdi> · <span data-i18n="mock.title"></span></p>
@@ -181,7 +181,7 @@
 
 <!-- BEFORE / AFTER -->
 <section class="sec">
-  <div class="panel ba">
+  <div class="panel ba ba-rail">
     <div class="prose"><p class="label reveal">04 — <span data-i18n="before.h"></span></p><h2 class="reveal" data-i18n="before.h">Before / After</h2></div>
     <div class="bacols">
       <div class="col before reveal"><h3 data-i18n="before.a"></h3><ul><li data-i18n="before.a1"></li><li data-i18n="before.a2"></li><li data-i18n="before.a3"></li></ul></div>
@@ -192,31 +192,26 @@
 
 
 
-<!-- DIFFERENTIATION -->
+<!-- DIFFERENTIATION: single-axis editorial list (no sparse fold card) -->
 <section id="diff" class="sec">
-  <div class="panel foldable is-open diffp">
-    <header class="tile-hd">
-      <div class="tile-hd-text">
-        <p class="label reveal">04 — <span data-i18n="diff.k">Differentiation</span></p>
-        <h2 class="reveal" data-i18n="diff.h">Why not just Day One / Notion / Zapier?</h2>
-      </div>
-      <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button>
-    </header>
-    <div class="fold-body">
+  <div class="panel diffp diff-rail">
+    <div class="prose">
+      <p class="label reveal">05 — <span data-i18n="diff.k">Differentiation</span></p>
+      <h2 class="reveal" data-i18n="diff.h">Why not just Day One / Notion / Zapier?</h2>
       <p class="lede reveal" data-i18n="diff.p"></p>
-      <ul class="diff-list reveal">
-        <li data-i18n="diff.b1"></li>
-        <li data-i18n="diff.b2"></li>
-        <li data-i18n="diff.b3"></li>
-      </ul>
     </div>
+    <ol class="diff-list reveal">
+      <li data-i18n="diff.b1"></li>
+      <li data-i18n="diff.b2"></li>
+      <li data-i18n="diff.b3"></li>
+    </ol>
   </div>
 </section>
 
 <!-- SETUP -->
 <section id="setup" class="sec">
   <div class="panel tut">
-    <p class="label reveal">05 — <span data-i18n="nav.setup">Setup</span></p>
+    <p class="label reveal">06 — <span data-i18n="nav.setup">Setup</span></p>
     <h2 class="reveal" data-i18n="setup.h">Guided setup</h2>
     <p class="sub reveal" data-i18n="setup.sub"></p>
     <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="pct"><i></i><span id="pct" dir="ltr">0%</span></div>
@@ -226,7 +221,7 @@
 
 <!-- FAQ + OSS -->
 <section id="faq" class="sec twin">
-  <div class="panel"><p class="label">06 — <span data-i18n="nav.faq">FAQ</span></p><h2 class="reveal" data-i18n="faq.h">Questions</h2><div id="faqList"></div></div>
+  <div class="panel"><p class="label">07 — <span data-i18n="nav.faq">FAQ</span></p><h2 class="reveal" data-i18n="faq.h">Questions</h2><div id="faqList"></div></div>
   <div class="panel oss"><div class="glow g3" aria-hidden="true"></div><p class="label">MIT</p><h2 class="reveal" data-i18n="oss.h"></h2><p class="reveal" data-i18n="oss.p"></p>
     <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="ui.star">Star on GitHub</span></a></div>
 </section>
@@ -288,7 +283,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.12.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.13.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>

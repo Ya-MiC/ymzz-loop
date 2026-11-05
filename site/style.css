@@ -1425,3 +1425,134 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
   box-shadow:inset 0 0 0 1px var(--edge);
   font-size:var(--t-base);color:var(--ink);
 }
+
+/* ===== v1.13.0 · Grail one-axis cadence · denser rhythm · chapter framing =====
+   Study notes (grail-app.com / awwwards Grail):
+   - One idea per beat; full-bleed bands; soft rise reveals; stagger ~.1s
+   - Avoid sparse multi-card grids competing for attention
+   - Editorial measure, numbered list cadence, hover lift only
+   - prefers-reduced-motion already covered above
+*/
+:root{
+  --ease-grail:cubic-bezier(.22,1,.36,1);
+  --rise:.85rem;              /* shorter travel = denser, less floaty */
+  --frame:clamp(.35rem,.9vw,.75rem); /* tighter section seam */
+  --pad:clamp(1.1rem,3.2vw,2.75rem); /* less empty inside panels */
+  --pad-card:clamp(.85rem,1.6vw,1.25rem);
+}
+
+/* Hero: less empty viewport, stronger hierarchy */
+.hero{
+  min-block-size:min(40rem,calc(100svh - 5rem))!important;
+  gap:var(--frame)!important;
+}
+.headp{gap:var(--s4)!important;justify-content:center!important}
+.headp h1{margin-block:var(--s2) var(--s3)!important;max-inline-size:18ch}
+.lede{max-inline-size:54ch;font-size:var(--t-base);color:var(--ink-2)}
+.stats{padding-block-start:var(--s4)!important;gap:var(--s3) clamp(1.25rem,3vw,2.5rem)!important}
+.dayp{gap:var(--s3)!important}
+
+/* Intro rail: stack prose → compact 3-col facts (one axis) */
+.intro-rail{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:var(--s5)!important;
+  align-items:start!important;
+}
+.intro-rail > .prose{max-inline-size:62ch}
+.facts-strip{
+  display:grid!important;
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:var(--s3)!important;
+  max-inline-size:none!important;
+}
+.facts-strip .fact{
+  min-block-size:0!important;
+  padding:var(--s4)!important;
+  gap:var(--s2)!important;
+}
+.facts-strip .fact dd{font-size:var(--t-sm)!important;line-height:1.55}
+
+/* Loop: denser step cards */
+.loop-rail .loop{gap:var(--s3)!important;margin-block-start:var(--s4)!important}
+.loop-rail .lp{min-block-size:0!important}
+.loop-rail .lp h3{margin:0 0 var(--s2)}
+.loop-rail .lp p{margin:0;font-size:var(--t-sm);color:var(--ink-2)}
+.loop-rail .again{margin-block-start:var(--s4)!important}
+
+/* Bento → denser rail: 2-col pairs, less air */
+.bento-rail{
+  grid-template-columns:repeat(12,minmax(0,1fr))!important;
+  gap:var(--s3)!important;
+}
+.bento-rail .t-notion{grid-column:span 7;grid-row:span 2}
+.bento-rail .t-mail{grid-column:span 5}
+.bento-rail .t-tz{grid-column:span 5}
+.bento-rail .t-sheet{grid-column:span 7}
+.bento-rail .t-hold{grid-column:span 5}
+.bento-rail .t-code{grid-column:span 12;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);column-gap:var(--s5)}
+.bento-rail .tile{gap:var(--s3)!important}
+.sec > .head{padding-block-end:var(--s3)!important}
+
+/* Before/after denser */
+.ba-rail{gap:var(--s4)!important}
+.ba-rail .bacols{gap:var(--s3)!important}
+.ba-rail .col{padding:var(--s4) var(--s5)!important}
+.ba-rail .col li{margin-block:var(--s1)!important}
+
+/* Diff rail: editorial list, numbered like Grail chance cards */
+.diff-rail{
+  display:grid!important;
+  grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)!important;
+  gap:clamp(1.25rem,4vw,3rem)!important;
+  align-items:end!important;
+}
+.diff-rail .prose{max-inline-size:none}
+.diff-rail .diff-list{
+  list-style:none;margin:0!important;padding:0;
+  display:grid;gap:var(--s2)!important;
+  counter-reset:diff;
+}
+.diff-rail .diff-list li{
+  counter-increment:diff;
+  display:grid;
+  grid-template-columns:2.5rem 1fr;
+  gap:var(--s3);
+  align-items:start;
+  padding:var(--s3) var(--s4)!important;
+  background:color-mix(in srgb,var(--panel) 92%,var(--sky))!important;
+  box-shadow:inset 0 0 0 1px var(--line)!important;
+}
+.diff-rail .diff-list li::before{
+  content:counter(diff, decimal-leading-zero);
+  font:500 var(--t-sm)/1 var(--f-body);
+  letter-spacing:.08em;
+  color:var(--ink-3);
+  padding-block-start:.2rem;
+}
+
+/* Sync strip tighter */
+.syncstrip .syncrow{gap:var(--s3)!important}
+.syncstrip .fc{padding:var(--s3)!important}
+
+/* Soft section cadence: panels breathe less, labels closer to titles */
+.sec .panel > .prose .label,
+.sec .head .label{margin-block-end:var(--s2)}
+.sec h2{margin-block:0 var(--s3)!important;letter-spacing:-.02em}
+.big{font-size:clamp(1.05rem,1.4vw,1.25rem)!important;line-height:1.55!important}
+
+/* Marquee slightly quieter */
+.marquee{margin-block:var(--s2) 0}
+
+@media (max-width:68rem){
+  .facts-strip{grid-template-columns:1fr!important}
+  .diff-rail{grid-template-columns:1fr!important;align-items:start!important}
+  .bento-rail .t-notion,.bento-rail .t-mail,.bento-rail .t-tz,
+  .bento-rail .t-sheet,.bento-rail .t-hold{grid-column:span 6}
+  .bento-rail .t-code{grid-column:span 12}
+}
+@media (max-width:48rem){
+  .bento-rail .t-notion,.bento-rail .t-mail,.bento-rail .t-tz,
+  .bento-rail .t-sheet,.bento-rail .t-hold,.bento-rail .t-code{grid-column:span 12}
+  .hero{min-block-size:0!important}
+}

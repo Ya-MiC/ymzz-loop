@@ -9,6 +9,15 @@
 
 
 
+## [1.13.0] — 2026-11-05
+
+### Changed
+- **Chapter framing (owner correction):** never “annihilate / 湮滅”. Each deploy runs **600 days of daily review**, then produces one **600-day summary（總結）**. Countdown 600→0 = days remaining until the summary; at 0 the daily loop **pauses / chapter closes**; redeploy starts the next chapter. Gate still enforces calendar days ≤600; comments, workflow email, READMEs, i18n, Differentiation, competitors, and product brief updated.
+- **Site layout (Grail cadence):** fewer competing cards, tighter vertical rhythm, clearer hierarchy, denser card interiors, stronger one-axis flow. Soft reveals / hover with `cubic-bezier(.22,1,.36,1)`; `prefers-reduced-motion` safe. Fonts, four palettes, micro borders, read progress, fold, donate, Feishu, zh-CN A-share egg kept; IBKR still gone; no How-it-works sticky story.
+
+### Site
+- Official site v1.13.0 · screenshots `v17-*`.
+
 ## [1.12.0] — 2026-11-05
 
 ### Changed
