@@ -9,6 +9,14 @@
 
 
 
+## [1.17.1] — 2026-11-05
+
+### Changed
+- **Hero equal height:** three cards stretch to the same column height even with empty to-dos; dayp content distributes (todos flex, holdings settle to bottom) — no accidental short right card.
+- **Product-only CTA:** “Get the automation” → `product` branch (no `site/`, no Pages workflow). `main` keeps the showcase. Builder `scripts/build-product-branch.mjs` + workflow `sync-product.yml` refresh `product` from `main`. See `docs/product-only.md`.
+- **Bottom spy:** removed 0–100 meter/number; progress is glass depth + soft accent wash inside the existing section capsule; jumps stay clickable.
+- **Dial rhythm:** smaller live clock (≈15.5rem), tighter dialp padding/foot so it matches center/right cards.
+
 ## [1.17.0] — 2026-11-05
 
 ### Changed

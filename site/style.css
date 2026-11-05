@@ -3573,3 +3573,103 @@ html[data-theme=dark] .hold-pct{font-weight:600!important}
     grid-template-columns:minmax(4rem,1fr) minmax(0,1.4fr) 2.75rem;
   }
 }
+
+/* ===== v1.17.1 · equal hero heights · dial rhythm · glass spy (no %) · product CTA ===== */
+
+/* Equal-height hero cards: stretch columns; distribute dayp content without a void */
+@media screen and (min-width:1089px){
+  .hero.hero-urgency{
+    align-items:stretch!important;
+  }
+  .hero.hero-urgency > .dialp,
+  .hero.hero-urgency > .headp,
+  .hero.hero-urgency > .dayp{
+    display:flex!important;
+    flex-direction:column!important;
+    min-block-size:100%!important;
+    height:auto!important;
+    align-self:stretch!important;
+  }
+  .hero.hero-urgency > .headp{
+    justify-content:center!important;
+  }
+  .hero.hero-urgency > .dialp{
+    justify-content:space-between!important;
+    gap:var(--s3)!important;
+  }
+  .hero.hero-urgency > .dayp{
+    justify-content:flex-start!important;
+    gap:var(--s3)!important;
+  }
+  /* soft filler: holdings sits toward bottom when todos empty */
+  .hero.hero-urgency > .dayp > .hold-mini{
+    margin-block-start:auto;
+  }
+  .hero.hero-urgency > .dayp > .todo-unified-wrap{
+    flex:1 1 auto;
+  }
+}
+
+/* Dial rebalance — smaller ring, calmer column */
+.dialp{
+  gap:var(--s3)!important;
+  padding:clamp(1rem, 2vw, 1.35rem)!important;
+}
+.dial{
+  inline-size:min(100%, 15.5rem)!important;
+  max-inline-size:15.5rem;
+  margin-inline:auto;
+  margin-block:0.25rem auto;
+}
+.clock{
+  font-size:clamp(1.85rem, 3.2vw, 2.65rem)!important;
+}
+.dialfoot{
+  padding:var(--s2)!important;
+  gap:var(--s3)!important;
+}
+.dialfoot dd{
+  font-size:1.05rem!important;
+}
+@media (max-width:68rem){
+  .dial{ inline-size:min(100%, 14rem)!important; max-inline-size:14rem; }
+}
+@media (min-width:1089px){
+  .dialp .label{ margin-block-end:0; }
+}
+
+/* Bottom spy: no numeric meter — glass depth + active section only */
+.spy-meter, .spy-pct, .spy-track{ display:none!important; }
+.sec-spy{
+  --spy-glass: 0.55;
+  --spy-sec: 0;
+  background:linear-gradient(
+    180deg,
+    transparent,
+    color-mix(in srgb, var(--ground) calc(var(--spy-glass) * 70%), transparent) 40%
+  )!important;
+}
+.spy-list{
+  background:color-mix(
+    in srgb,
+    var(--panel) calc((0.55 + var(--spy-glass) * 0.35) * 100%),
+    transparent
+  )!important;
+  backdrop-filter:blur(calc(0.45rem + var(--spy-glass) * 0.55rem)) saturate(1.25)!important;
+  -webkit-backdrop-filter:blur(calc(0.45rem + var(--spy-glass) * 0.55rem)) saturate(1.25)!important;
+  box-shadow:
+    0 0.4rem 1.1rem -0.5rem rgba(42,36,29, calc(0.1 + var(--spy-glass) * 0.12)),
+    inset 0 0 0 1px color-mix(in srgb, var(--edge) 45%, transparent)!important;
+  /* subtle section cue: accent wash shifts with --spy-sec */
+  background-image:linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--accent-soft) calc(var(--spy-sec) * 28%), transparent),
+    transparent 55%
+  )!important;
+}
+@media (prefers-reduced-motion:reduce){
+  .sec-spy, .spy-list{
+    transition:none!important;
+  }
+  .sec-spy{ --spy-glass: 0.72; }
+}

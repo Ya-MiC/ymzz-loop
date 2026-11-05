@@ -1,0 +1,27 @@
+# Keep `product` branch = automation only (no site/, no pages.yml).
+# Showcase stays on main. Site CTA → /tree/product
+name: sync-product
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: sync-product
+  cancel-in-progress: true
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Build product branch
+        run: node scripts/build-product-branch.mjs
+      - name: Push product
+        run: |
+          git push origin product --force

@@ -21,7 +21,7 @@
   "hero.h1b": "이미 기다리고 있습니다.",
   "hero.identity": "Notion에 쓰고, 매일을 Google Sheets와 내 GitHub Markdown(선택 Feishu)에 남깁니다. $0 셀프호스트. 한 번 배포 = 600일 챕터, 요약으로 마무리.",
   "hero.cta1": "15분 설정 시작하기",
-  "hero.cta2": "이 템플릿 사용하기",
+  "hero.cta2": "자동화 받기（사이트 제외）",
   "stat.cost": "월 비용",
   "stat.tz": "개 시간대 선택 가능",
   "stat.dest": "개 동기화 대상",
@@ -275,5 +275,6 @@
   "hold.label": "이름",
   "hold.link": "링크",
   "hold.linkPh": "https://…",
-  "hold.pct": "비중"
+  "hold.pct": "비중",
+  "hero.cta2title": "사이트 없는 product 전용 브랜치. ZIP 다운로드 또는 clone -b product."
 }

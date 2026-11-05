@@ -21,7 +21,7 @@
   "hero.h1b": "already waiting.",
   "hero.identity": "Write in Notion. Keep every day in Google Sheets and your own GitHub Markdown (optional Feishu). $0 self-host. One deploy = one 600-day chapter that closes with a summary.",
   "hero.cta1": "Start the 15-min setup",
-  "hero.cta2": "Use this template",
+  "hero.cta2": "Get the automation",
   "stat.cost": "per month",
   "stat.tz": "time zones you can pick",
   "stat.dest": "destinations",
@@ -275,5 +275,6 @@
   "hold.label": "Label",
   "hold.link": "Link",
   "hold.linkPh": "https://…",
-  "hold.pct": "Percent"
+  "hold.pct": "Percent",
+  "hero.cta2title": "Opens the product-only branch (no showcase site). Download ZIP or clone -b product."
 }

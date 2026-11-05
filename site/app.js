@@ -87,6 +87,7 @@
     const h = document.documentElement; h.lang = dict._lang || lang; h.dir = dict._dir || "ltr";
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
     $$("[data-i18n-placeholder]").forEach(el => { el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder)); });
+    $$("[data-i18n-title]").forEach(el => { el.setAttribute("title", t(el.dataset.i18nTitle)); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
     $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
     if (window.__ymzzHoldSync) window.__ymzzHoldSync(lang);
@@ -515,7 +516,7 @@
     const bar = $(".readbar");
     const hero = $(".hero");
     const root = document.documentElement;
-    const spyFill = $("#spyFill"), spyPct = $("#spyPct");
+    const spy = $("#secSpy");
     let ticking = false;
     const measureHeroW = () => {
       if (!hero) return;
@@ -536,10 +537,11 @@
         bar.style.setProperty("--read-p", v);
         bar.setAttribute("aria-valuenow", String(Math.round(p * 100)));
       }
-      // bottom spy 0–100 fill (complements section dots)
-      const pct = Math.round(p * 100);
-      if (spyFill) spyFill.style.transform = "scaleX(" + v + ")";
-      if (spyPct) spyPct.textContent = String(pct);
+      // bottom spy: glass depth from scroll (no numeric %). Active section via IO below.
+      if (spy) {
+        const g = (0.42 + p * 0.48).toFixed(3); // more frosted as you go deeper
+        spy.style.setProperty("--spy-glass", g);
+      }
       if (nav && hero) {
         const hb = hero.getBoundingClientRect().bottom;
         // shrink only after entire first screen has scrolled past (hero bottom ≤ 0)
@@ -575,11 +577,17 @@
     }).join("");
     const links = $$("[data-spy-link]", list);
     const setActive = (id) => {
-      links.forEach(a => {
+      let idx = 0;
+      links.forEach((a, i) => {
         const on = a.getAttribute("data-spy-link") === id;
         a.classList.toggle("is-on", on);
-        if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+        if (on) { a.setAttribute("aria-current", "true"); idx = i; } else a.removeAttribute("aria-current");
       });
+      if (spy) {
+        const t = links.length > 1 ? idx / (links.length - 1) : 0;
+        spy.style.setProperty("--spy-sec", t.toFixed(3));
+        spy.dataset.active = id;
+      }
     };
     if ("IntersectionObserver" in window) {
       const ratios = new Map();

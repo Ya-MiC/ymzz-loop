@@ -21,7 +21,7 @@
   "hero.h1b": "自動就位。",
   "hero.identity": "在 Notion 書寫，把每天留在 Google Sheets 與你自己的 GitHub Markdown（可選飛書）。$0 自託管。一次部署＝一段 600 天篇章，以總結收束。",
   "hero.cta1": "開始 15 分鐘設定",
-  "hero.cta2": "使用此模板",
+  "hero.cta2": "取得自動化（無網站）",
   "stat.cost": "每月費用",
   "stat.tz": "個時區可選",
   "stat.dest": "個同步端",
@@ -275,5 +275,6 @@
   "hold.label": "名稱",
   "hold.link": "連結",
   "hold.linkPh": "https://…",
-  "hold.pct": "占比"
+  "hold.pct": "占比",
+  "hero.cta2title": "開啟僅含自動化的 product 分支（不含展示網站）。可 Download ZIP 或 git clone -b product。"
 }

@@ -18,7 +18,7 @@
   "hero.h1b": "بانتظارك.",
   "hero.identity": "Write in Notion. Keep every day in Google Sheets and your own GitHub Markdown (optional Feishu). $0 self-host. One deploy = one 600-day chapter that closes with a summary.",
   "hero.cta1": "ابدأ الإعداد في 15 دقيقة",
-  "hero.cta2": "استخدم هذا القالب",
+  "hero.cta2": "احصل على الأتمتة (بدون موقع)",
   "stat.cost": "شهريًا",
   "stat.tz": "منطقة زمنية",
   "stat.dest": "وجهات",
@@ -171,5 +171,6 @@
   "hold.label": "الاسم",
   "hold.link": "رابط",
   "hold.linkPh": "https://…",
-  "hold.pct": "النسبة"
+  "hold.pct": "النسبة",
+  "hero.cta2title": "فرع product للأتمتة فقط دون موقع العرض."
 }

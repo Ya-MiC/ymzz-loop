@@ -7,7 +7,7 @@
 One deploy = one **600-day chapter** of daily review, counting **600→0** — a gentle clock, then a **600-day summary** and the loop pauses.  
 GitHub Actions in **your** fork opens today’s blank page in Notion, emails the link, and **auto-ingests yesterday** into Google Sheets + your GitHub Markdown (optional Feishu).  
 **$0 · MIT · multi-end · no AI quota · any time zone** — Notion write → Sheets + Git (+ Feishu).  
-**[Open the site & 15-min setup →](https://ya-mic.github.io/ymzz-loop/)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
+**[Open the site & 15-min setup →](https://ya-mic.github.io/ymzz-loop/)** · **[Get automation only (no website) →](https://github.com/Ya-MiC/ymzz-loop/tree/product)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
 
 <p align="center">
 <a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
