@@ -2,6 +2,10 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.5.1] - 2026-11-05
+### Changed
+- "How the loop works": replaced flat cards with layered brand gradients (sky→paper, lotus→lilac, lilac→sky), blurred glow orbs, section mesh + grain, inner highlight and soft depth, gentle hover lift, gradient connectors; dark-mode variant; reduced-motion safe.
+
 ## [1.5.0] - 2026-11-05
 ### Changed
 - Design system pass: strict fluid type scale (`--t-xs` … `--t-6xl`), Fraunces for display only (≥ `--t-xl`), Inter for all UI/body/labels/numbers, JetBrains Mono only for code; weights limited to 400/500/600; line-height and tracking tokens per script.
