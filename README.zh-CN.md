@@ -12,8 +12,9 @@
 
 <h1 align="center">ymzz-loop · 每日复盘</h1>
 <p align="center"><b>每日复盘的多端数据同步产品。</b><br>
+<strong>硬上限 600→0 湮灭／次部署</strong>——像比特币的 2100 万枚。<br>
 作为产品用户，你 Fork 模板、绑定 Notion／Google／邮箱一次；GitHub Actions 在<em>你的</em> Fork 里每天建立今日空白复盘、寄出链接，并<strong>自动摄取前一日</strong>到 Google Sheets + Markdown（可选飞书，见 docs/feishu.md）。<br>
-<strong>寿命：第 0 天（首次成功）→ 第 600 天硬停止（湮灭）</strong>，除非你部署更新版本。<br>
+<strong>硬上限：一次部署最多 600 次每日复盘，从 600 倒数到 0 后湮灭</strong>（比特币 2100 万类比）——部署新版可重开窗口。<br>
 $0 · 任意时区 · 无服务器 · 无 AI 配额 · MIT</p>
 
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官网与交互教学 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架构 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
@@ -34,7 +35,7 @@ flowchart LR
 
 1. **送入**——在你选定的时间，Notion 自动建好空白的每日复盘模板，并发出带链接的提醒邮件。
 2. **书写**——任何设备都能填。
-3. **保存**——下一次运行把昨天的内容复制到 Google Sheets 与你 fork 里的 `notion/YYYY/*.md`。然后每天重复，最多 600 天。
+3. **保存**——下一次运行把昨天的内容复制到 Google Sheets 与你 fork 里的 `notion/YYYY/*.md`。然后每天重复，直到 600→0 湮灭。
 
 ## 它做什么 What it does
 每天在**你设置的时区与时间**（缺省 **07:00 UTC**），GitHub Actions 自动：
@@ -42,7 +43,7 @@ flowchart LR
 2. 寄信给你，附今日页面链接 / emails you the link
 3. 把**昨天**的复盘 + 目前持仓同步到 Google Sheet（分页「每日复盘」「持仓」）与本仓库 `notion/YYYY/MMDD_HHMM_<时区>.md`（例如 `1105_0705_utc.md`，档内写明时区）/ syncs yesterday to Google Sheets and a markdown snapshot
 
-不用 Grok / AI 额度，只用 GitHub 免费分钟。**寿命上限：自首次成功运行起最多 600 个日历天，到期自动停止**。长期免维护：每小时闸门数秒结束、每天只真正运行一次（去重）、每次运行重新激活调度、45 天无提交自动补一次（避开 GitHub 60 天停用规则）、10 分钟逾时、失败寄信。
+不用 Grok / AI 额度，只用 GitHub 免费分钟。**寿命（600→0）：** 首次成功时剩余 **600** 天，每日递减，到 **0** 湮灭（比特币式硬上限）。部署更新版可重开。长期免维护：每小时闸门数秒结束、每天只真正运行一次（去重）、每次运行重新激活调度、45 天无提交自动补一次（避开 GitHub 60 天停用规则）、10 分钟逾时、失败寄信。
 No AI quota; free GitHub minutes only. Built to run unattended.
 
 | | ymzz-loop | 一般 Notion 模板 | 付费日记 App |

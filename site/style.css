@@ -1414,3 +1414,14 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
 
 /* v1.11.1 · flow / How-it-works section removed — hide any leftover selectors */
 .stage,.paper-stage,.stage-glow,.story,.bign,.sprog,#flow,#flowList,#bigN,#sprog{display:none!important}
+
+/* v1.12.0 · differentiation */
+.diffp .lede{max-inline-size:62ch;color:var(--ink-2)}
+.diff-list{list-style:none;margin:var(--s5) 0 0;padding:0;display:grid;gap:var(--s3)}
+.diff-list li{
+  padding:var(--s4) var(--s5);
+  border-radius:var(--Ri);
+  background:color-mix(in srgb,var(--accent) 12%,var(--paper));
+  box-shadow:inset 0 0 0 1px var(--edge);
+  font-size:var(--t-base);color:var(--ink);
+}

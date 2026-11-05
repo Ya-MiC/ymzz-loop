@@ -8,6 +8,16 @@
 
 
 
+
+## [1.12.0] — 2026-11-05
+
+### Changed
+- Lifespan messaging: **600→0 annihilate** (Bitcoin 21M analogy), not 0→600. First success starts with 600 remaining; hits 0 → gate stops. Redeploy = fresh window. Gate implementation unchanged (calendar days from first success ≤600).
+
+### Added
+- Site Differentiation foldable section (vs Day One / Notion / Zapier glue).
+- Research notes for Trending push: `site-research/competitors.md` (outside or alongside brief).
+
 ## [1.11.2] — 2026-11-05
 
 ### Changed
