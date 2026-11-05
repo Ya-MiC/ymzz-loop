@@ -6,6 +6,12 @@
 
 
 
+
+## [1.11.1] — 2026-11-05
+
+### Removed
+- Entire 「運作方式」 / How it works sticky story section (`#flow`, 05 — steps 01–05). Nav link and exclusive i18n keys removed.
+
 ## [1.11.0] — 2026-11-05
 
 ### Added

@@ -1,6 +1,6 @@
 {
   "name": "ymzz-loop",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Zero-cost daily review & holdings journal: GitHub Actions creates your Notion page, emails a reminder, and syncs yesterday to Google Sheets + Markdown. Any time zone. \u6bcf\u65e5\u5fa9\u76e4\uff0c\u96f6\u6210\u672c\u81ea\u52d5\u5316\u3002",
   "private": true,
   "type": "module",

@@ -14,21 +14,10 @@
   const pre = (s) => `<pre dir="ltr"><button class="copy" type="button">${icon("copy")}<span>${t("ui.copy")}</span></button><code>${esc(s)}</code></pre>`;
   const load = async l => { const r = await fetch(`i18n/${l}.json`); return r.json(); };
 
-  // story / faq built from keys
+  // faq built from keys
   const renderStatic = () => {
-    $("#flowList").innerHTML = ["01", "02", "03", "04", "05"].map((n, i) => `<li data-n="${n}" data-i="${i}"><span class="n" aria-hidden="true">${n}</span><h3><span class="vh">${i}. </span>${t(`s${i}.t`)}</h3><p>${t(`s${i}.p`)}</p></li>`).join("");
     $("#faqList").innerHTML = [1, 2, 3, 4, 5].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
-    observeStory();
   };
-  // sticky story: active step
-  let sio;
-  function observeStory() {
-    sio?.disconnect();
-    sio = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; const li = e.target, i = +li.dataset.i;
-      $$("#flowList li").forEach(x => x.classList.toggle("on", x === li)); $("#bigN").textContent = li.dataset.n; $("#sprog").style.inlineSize = ((i + 1) / 5 * 100) + "%"; }), { rootMargin: "-45% 0px -45% 0px" });
-    $$("#flowList li").forEach(li => sio.observe(li));
-    if (reduce) $$("#flowList li").forEach(li => li.classList.add("on"));
-  }
 
   // world-clock tile (feature demo only; no hero clock)
   function drawCities() {

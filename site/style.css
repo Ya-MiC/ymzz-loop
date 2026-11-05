@@ -589,110 +589,6 @@ main{
   box-shadow:var(--sh)!important;
 }
 
-/* —— How it works: LIGHT paper stage (MIT-like), dark ink for type only —— */
-.stage,
-.paper-stage{
-  grid-template-columns:1fr!important;
-  background:
-    radial-gradient(90% 70% at 10% 0%,color-mix(in srgb,var(--accent) 28%,transparent),transparent 60%),
-    radial-gradient(80% 60% at 95% 100%,color-mix(in srgb,var(--accent-soft) 32%,transparent),transparent 65%),
-    linear-gradient(180deg,color-mix(in srgb,#fff 55%,var(--ground)),color-mix(in srgb,var(--accent-warm) 12%,var(--ground)))!important;
-  color:var(--ink)!important;
-  box-shadow:var(--sh);
-  border:0;
-}
-.stage-glow{
-  background:radial-gradient(circle,color-mix(in srgb,var(--accent-warm) 35%,transparent),transparent 70%)!important;
-  opacity:.55;inset-inline-start:50%;transform:translateX(-50%);
-}
-.stage .label{color:var(--ink-3)!important}
-.stage h2{color:var(--ink)}
-.stage > .sticky,
-.stage > .story{grid-column:1/-1!important}
-.sticky{
-  position:relative!important; /* stop left sticky column; stack heading then steps */
-  inset-block-start:auto!important;
-  text-align:start;
-  margin-block-end:var(--s5);
-  max-inline-size:40rem;
-}
-.bign{
-  color:transparent!important;
-  -webkit-text-stroke:1.5px color-mix(in srgb,var(--ink) 28%,transparent)!important;
-  margin-block-start:var(--s2)!important;
-}
-.sprog{background:color-mix(in srgb,var(--ink) 10%,transparent)!important;max-inline-size:18rem}
-.sprog i{background:linear-gradient(90deg,var(--accent),var(--accent-warm),var(--accent-soft))!important}
-.story{gap:var(--s4)!important;max-inline-size:40rem}
-.story li{
-  min-block-size:auto!important;
-  opacity:1!important;transform:none!important;
-  background:color-mix(in srgb,#fff 78%,var(--ground))!important;
-  color:var(--ink)!important;
-  box-shadow:var(--sh)!important;
-  border:0!important;
-}
-.story li.on{
-  background:color-mix(in srgb,#fff 92%,var(--accent-soft))!important;
-  box-shadow:var(--sh2)!important;
-}
-.story .n{
-  color:var(--ink)!important;
-  background:linear-gradient(140deg,var(--accent),var(--accent-warm))!important;
-}
-.story h3{color:var(--ink)!important}
-.story p{color:var(--ink-2)!important}
-[data-theme=dark] .stage,
-[data-theme=dark] .paper-stage{
-  background:
-    radial-gradient(90% 70% at 10% 0%,color-mix(in srgb,var(--accent) 18%,transparent),transparent 60%),
-    radial-gradient(80% 60% at 95% 100%,color-mix(in srgb,var(--accent-soft) 16%,transparent),transparent 65%),
-    linear-gradient(180deg,#352E25,#2A241D)!important;
-  color:var(--ink)!important;
-}
-[data-theme=dark] .story li{background:#2A241D!important}
-[data-theme=dark] .story li.on{background:#352E25!important}
-[data-theme=dark] .bign{-webkit-text-stroke:1.5px color-mix(in srgb,var(--ink) 35%,transparent)!important}
-
-/* Soft section-to-section: no hard separators; shared ground shows through gaps */
-.marquee{
-  border:0;
-}
-
-/* Nav: scroll-driven opacity + blur (vars set by rAF in app.js) */
-.nav{
-  --nav-p:0;
-  --nav-alpha:calc(0.28 + (var(--nav-p) * 0.62));
-  --nav-blur:calc(2px + (var(--nav-p) * 12px));
-  background:color-mix(in srgb,var(--ground) calc(var(--nav-alpha) * 100%), transparent)!important;
-  backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.35))!important;
-  -webkit-backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.35))!important;
-  box-shadow:
-    0 calc(0.15rem + var(--nav-p) * 0.55rem) calc(0.6rem + var(--nav-p) * 1.4rem) color-mix(in srgb,var(--ink) calc(var(--nav-p) * 14%), transparent),
-    inset 0 0 0 0 transparent!important;
-  border:0!important;
-  transition:none; /* rAF drives continuous change; avoid fighting */
-}
-@media (prefers-reduced-motion:reduce){
-  .nav{
-    --nav-p:0.85;
-    transition:background .2s linear,backdrop-filter .2s linear;
-  }
-}
-
-/* Setup bezel: drop nested rim */
-.tut .bezel{padding:0;background:transparent;box-shadow:none}
-.tut .bezel > div,.tpanel{box-shadow:var(--sh);border-radius:var(--Ri);background:color-mix(in srgb,#fff 80%,var(--ground))}
-[data-theme=dark] .tpanel{background:#2A241D}
-
-/* FAQ twin already single-col above; oss soft */
-.oss{border:0}
-
-/* Calm reveal (already ink ease) */
-@media (max-width:68rem){
-  .hero > .dayp{order:2}
-  .sticky{position:relative!important}
-}
 
 /* ===== v1.9.0 · soft Morandi paper only · no black surfaces · value-contrast · one rim · Inter UI ===== */
 :root{
@@ -1515,3 +1411,6 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
   .fold-body{transition:none!important}
   .tile:hover,.lp:hover,.fact:hover,.fc:hover,.daycard:hover,.btn:hover{transform:none!important}
 }
+
+/* v1.11.1 · flow / How-it-works section removed — hide any leftover selectors */
+.stage,.paper-stage,.stage-glow,.story,.bign,.sprog,#flow,#flowList,#bigN,#sprog{display:none!important}
