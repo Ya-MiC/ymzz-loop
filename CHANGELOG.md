@@ -9,6 +9,13 @@
 
 
 
+## [1.13.1] — 2026-11-05
+
+### Fixed
+- **Mock cards hug content:** Notion template card (「值得寫的模板」) no longer stretches with an empty lower third — `align-self:start`, no `margin-top:auto` keyword footer desert. Section labels (01 保持 / 09 明日三件事) paired snug with body; CJK-friendly label letter-spacing. Same hug for other sparse feature tiles.
+- **Donate QR caption:** breathing room between QR and「掃描 · Arbitrum One · USDC」; CJK-friendly caption placement.
+- **Page rhythm:** restore calm breathing *between* sections (not overall tighter). Internal card layout stops when content is enough. Keeps Grail motion, fonts, palettes, 600-day chapter → summary framing (no annihilate).
+
 ## [1.13.0] — 2026-11-05
 
 ### Changed

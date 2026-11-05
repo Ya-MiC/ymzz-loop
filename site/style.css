@@ -111,7 +111,7 @@ h1 .l2{font-style:italic;background:linear-gradient(95deg,var(--cocoa) 0%,#8f78b
 .tile::after{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(28rem circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.55),transparent 45%);opacity:0;transition:opacity .4s}
 .tile:hover::after{opacity:1}
 .tile header{display:grid;gap:var(--s2)}.tile .label{color:rgba(34,31,20,.55)}
-.tile .desc{margin:auto 0 0;color:#3f392d;font-size:var(--t-base);max-inline-size:52ch}
+.tile .desc{margin:0;color:#3f392d;font-size:var(--t-base);max-inline-size:52ch}
 .sky{background:linear-gradient(160deg,#cfe8f6,var(--sky))}.lotus{background:linear-gradient(160deg,#f9e9f0,var(--lotus))}.lilac{background:linear-gradient(160deg,#ddd3ec,var(--lilac))}
 .sage{background:linear-gradient(160deg,#cbd8bf,var(--sage))}.cream{background:linear-gradient(160deg,#f1ecda,var(--cream))}.ink{background:color-mix(in srgb,var(--cream) 55%,var(--paper));color:var(--ink)}.ink .label{color:var(--ink-3)}.ink .desc{color:var(--ink-2)}
 [data-theme=dark] .tile:not(.ink){filter:saturate(.8) brightness(.86)}
@@ -444,7 +444,7 @@ body{background:var(--ground);color:var(--ink)}
   transform:none!important;
 }
 .tile .label{color:var(--ink-3)!important}
-.tile .desc{color:var(--ink-2)!important;margin-top:auto}
+.tile .desc{color:var(--ink-2)!important;margin-top:0}
 .tile[data-accent=sky],.tile[data-accent=lotus],.tile[data-accent=lilac],.tile[data-accent=sage],.tile[data-accent=cream],.tile[data-accent=ink]{
   border-block-start:0;background:var(--panel)!important;color:var(--ink)!important;
 }
@@ -1389,12 +1389,13 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
 .foldable:not(.is-open) > .fold-tog .fold-chev{transform:rotate(45deg)}
 .fold-body{
   display:grid;
-  grid-template-rows:1fr;
-  transition:grid-template-rows .45s var(--ease-grail), opacity .35s var(--ease-grail);
+  grid-template-rows:auto; /* hug content when open — 1fr caused empty lower third */
+  transition:opacity .35s var(--ease-grail), max-block-size .45s var(--ease-grail);
   opacity:1;overflow:hidden;
+  max-block-size:80rem;
 }
 .foldable:not(.is-open) > .fold-body{
-  grid-template-rows:0fr;opacity:0;pointer-events:none;
+  grid-template-rows:0fr;opacity:0;pointer-events:none;max-block-size:0;
 }
 .fold-body > *{min-block-size:0}
 .prompts-fold{align-self:flex-start;inline-size:auto;padding-inline:var(--s3);gap:var(--s2);display:inline-flex;place-items:center}
@@ -1485,7 +1486,7 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
   grid-template-columns:repeat(12,minmax(0,1fr))!important;
   gap:var(--s3)!important;
 }
-.bento-rail .t-notion{grid-column:span 7;grid-row:span 2}
+.bento-rail .t-notion{grid-column:span 7;grid-row:auto}
 .bento-rail .t-mail{grid-column:span 5}
 .bento-rail .t-tz{grid-column:span 5}
 .bento-rail .t-sheet{grid-column:span 7}
@@ -1555,4 +1556,329 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
   .bento-rail .t-notion,.bento-rail .t-mail,.bento-rail .t-tz,
   .bento-rail .t-sheet,.bento-rail .t-hold,.bento-rail .t-code{grid-column:span 12}
   .hero{min-block-size:0!important}
+}
+
+/* ===== v1.13.1 · hug-content cards · calm section air · CJK labels · donate QR =====
+   Owner: NOT overall tighter. Unify aesthetic with calm breathing BETWEEN sections;
+   each card's INTERNAL layout ends when content is enough (no empty lower third). */
+:root{
+  /* restore calm section seams (undo v1.13.0 over-tight frame) */
+  --frame:clamp(.65rem,1.6vw,1.25rem);
+  --pad:clamp(1.35rem,3.6vw,3.25rem);
+  --pad-card:clamp(1rem,2vw,1.5rem);
+  --rise:1rem;
+}
+
+/* Feature tiles: hug content — never stretch into empty lower thirds */
+.bento-rail .tile,
+.bento .tile{
+  align-self:start!important;
+  min-block-size:0!important;
+  height:auto!important;
+}
+.bento-rail .t-notion{
+  grid-row:auto!important; /* was span 2 → forced tall void */
+  grid-column:span 7;
+}
+.tile .desc,
+.tile .desc.kw{
+  margin-top:0!important;
+  margin-block-start:var(--s3)!important;
+  margin-block-end:0!important;
+}
+.tile .desc.kw{
+  font-size:var(--t-sm)!important;
+  line-height:1.65;
+  color:var(--ink-3)!important;
+  max-inline-size:none;
+}
+
+/* Notion paper: paired fields, CJK-snug */
+.paper.notion{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s3);
+  padding:clamp(1rem,1.8vw,1.35rem)!important;
+}
+.paper.notion .mt{
+  margin:0;
+  font:500 var(--t-base)/1.45 var(--f-display);
+  letter-spacing:-.01em;
+}
+.paper.notion .props{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:var(--s2) var(--s5)!important;
+  margin:0!important;
+  align-items:center;
+}
+.paper.notion .prop{
+  display:inline-flex;
+  align-items:baseline;
+  gap:var(--s2);
+}
+.paper.notion .prop dt{
+  margin:0;
+  font:500 var(--t-xs)/1.4 var(--f-body);
+  letter-spacing:.04em;
+  color:var(--ink-3);
+}
+.paper.notion .prop dd{margin:0}
+.paper.notion .fields{
+  display:grid;
+  gap:var(--s3);
+  margin:0;
+}
+.paper.notion .field{
+  display:grid;
+  gap:.35rem; /* label sits on body — no desert between 01 保持 and its line */
+}
+.paper.notion .secn{
+  margin:0!important;
+  font:600 var(--t-sm)/1.35 var(--f-body);
+  letter-spacing:0;
+  color:var(--ink);
+}
+.paper.notion .secn bdi{
+  font-variant-numeric:tabular-nums;
+  color:var(--ink-3);
+  margin-inline-end:.35rem;
+}
+.paper.notion .line{
+  margin:0;
+  padding-block-end:var(--s2)!important;
+  border-block-end:1px dashed color-mix(in srgb,var(--ink) 12%,transparent);
+  color:var(--ink-2);
+  font-size:var(--t-sm);
+  line-height:1.55;
+}
+
+/* CJK / Hangul: don't uppercase-track labels — feels “wrongly placed” */
+:lang(zh-Hant) .label,
+:lang(zh-CN) .label,
+:lang(ko) .label,
+:lang(zh-Hant) .props dt,
+:lang(zh-CN) .props dt,
+:lang(ko) .props dt{
+  letter-spacing:.02em!important;
+  text-transform:none!important;
+}
+:lang(zh-Hant) .paper.notion .secn,
+:lang(zh-CN) .paper.notion .secn,
+:lang(ko) .paper.notion .secn{
+  letter-spacing:0!important;
+}
+
+/* Other mock tiles: same hug, no forced stretch */
+.t-mail .fold-body,
+.t-tz .fold-body,
+.t-hold .fold-body,
+.t-code .fold-body{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s3);
+}
+.t-mail .paper.mail{margin:0}
+.dayp{
+  justify-content:flex-start!important; /* was space-between → mid void */
+  gap:var(--s4)!important;
+}
+.daycard{flex:none}
+
+/* Donate QR: breathing room under code for CJK caption */
+.donate-qr{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  margin:0;
+}
+.donate-qr img{
+  display:block;
+  padding:var(--s3);
+  background:var(--panel)!important;
+  border-radius:var(--Ri);
+  box-shadow:inset 0 0 0 1px var(--line), var(--sh);
+}
+.donate-qr figcaption,
+.donate-qr .label{
+  margin:0!important;
+  margin-block-start:var(--s4)!important; /* room between QR box and 掃描… */
+  padding-block:var(--s1);
+  padding-inline:var(--s2);
+  text-align:center;
+  font:500 var(--t-xs)/1.55 var(--f-body)!important;
+  letter-spacing:.04em;
+  color:var(--ink-3);
+  max-inline-size:18rem;
+}
+:lang(zh-Hant) .donate-qr figcaption,
+:lang(zh-CN) .donate-qr figcaption,
+:lang(ko) .donate-qr figcaption{
+  letter-spacing:.06em!important;
+  text-transform:none!important;
+  line-height:1.7!important;
+}
+.donate-box{
+  align-items:start!important;
+  gap:clamp(1.25rem,3vw,2rem)!important;
+}
+
+/* Section air: calm between bands (page aesthetic unity) */
+.sec{margin-block-start:clamp(1rem,2.2vw,1.75rem)}
+.bento-rail{gap:var(--frame)!important} /* was over-tight s3 */
+
+/* v1.13.1b · hero day panel + prompts hug (same void class as template card) */
+.hero{
+  align-items:start!important; /* columns don't stretch to match tallest */
+}
+.headp,.dayp{
+  min-block-size:0!important;
+  height:auto!important;
+  align-self:start!important;
+}
+.dayp .prompts-wrap,
+.dayp .foldable{
+  flex:none!important;
+  margin-block-start:var(--s3);
+}
+.dayp .prompts{
+  gap:0!important;
+}
+.dayp .prompts li{
+  padding-block:var(--s2) !important;
+  line-height:1.45;
+}
+.dayp .prompts li .pn{
+  min-inline-size:1.75rem;
+  font-variant-numeric:tabular-nums;
+}
+/* Collapse control sits with content, not floating mid-void */
+.dayp .prompts-fold{
+  margin-block-end:var(--s2);
+}
+
+
+/* v1.13.1c · fold-body + dayp/prompts truly hug */
+.foldable.is-open > .fold-body{
+  grid-template-rows:auto!important;
+  max-block-size:none!important;
+}
+.prompts-wrap.is-open{
+  display:flex;
+  flex-direction:column;
+  gap:var(--s2);
+  flex:0 0 auto!important;
+}
+.prompts-wrap .fold-body{flex:0 0 auto}
+.dayp .prompts-wrap{margin-block-end:0}
+.dayp{padding-block-end:var(--pad-card)!important}
+
+
+/* v1.13.1d · nuclear hug: source fixes + loop/lp + paper no grow */
+.tile{justify-content:flex-start!important}
+.tile .paper{flex:0 0 auto!important;margin:0}
+.tile .desc{flex:0 0 auto!important;margin-top:0!important;margin-block-start:var(--s3)!important}
+.bento-rail .t-notion,
+.bento .t-notion,
+.t-notion{grid-row:auto!important;align-self:start!important}
+.loop .lp,
+.loop-rail .lp{
+  align-self:start!important;
+  min-block-size:0!important;
+  height:auto!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  gap:var(--s3)!important;
+}
+.loop .lp .lt{margin-block-start:var(--s3)!important}
+.t-code{align-items:start!important}
+.t-code .fold-body{align-items:start}
+
+
+/* v1.13.1e · absolute hug + donate caption gap (no var ambiguity) */
+html .tile.t-notion,
+html .bento .tile.t-notion,
+html .bento-rail .tile.t-notion{
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  align-self:start!important;
+  height:fit-content!important;
+  min-height:0!important;
+  max-height:none!important;
+  grid-row:auto!important;
+}
+html .tile.t-notion > .desc,
+html .tile.t-notion > .desc.kw,
+html .tile > .desc{
+  margin:0.75rem 0 0 0!important;
+  margin-top:0.75rem!important;
+  margin-block-start:0.75rem!important;
+  position:static!important;
+  flex:none!important;
+}
+html .tile.t-notion > .paper{
+  flex:none!important;
+}
+html .donate-qr{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:1rem!important; /* breathing room QR → caption */
+}
+html .donate-qr img{
+  margin:0!important;
+  margin-block-end:0!important;
+}
+html .donate-qr figcaption,
+html .donate-qr > .label,
+html figure.donate-qr > figcaption{
+  display:block!important;
+  margin:0!important;
+  margin-top:0!important;
+  padding-top:0!important;
+  /* gap on parent handles spacing */
+  letter-spacing:0.04em!important;
+  text-transform:none!important;
+  line-height:1.7!important;
+  text-align:center!important;
+}
+html .panel.donate{
+  height:fit-content!important;
+  min-height:0!important;
+  align-self:start!important;
+}
+
+
+/* v1.13.1f · keywords live inside paper; paper hugs; donate gap 1.5rem */
+.paper.notion{
+  gap:var(--s3)!important;
+  padding:1rem 1.15rem 1.1rem!important;
+}
+.paper.notion .fields{gap:0.85rem!important}
+.paper.notion .field{gap:0.3rem!important}
+.paper.notion .kw{
+  margin:0.35rem 0 0!important;
+  padding-block-start:0.75rem;
+  border-block-start:1px solid color-mix(in srgb,var(--ink) 8%,transparent);
+  font-size:var(--t-xs);
+  line-height:1.65;
+  color:var(--ink-3);
+  letter-spacing:0.01em;
+}
+:lang(zh-Hant) .paper.notion .kw,
+:lang(zh-CN) .paper.notion .kw,
+:lang(ko) .paper.notion .kw{
+  letter-spacing:0.02em;
+  line-height:1.7;
+}
+/* tile after removing external desc — no trailing desert */
+.tile.t-notion{gap:var(--s3)!important}
+html .donate-qr{gap:1.5rem!important}
+html .donate-qr figcaption{
+  margin:0!important;
+  padding-block:0.15rem;
+  line-height:1.7!important;
 }
