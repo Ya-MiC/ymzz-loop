@@ -518,17 +518,34 @@
     const root = document.documentElement;
     const spy = $("#secSpy");
     let ticking = false;
-    const measureHeroW = () => {
+    /* Freeze hero-row width while scrolled so elastic delta (hero→content) is not
+       eaten by mid-scroll reflow / circular --nav-hero-w ↔ hero width binding. */
+    let frozenHeroW = 0;
+    const measureHeroW = (fromResize) => {
       if (!hero) return;
-      const r = hero.getBoundingClientRect();
-      // outer width of the 3-card row (hero already padded)
-      const w = Math.round(r.width);
-      root.style.setProperty("--nav-hero-w", w + "px");
-      if (nav) nav.style.setProperty("--nav-hero-w", w + "px");
+      if (!fromResize && scrollY > 8 && frozenHeroW > 0) {
+        root.style.setProperty("--nav-hero-w", frozenHeroW + "px");
+        if (nav) nav.style.setProperty("--nav-hero-w", frozenHeroW + "px");
+        return;
+      }
+      const w = Math.round(hero.getBoundingClientRect().width);
+      if (w < 160) return;
+      if (scrollY <= 8 || fromResize || frozenHeroW <= 0) frozenHeroW = w;
+      root.style.setProperty("--nav-hero-w", frozenHeroW + "px");
+      if (nav) nav.style.setProperty("--nav-hero-w", frozenHeroW + "px");
+      // px content width for reliable calc() with --nav-p (avoid min() in multiply)
+      const sample = document.querySelector(".intro") || document.querySelector(".hold-card") || document.querySelector(".panel");
+      let cw;
+      if (sample) cw = Math.round(sample.getBoundingClientRect().width);
+      else cw = Math.round(Math.min(72 * 16, innerWidth - 80));
+      if (cw > 200) {
+        root.style.setProperty("--content-w-px", cw + "px");
+        if (nav) nav.style.setProperty("--content-w-px", cw + "px");
+      }
     };
     const apply = () => {
       ticking = false;
-      measureHeroW();
+      measureHeroW(false);
       const max = Math.max(1, root.scrollHeight - innerHeight);
       const p = Math.min(1, Math.max(0, scrollY / max));
       const v = p.toFixed(4);
@@ -558,24 +575,42 @@
       }
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
+    const onResize = () => {
+      frozenHeroW = 0;
+      measureHeroW(true);
+      onScroll();
+    };
     addEventListener("scroll", onScroll, { passive: true });
-    addEventListener("resize", onScroll, { passive: true });
+    addEventListener("resize", onResize, { passive: true });
     apply();
   })();
 
 
-  // section preview strip (what you're looking at) — complements top % readbar
+  // section strip = whole-page progress preview via glass on items (no numeric %)
   (() => {
     const list = $("#spyList"), spy = $("#secSpy");
     if (!list || !spy) return;
     const secs = $$("[data-spy]");
     if (!secs.length) { spy.hidden = true; return; }
+    const n = secs.length;
     list.innerHTML = secs.map((s, i) => {
       const id = s.id || ("spy-" + i);
       const label = s.getAttribute("data-spy") || id;
-      return `<li><a href="#${id}" data-spy-link="${id}"><i aria-hidden="true"></i><span>${label}</span></a></li>`;
+      return `<li><a href="#${id}" data-spy-link="${id}" data-spy-i="${i}" style="--spy-i:${i};--spy-fill:0"><i aria-hidden="true"></i><span>${label}</span></a></li>`;
     }).join("");
     const links = $$("[data-spy-link]", list);
+    /* Glass fill advances through items as page progress (items themselves = progress preview) */
+    const paintGlassProgress = () => {
+      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      const p = Math.min(1, Math.max(0, scrollY / max));
+      links.forEach((a, i) => {
+        // 0 before section, 0→1 while crossing, 1 after — frost travels Hero→Donate
+        const fill = Math.min(1, Math.max(0, p * n - i));
+        a.style.setProperty("--spy-fill", fill.toFixed(3));
+      });
+      spy.style.setProperty("--spy-glass", (0.42 + p * 0.48).toFixed(3));
+      spy.style.setProperty("--read-p", p.toFixed(4));
+    };
     const setActive = (id) => {
       let idx = 0;
       links.forEach((a, i) => {
@@ -588,6 +623,7 @@
         spy.style.setProperty("--spy-sec", t.toFixed(3));
         spy.dataset.active = id;
       }
+      paintGlassProgress();
     };
     if ("IntersectionObserver" in window) {
       const ratios = new Map();
@@ -601,8 +637,18 @@
     } else {
       setActive(secs[0].id);
     }
+    // glass progress on items tracks whole-page scroll (items = progress preview)
+    let spyTick = false;
+    const onSpyScroll = () => {
+      if (spyTick) return;
+      spyTick = true;
+      requestAnimationFrame(() => { spyTick = false; paintGlassProgress(); });
+    };
+    addEventListener("scroll", onSpyScroll, { passive: true });
+    addEventListener("resize", onSpyScroll, { passive: true });
     // initial
     setActive(secs[0].id);
+    paintGlassProgress();
   })();
 
   // mobile nav drawer

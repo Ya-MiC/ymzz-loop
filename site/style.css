@@ -3574,101 +3574,184 @@ html[data-theme=dark] .hold-pct{font-weight:600!important}
   }
 }
 
-/* ===== v1.17.1 · equal hero heights · dial rhythm · glass spy (no %) · product CTA ===== */
+/* ===== v1.17.2 · restore loved hero/nav proportions · glass spy (no %) · soft dayp stretch ===== */
 
-/* Equal-height hero cards: stretch columns; distribute dayp content without a void */
+/* Undo v1.17.1 dial shrink — restore v1.17.0 / dial-hero sizes (22rem ring, large clock) */
+.dialp{
+  gap:var(--s4)!important;
+  padding:unset;
+}
+.dial{
+  inline-size:min(100%, 22rem)!important;
+  max-inline-size:22rem;
+  margin-inline:auto;
+  margin-block:unset;
+}
+.clock{
+  font:500 clamp(2.25rem, 4.5vw, 3.75rem)/1 var(--f-display)!important;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+}
+.dialfoot{
+  padding-block-start:var(--s3)!important;
+  gap:var(--s4)!important;
+}
+.dialfoot dd{
+  font:500 1.25rem var(--f-display)!important;
+  font-variant-numeric:tabular-nums;
+}
+@media (max-width:68rem){
+  .dial{ inline-size:min(100%, 22rem)!important; max-inline-size:22rem; }
+}
+
+/*
+ * Soft third-card height only: stretch dayp to the hero row without rewriting
+ * dial/head layout (preserves loved proportions). Hero already align-items:stretch.
+ */
 @media screen and (min-width:1089px){
   .hero.hero-urgency{
     align-items:stretch!important;
   }
-  .hero.hero-urgency > .dialp,
-  .hero.hero-urgency > .headp,
   .hero.hero-urgency > .dayp{
+    align-self:stretch!important;
+    min-block-size:100%;
     display:flex!important;
     flex-direction:column!important;
-    min-block-size:100%!important;
-    height:auto!important;
-    align-self:stretch!important;
   }
-  .hero.hero-urgency > .headp{
-    justify-content:center!important;
-  }
-  .hero.hero-urgency > .dialp{
-    justify-content:space-between!important;
-    gap:var(--s3)!important;
-  }
-  .hero.hero-urgency > .dayp{
-    justify-content:flex-start!important;
-    gap:var(--s3)!important;
-  }
-  /* soft filler: holdings sits toward bottom when todos empty */
+  /* gentle: holdings settle low if dayp has spare room — no dial/head flex rewrite */
   .hero.hero-urgency > .dayp > .hold-mini{
     margin-block-start:auto;
   }
-  .hero.hero-urgency > .dayp > .todo-unified-wrap{
-    flex:1 1 auto;
+}
+
+/* --- Top capsule elastic: nuclear restore (hero-w → content-w after hero past) --- */
+@property --nav-p{
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+:root{
+  --nav-hero-w-px: calc(100vw - (2 * var(--edge-x)));
+  --content-w-px: min(72rem, calc(100vw - (2 * var(--edge-x))));
+}
+html .nav,
+html:not(.nav-scrolled) .nav,
+html.nav-scrolled .nav,
+.nav:not(.is-scrolled),
+.nav.is-scrolled{
+  --nav-p: var(--nav-p, 0);
+  width: calc(var(--nav-hero-w, var(--nav-hero-w-px)) - (var(--nav-p) * (var(--nav-hero-w, var(--nav-hero-w-px)) - var(--content-w-px, var(--content-w))))) !important;
+  max-inline-size: var(--nav-hero-w, var(--nav-hero-w-px)) !important;
+  margin-inline: auto !important;
+  border-radius: calc(1.1rem + (var(--nav-p) * 4rem)) !important;
+  margin-block-start: var(--frame) !important;
+  transition:
+    width .55s cubic-bezier(.22,1,.36,1),
+    border-radius .55s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s cubic-bezier(.22,1,.36,1),
+    backdrop-filter .45s cubic-bezier(.22,1,.36,1),
+    --nav-p .55s cubic-bezier(.22,1,.36,1) !important;
+}
+@media (prefers-reduced-motion: reduce){
+  html .nav,
+  html:not(.nav-scrolled) .nav,
+  .nav:not(.is-scrolled),
+  html.nav-scrolled .nav,
+  .nav.is-scrolled{
+    transition: none !important;
+    width: var(--content-w-px, var(--content-w)) !important;
+    --nav-p: 1;
+  }
+}
+@media (max-width: 48rem){
+  html .nav,
+  html:not(.nav-scrolled) .nav,
+  .nav:not(.is-scrolled),
+  html.nav-scrolled .nav,
+  .nav.is-scrolled{
+    width: calc(100% - (2 * var(--edge-x))) !important;
+    max-inline-size: none !important;
+    border-radius: 1.25rem !important;
+    transition: none !important;
   }
 }
 
-/* Dial rebalance — smaller ring, calmer column */
-.dialp{
-  gap:var(--s3)!important;
-  padding:clamp(1rem, 2vw, 1.35rem)!important;
-}
-.dial{
-  inline-size:min(100%, 15.5rem)!important;
-  max-inline-size:15.5rem;
-  margin-inline:auto;
-  margin-block:0.25rem auto;
-}
-.clock{
-  font-size:clamp(1.85rem, 3.2vw, 2.65rem)!important;
-}
-.dialfoot{
-  padding:var(--s2)!important;
-  gap:var(--s3)!important;
-}
-.dialfoot dd{
-  font-size:1.05rem!important;
-}
-@media (max-width:68rem){
-  .dial{ inline-size:min(100%, 14rem)!important; max-inline-size:14rem; }
-}
-@media (min-width:1089px){
-  .dialp .label{ margin-block-end:0; }
-}
-
-/* Bottom spy: no numeric meter — glass depth + active section only */
-.spy-meter, .spy-pct, .spy-track{ display:none!important; }
+/* --- Bottom spy: NO % / progress / numbers — glass capsule + active glass highlight --- */
+.spy-meter, .spy-pct, .spy-track, .spy-fill{ display:none!important; }
 .sec-spy{
   --spy-glass: 0.55;
   --spy-sec: 0;
   background:linear-gradient(
     180deg,
     transparent,
-    color-mix(in srgb, var(--ground) calc(var(--spy-glass) * 70%), transparent) 40%
+    color-mix(in srgb, var(--ground) calc(var(--spy-glass) * 72%), transparent) 42%
   )!important;
 }
 .spy-list{
   background:color-mix(
     in srgb,
-    var(--panel) calc((0.55 + var(--spy-glass) * 0.35) * 100%),
+    var(--panel) calc((0.58 + var(--spy-glass) * 0.32) * 100%),
     transparent
   )!important;
-  backdrop-filter:blur(calc(0.45rem + var(--spy-glass) * 0.55rem)) saturate(1.25)!important;
-  -webkit-backdrop-filter:blur(calc(0.45rem + var(--spy-glass) * 0.55rem)) saturate(1.25)!important;
+  backdrop-filter:blur(calc(0.55rem + var(--spy-glass) * 0.65rem)) saturate(1.3)!important;
+  -webkit-backdrop-filter:blur(calc(0.55rem + var(--spy-glass) * 0.65rem)) saturate(1.3)!important;
   box-shadow:
-    0 0.4rem 1.1rem -0.5rem rgba(42,36,29, calc(0.1 + var(--spy-glass) * 0.12)),
-    inset 0 0 0 1px color-mix(in srgb, var(--edge) 45%, transparent)!important;
-  /* subtle section cue: accent wash shifts with --spy-sec */
-  background-image:linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--accent-soft) calc(var(--spy-sec) * 28%), transparent),
-    transparent 55%
+    0 0.45rem 1.2rem -0.55rem rgba(42,36,29, calc(0.1 + var(--spy-glass) * 0.14)),
+    inset 0 0 0 1px color-mix(in srgb, var(--edge) 48%, transparent)!important;
+  transition: background .35s cubic-bezier(.22,1,.36,1), backdrop-filter .35s cubic-bezier(.22,1,.36,1), box-shadow .35s cubic-bezier(.22,1,.36,1);
+}
+/*
+ * Section items themselves = whole-page progress preview.
+ * --spy-fill 0→1 advances glass frost through Hero…Donate as user scrolls.
+ * .is-on = current section (click jumps). No separate % bar / numbers.
+ */
+.spy-list a{
+  --spy-fill: 0;
+  position:relative;
+  color:color-mix(in srgb, var(--ink-3) calc(100% - var(--spy-fill) * 35%), var(--ink))!important;
+  background:color-mix(
+    in srgb,
+    var(--panel) calc(var(--spy-fill) * 62%),
+    color-mix(in srgb, var(--accent-soft) calc(var(--spy-fill) * 28%), transparent)
   )!important;
+  backdrop-filter:blur(calc(var(--spy-fill) * 0.7rem)) saturate(calc(1 + var(--spy-fill) * 0.35))!important;
+  -webkit-backdrop-filter:blur(calc(var(--spy-fill) * 0.7rem)) saturate(calc(1 + var(--spy-fill) * 0.35))!important;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--edge) calc(var(--spy-fill) * 55%), transparent),
+    0 0.15rem 0.55rem -0.2rem rgba(42,36,29, calc(var(--spy-fill) * 0.14))!important;
+  transition:
+    color .28s cubic-bezier(.22,1,.36,1),
+    background .28s cubic-bezier(.22,1,.36,1),
+    box-shadow .32s cubic-bezier(.22,1,.36,1),
+    backdrop-filter .32s cubic-bezier(.22,1,.36,1)!important;
+}
+.spy-list a i{
+  opacity:calc(0.4 + var(--spy-fill) * 0.55)!important;
+  background:color-mix(in srgb, var(--ink-3) calc(100% - var(--spy-fill) * 100%), var(--accent-warm, var(--cocoa)))!important;
+}
+.spy-list a.is-on{
+  color:var(--ink)!important;
+  background:color-mix(
+    in srgb,
+    var(--panel) 58%,
+    color-mix(in srgb, var(--accent-soft) 48%, transparent)
+  )!important;
+  backdrop-filter:blur(0.75rem) saturate(1.4)!important;
+  -webkit-backdrop-filter:blur(0.75rem) saturate(1.4)!important;
+  box-shadow:
+    0 0.25rem 0.85rem -0.3rem color-mix(in srgb, var(--accent) 32%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, var(--accent-soft) 60%, transparent)!important;
+}
+.spy-list a.is-on i{
+  background:var(--accent-warm, var(--cocoa))!important;
+  opacity:1!important;
+  transform:scale(1.25);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-soft) 42%, transparent);
 }
 @media (prefers-reduced-motion:reduce){
-  .sec-spy, .spy-list{
+  .sec-spy, .spy-list, .spy-list a{
     transition:none!important;
   }
   .sec-spy{ --spy-glass: 0.72; }
