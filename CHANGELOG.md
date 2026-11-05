@@ -7,6 +7,12 @@
 
 
 
+
+## [1.11.2] — 2026-11-05
+
+### Changed
+- Holdings copy: removed IBKR; any-broker wording. zh-CN mock ticker easter egg `600519.SH` (others keep `2330.TW`).
+
 ## [1.11.1] — 2026-11-05
 
 ### Removed

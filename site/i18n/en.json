@@ -50,7 +50,7 @@
   "f1.p": "Score, mood, energy, Keep / Problem / Try, decisions, top 3 for tomorrow, deep-work hours.",
   "f2.t": "Holdings, broker-agnostic",
   "f2.m": "Database · Holdings",
-  "f2.p": "Ticker, platform, cost, value, weight, thesis, stop/target — snapshotted daily so you see how it changed. Works for IBKR or any broker (entered by you).",
+  "f2.p": "Ticker, platform, cost, value, weight, thesis, stop/target — snapshotted daily so you see how it changed. Works for any broker (entered by you).",
   "f3.t": "A nudge, on time",
   "f3.m": "Notifier · Email",
   "f3.p": "One email linking to the page created in step 01, at the hour you choose, in your own time zone.",

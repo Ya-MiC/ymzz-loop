@@ -55,7 +55,12 @@
     const h = document.documentElement; h.lang = dict._lang || lang; h.dir = dict._dir || "ltr";
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
-    $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates(); renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
+    $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
+    // holdings mock: zh-CN easter egg → A-share; others keep 2330.TW
+    (() => { const el = $("#holdTicker"); if (!el) return;
+      el.textContent = (lang === "zh-CN") ? "600519.SH" : (el.dataset.tickerDefault || "2330.TW");
+    })();
+    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
   };
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 

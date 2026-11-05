@@ -49,13 +49,13 @@ No AI quota; free GitHub minutes only. Hard-capped at 600 days from first succes
 |---|---|---|---|
 | 每日自動建頁 + 提醒信 | ✅ | ❌ | ⚠️ |
 | 同步 Google Sheet + Git 歷史 | ✅ | ❌ | ❌ |
-| 持倉表（IBKR 等）| ✅ | ⚠️ | ❌ |
+| 持倉表（任何券商）| ✅ | ⚠️ | ❌ |
 | 任意時區 | ✅ | — | ✅ |
 | 費用 | **$0** | $0–$20 | 訂閱制 |
 
 ## 模板 Template
 - **每日復盤 Daily Review**：日期、評分、心情、精力、Keep 做得好、Problem 問題、Try 教訓、決策、明日三件事、資訊輸入、平台、市場/持倉筆記、深度工作時數、完成
-- **持倉 Holdings**（IBKR 等）：代號、平台、類別、數量、成本價、現價、市值、幣別、佔比、論點、停損/目標、更新日期、備註
+- **持倉 Holdings**（任何券商，自行填寫）：代號、平台、類別、數量、成本價、現價、市值、幣別、佔比、論點、停損/目標、更新日期、備註
 - 方法來源 Frameworks: **KPT** (Keep/Problem/Try, Agile retrospectives) · **曾國藩日課・三省** · **柳比歇爾時間統計法** (Lyubishchev time log) · **交易日誌每日復盤** (Brett Steenbarger, *The Daily Trading Coach*)
 
 ## 時區 Time zone

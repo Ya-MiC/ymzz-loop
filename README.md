@@ -42,7 +42,7 @@ It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Li
 
 ## Template
 - **Daily Review**: date, score, mood, energy, Keep, Problem, Try, decisions, top 3 for tomorrow, inputs, platforms, market/holdings notes, deep-work hours, done.
-- **Holdings** (IBKR or any broker, entered by you): ticker, platform, class, quantity, cost, price, value, currency, weight, thesis, stop/target, updated, note.
+- **Holdings** (any broker, entered by you): ticker, platform, class, quantity, cost, price, value, currency, weight, thesis, stop/target, updated, note.
 - Frameworks: KPT (Keep/Problem/Try), Zeng Guofan's daily self-review, Lyubishchev time log, trading-journal daily review (Brett Steenbarger).
 
 ## Time zone

@@ -49,13 +49,13 @@ No AI quota; free GitHub minutes only. Built to run unattended.
 |---|---|---|---|
 | 每日自动建页 + 提醒信 | ✅ | ❌ | ⚠️ |
 | 同步 Google Sheet + Git 历史 | ✅ | ❌ | ❌ |
-| 持仓表（IBKR 等）| ✅ | ⚠️ | ❌ |
+| 持仓表（任何券商）| ✅ | ⚠️ | ❌ |
 | 任意时区 | ✅ | — | ✅ |
 | 费用 | **$0** | $0–$20 | 订阅制 |
 
 ## 模板 Template
 - **每日复盘 Daily Review**：日期、评分、心情、精力、Keep 做得好、Problem 问题、Try 教训、决策、明日三件事、信息输入、平台、市场/持仓笔记、深度工作时数、完成
-- **持仓 Holdings**（IBKR 等）：代号、平台、类别、数量、成本价、现价、市值、币别、占比、论点、停损/目标、更新日期、备注
+- **持仓 Holdings**（任何券商，自行填写）：代号、平台、类别、数量、成本价、现价、市值、币别、占比、论点、停损/目标、更新日期、备注
 - 方法来源 Frameworks: **KPT** (Keep/Problem/Try, Agile retrospectives) · **曾国藩日课・三省** · **柳比歇尔时间统计法** (Lyubishchev time log) · **交易日志每日复盘** (Brett Steenbarger, *The Daily Trading Coach*)
 
 ## 时区 Time zone
