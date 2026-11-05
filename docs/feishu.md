@@ -1,4 +1,9 @@
+<!-- Product voice: every forker is a product user of ymzz-loop. -->
+
 # 飛書 / Lark 目的地 · Feishu / Lark sink
+
+> **As a product user / forker:** these Feishu steps are for *you* after you fork ymzz-loop — not only for the author. Optional sink; the core Notion → Sheets + Markdown loop works without Feishu.
+
 
 把昨天的復盤（與可選持倉）寫進飛書**多維表格 Bitable**；也可選再建一份 Docx。  
 Secrets 由你自己在 GitHub 設定；**未設定時自動略過**，不影響 Notion / Sheets / Markdown。  

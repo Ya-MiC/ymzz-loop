@@ -11,7 +11,10 @@
 </p>
 
 <h1 align="center">ymzz-loop · 每日复盘</h1>
-<p align="center"><b>每日复盘，自动循环：在 Notion 写，存到 Google Sheet（可選飛書，見 docs/feishu.md）s 与你自己的 GitHub。</b><br>Notion、Google、邮箱只绑定一次。之后每天由你自己 fork 的仓库里的 GitHub Actions 把新的每日复盘模板送进 Notion 并发邮件提醒；下一次运行再把你写好的内容备份到 Google Sheets 与仓库的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>每日复盘的多端数据同步产品。</b><br>
+作为产品用户，你 Fork 模板、绑定 Notion／Google／邮箱一次；GitHub Actions 在<em>你的</em> Fork 里每天建立今日空白复盘、寄出链接，并<strong>自动摄取前一日</strong>到 Google Sheets + Markdown（可选飞书，见 docs/feishu.md）。<br>
+<strong>寿命：第 0 天（首次成功）→ 第 600 天硬停止（湮灭）</strong>，除非你部署更新版本。<br>
+$0 · 任意时区 · 无服务器 · 无 AI 配额 · MIT</p>
 
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官网与交互教学 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架构 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
@@ -65,7 +68,9 @@ No AI quota; free GitHub minutes only. Built to run unattended.
 GitHub 调度只支持 UTC，所以 workflow 每小时醒来一次：闸门不安装任何套件、数秒结束；只有「本地时间 ≥ 提醒时间 且 今天还没跑过」才真正运行（`.ymzz/last-run` 去重）。调度延迟或漏跑会在下一小时补上。公开仓库 Actions 免费；私人仓库约 720 分钟/月，低于免费 2,000 分钟。
 Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds unless local time ≥ your reminder time and today hasn't run yet.
 
-## 设置步骤 Setup（一次就好 / once）
+## 设置（每一位 Fork 的产品用户）
+
+以下步骤是给 **你**（Fork／使用模板之后），不是只给作者。步骤 Setup（一次就好 / once）
 1. **Notion integration**：到 https://www.notion.so/profile/integrations → New integration（Internal）名称 `ymzz` → 拷贝 token。打开你要放复盘的 Notion 页面 → 右上 `⋯` → Connections → 加入 `ymzz`。
 2. **创建数据库 Create databases**（在电脑上 / on your PC，需 Node.js 20+）：
    ```bash

@@ -10,7 +10,10 @@
 </p>
 
 <h1 align="center">ymzz-loop</h1>
-<p align="center"><b>Your daily review, on a loop: Notion to write, Google Sheets + your own GitHub to keep.</b><br>Bind Notion, Google and email once. Every day GitHub Actions — running in your own fork — drops a fresh daily-review template into Notion and emails you; the next run backs up what you wrote to Google Sheets and to Markdown in your repo.<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>A multi-end data sync product for daily review (每日復盤).</b><br>
+As a product user you fork the template, bind Notion / Google / email once, and GitHub Actions — running in <em>your</em> fork — drops today's blank review into Notion, emails you the link, then <b>auto-ingests yesterday</b> into Google Sheets + Markdown (optional Feishu).<br>
+<strong>Lifespan: day 0 (first success) → hard stop at day 600 (湮滅)</strong>, unless you deploy a newer version.<br>
+$0 · any time zone · no servers · no AI quota · MIT</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">Website & guided setup</a> · <a href="docs/architecture.md">Architecture</a> · <a href="CHANGELOG.md">Changelog</a></p>
 
 
@@ -35,7 +38,7 @@ At the time you choose (default **07:00 UTC**), GitHub Actions:
 2. emails you a link to that page;
 3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」), optionally to **Feishu / Lark Bitable** (see [docs/feishu.md](docs/feishu.md)), and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
 
-It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Lifespan: at most 600 calendar days from the first successful run**, then the gate stops and the schedule is disabled (so you can move to a newer release). Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
+It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Lifespan: day 0 = first successful run; day 600 = annihilate** — the gate hard-stops the schedule by design. Deploy a newer ymzz-loop version (re-setup / new release) to open a fresh 0→600 window; your Notion / Sheets / Markdown stay yours either way. Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
 
 ## Template
 - **Daily Review**: date, score, mood, energy, Keep, Problem, Try, decisions, top 3 for tomorrow, inputs, platforms, market/holdings notes, deep-work hours, done.

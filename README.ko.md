@@ -10,7 +10,10 @@
 </p>
 
 <h1 align="center">ymzz-loop</h1>
-<p align="center"><b>매일의 회고를 순환으로: Notion에서 쓰고, Google Sheets(선택: Feishu, docs/feishu.md)와 내 GitHub에 보관.</b><br>Notion, Google, 이메일은 한 번만 연결하세요. 그 뒤로 매일 내 포크에서 실행되는 GitHub Actions가 새 회고 템플릿을 Notion에 넣고 메일로 알려 주며, 다음 실행 때 작성한 내용을 Google Sheets와 저장소의 Markdown으로 백업합니다.<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>매일 복기를 위한 멀티엔드 데이터 동기화 제품.</b><br>
+제품 사용자로서 템플릿을 Fork하고 Notion/Google/메일을 한 번 연결하면, GitHub Actions가 <em>내</em> Fork에서 오늘의 빈 복기를 만들고 링크를 보내며 <strong>전일을 자동 수집</strong>해 Sheets + Markdown(선택 Feishu)에 남깁니다.<br>
+<strong>수명: 0일(첫 성공) → 600일 하드 스톱(소멸)</strong>. 새 버전을 배포하지 않으면 멈춥니다.<br>
+$0 · 모든 시간대 · 서버 없음 · AI 쿼터 없음 · MIT</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
 
 
@@ -43,7 +46,9 @@ GitHub 무료 Actions 시간과 무료 Notion/Google API만 사용합니다. 실
 ## 시간대
 저장소 Variables `YMZZ_TZ`(예: `America/Los_Angeles`, `Asia/Seoul`)와 `YMZZ_REMIND_TIME`(`HH:MM`)을 설정하거나 `sync.config.json`의 `timezone` / `remind_time`을 수정하세요. 기본값은 `Etc/UTC` `07:00`입니다. 워크플로는 매시간 깨어나고, 정한 시각이 지나고 오늘 아직 실행하지 않았을 때만 진행합니다.
 
-## 설정 (한 번, 약 15분)
+## 설정 (모든 Fork 제품 사용자)
+
+아래 단계는 작성자만이 아니라 **Fork 이후의 당신**을 위한 것입니다. (한 번, 약 15분)
 1. **Notion 통합** — https://www.notion.so/profile/integrations → New integration(Internal) `ymzz` → 토큰 복사 → 회고 페이지 `⋯` → Connections → `ymzz` 추가.
 2. **데이터베이스 생성**(Node.js 20+):
    ```bash

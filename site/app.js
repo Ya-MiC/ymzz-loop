@@ -150,7 +150,9 @@
       const tick = n => { const p = dur ? Math.min(1, (n - t0) / dur) : 1; c.textContent = Math.round(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(tick); else c.textContent = String(to); };
       requestAnimationFrame(tick); });
   }), { threshold: .05, rootMargin: "0px 0px -5% 0px" });
-  $$(".reveal, .tile").forEach((el, i) => { el.style.setProperty("--i", i % 4); io.observe(el); });
+  $$(".reveal, .tile, .lp, .fact, .fc").forEach((el, i) => { el.style.setProperty("--i", i % 6); io.observe(el); });
+  const secIo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("sec-in"); secIo.unobserve(e.target); } }), { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  $$(".sec, .hero, .marquee, .foot").forEach(el => secIo.observe(el));
 
   // guided setup
   const SECRETS = ["NOTION_TOKEN", "GOOGLE_SERVICE_ACCOUNT_JSON", "SHEET_ID", "SMTP_USER", "SMTP_PASS", "MAIL_TO"];
@@ -262,6 +264,35 @@
     addEventListener("keydown", e => { if (e.key === "Escape") close(); });
   })();
 
-  setTheme(store.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
+
+  // foldable cards (chevron); secondary tiles start collapsed on phone
+  (() => {
+    const mq = matchMedia("(max-width: 48rem)");
+    const label = (open) => open ? t("fold.less") : t("fold.more");
+    const setOpen = (root, open) => {
+      root.classList.toggle("is-open", open);
+      const btn = root.querySelector(".fold-tog");
+      if (btn) {
+        btn.setAttribute("aria-expanded", open ? "true" : "false");
+        const tx = btn.querySelector(".fold-tx"); if (tx) tx.textContent = label(open);
+      }
+    };
+    const init = () => {
+      $$(".foldable").forEach(root => {
+        const preferCollapse = root.dataset.foldMobile === "collapse" && mq.matches;
+        setOpen(root, preferCollapse ? false : true);
+      });
+    };
+    document.addEventListener("click", e => {
+      const btn = e.target.closest(".fold-tog"); if (!btn) return;
+      const root = btn.closest(".foldable"); if (!root) return;
+      setOpen(root, !root.classList.contains("is-open"));
+    });
+    mq.addEventListener?.("change", init);
+    init();
+    window.__ymzzFoldRefresh = () => $$(".foldable").forEach(root => setOpen(root, root.classList.contains("is-open")));
+  })();
+
+    setTheme(store.get("theme", matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"));
   apply();
 })();

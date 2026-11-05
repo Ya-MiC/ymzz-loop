@@ -11,7 +11,10 @@
 </p>
 
 <h1 align="center">ymzz-loop · 每日復盤</h1>
-<p align="center"><b>每日復盤，自動循環：在 Notion 寫，存到 Google Sheets 與你自己的 GitHub。</b><br>Notion、Google、郵箱只綁定一次。之後每天由你自己 fork 的倉庫裡的 GitHub Actions 把新的每日復盤模板送進 Notion 並寄信提醒；下一次運行再把你寫好的內容備份到 Google Sheets 與倉庫的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><b>每日復盤的多端數據同步產品。</b><br>
+作為產品使用者，你 Fork 模板、綁定 Notion／Google／信箱一次；GitHub Actions 在<em>你的</em> Fork 裡每天建立今日空白復盤、寄出連結，並<strong>自動攝取前一日</strong>到 Google Sheets + Markdown（可選飛書）。<br>
+<strong>壽命：第 0 天（首次成功）→ 第 600 天硬停止（湮滅）</strong>，除非你部署更新版本。<br>
+$0 · 任意時區 · 無伺服器 · 無 AI 配額 · MIT</p>
 
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官網與互動教學 Website & guided setup</a> · <a href="CREDITS.md">致謝 Credits</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
@@ -31,7 +34,7 @@ flowchart LR
 
 1. **送入**——在你選的時間，Notion 自動建好空白的每日復盤模板，並寄出附連結的提醒信。
 2. **書寫**——任何裝置都能填。
-3. **留存**——下一次運行把昨天的內容複製到 Google Sheets 與你 fork 裡的 `notion/YYYY/*.md`。然後每天重複，最多 600 天。
+3. **留存**——下一次運行把昨天的內容複製到 Google Sheets 與你 fork 裡的 `notion/YYYY/*.md`。然後每天重複，第 0→600 天湮滅（可部署更新版重開）· 最多 600 天。
 
 ## 它做什麼 What it does
 每天在**你設定的時區與時間**（預設 **07:00 UTC**），GitHub Actions 自動：
@@ -39,7 +42,7 @@ flowchart LR
 2. 寄信給你，附今日頁面連結 / emails you the link
 3. 把**昨天**的復盤 + 目前持倉同步到 Google Sheet（分頁「每日復盤」「持倉」）、可選**飛書多維表格**（見 [docs/feishu.md](docs/feishu.md)）與本倉庫 `notion/YYYY/MMDD_HHMM_<時區>.md`（例如 `1105_0705_utc.md`，檔內寫明時區）/ syncs yesterday to Google Sheets and a markdown snapshot
 
-不用 Grok / AI 額度，只用 GitHub 免費分鐘。**壽命上限：自首次成功運行起最多 600 個日曆天**，到期閘門停止並停用排程（方便換上更新版本）。到期前：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
+不用 Grok / AI 額度，只用 GitHub 免費分鐘。**壽命上限：自首次成功運行起第 0→600 天湮滅（可部署更新版重開）· 最多 600 個日曆天**，到期閘門停止並停用排程（方便換上更新版本）。到期前：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
 No AI quota; free GitHub minutes only. Hard-capped at 600 days from first success, then stops.
 
 | | ymzz-loop | 一般 Notion 模板 | 付費日記 App |
@@ -65,7 +68,9 @@ No AI quota; free GitHub minutes only. Hard-capped at 600 days from first succes
 GitHub 排程只支援 UTC，所以 workflow 每小時醒來一次：閘門不安裝任何套件、數秒結束；只有「本地時間 ≥ 提醒時間 且 今天還沒跑過」才真正執行（`.ymzz/last-run` 去重）。排程延遲或漏跑會在下一小時補上。公開倉庫 Actions 免費；私人倉庫約 720 分鐘/月，低於免費 2,000 分鐘。
 Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds unless local time ≥ your reminder time and today hasn't run yet.
 
-## 設定步驟 Setup（一次就好 / once）
+## 設定（每一位 Fork 的產品使用者）
+
+以下步驟是給 **你**（Fork／使用模板之後），不是只給作者。步驟 Setup（一次就好 / once）
 1. **Notion integration**：到 https://www.notion.so/profile/integrations → New integration（Internal）名稱 `ymzz` → 複製 token。打開你要放復盤的 Notion 頁面 → 右上 `⋯` → Connections → 加入 `ymzz`。
 2. **建立資料庫 Create databases**（在電腦上 / on your PC，需 Node.js 20+）：
    ```bash

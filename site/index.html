@@ -45,6 +45,7 @@
     <p class="label eyebrow reveal" data-i18n="hero.eyebrow">Open source · by 晏銘湛箴</p>
     <h1><span class="l1" data-i18n="hero.h1a">Your daily review,</span> <span class="l2" data-i18n="hero.h1b">already waiting.</span></h1>
     <p class="lede reveal" data-i18n="hero.identity"></p>
+    <p class="pillars label reveal" data-i18n="hero.pillars"></p>
     <div class="cta reveal">
       <a class="btn primary" href="#setup"><span data-i18n="hero.cta1">Start the 15-min setup</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
       <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/generate" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="hero.cta2">Use this template</span></a>
@@ -63,11 +64,14 @@
       <p class="dmo" id="dMo"></p>
       <ol class="week" id="week" dir="ltr"></ol>
     </div>
-    <ul class="prompts">
+    <div class="foldable is-open prompts-wrap" data-fold-mobile="collapse">
+      <button type="button" class="fold-tog prompts-fold" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="label fold-tx" data-i18n="fold.less">Collapse</span></button>
+      <div class="fold-body"><ul class="prompts">
       <li><span class="pn" aria-hidden="true">01</span><span data-i18n="mock.keep"></span></li>
       <li><span class="pn" aria-hidden="true">02</span><span data-i18n="day.p2">What did I learn?</span></li>
       <li><span class="pn" aria-hidden="true">09</span><span data-i18n="mock.top3"></span></li>
-    </ul>
+    </ul></div>
+    </div>
   </div>
 </section>
 
@@ -133,32 +137,44 @@
         <p class="secn">09 <span data-i18n="mock.top3"></span></p><p class="fill line" data-i18n="mock.top3v"></p></div>
       <p class="desc" data-i18n="f1.p"></p>
     </article>
-    <article class="tile t-mail reveal" data-accent="lotus">
-      <header><p class="label" data-i18n="f3.m"></p><h3 data-i18n="f3.t"></h3></header>
+    <article class="tile foldable is-open t-mail reveal" data-accent="lotus" data-fold-mobile="collapse">
+      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f3.m"></p><h3 data-i18n="f3.t"></h3></div>
+        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
+      <div class="fold-body">
       <div class="paper mail"><p class="from"><svg class="i" aria-hidden="true"><use href="icons.svg#i-mail"/></svg><bdi dir="ltr">you@gmail.com</bdi><span class="label" style="margin-inline-start:auto">07:00</span></p><p class="subj" data-i18n="mock.subj"></p><p data-i18n="mock.body"></p><span class="btn small" data-i18n="mock.btn"></span></div>
+      </div>
     </article>
-    <article class="tile t-tz reveal" data-accent="lilac">
-      <header><p class="label" data-i18n="f5.m"></p><h3 data-i18n="f5.t"></h3></header>
+    <article class="tile foldable is-open t-tz reveal" data-accent="lilac" data-fold-mobile="collapse">
+      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f5.m"></p><h3 data-i18n="f5.t"></h3></div>
+        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
+      <div class="fold-body">
       <ul class="cities" id="cities" dir="ltr"></ul>
       <p class="desc" data-i18n="f5.p"></p>
+      </div>
     </article>
     <article class="tile t-sheet reveal" data-accent="sage">
       <header><p class="label" data-i18n="f4.m"></p><h3 data-i18n="f4.t"></h3></header>
       <div class="paper sheet"><table><thead><tr><th>Date</th><th>Score</th><th>Mood</th><th>Deep work</th></tr></thead><tbody dir="ltr" id="sheetRows"><tr><td><bdi class="rd" data-off="-3"></bdi></td><td>7</td><td>ok</td><td>3.5</td></tr><tr><td><bdi class="rd" data-off="-2"></bdi></td><td>6</td><td>tired</td><td>2</td></tr><tr><td><bdi class="rd" data-off="-1"></bdi></td><td>7</td><td>ok</td><td>3</td></tr><tr class="new" aria-current="date"><td><bdi class="rd" data-off="0"></bdi></td><td>8</td><td>calm</td><td>4</td></tr></tbody></table></div>
     </article>
-    <article class="tile t-hold reveal" data-accent="cream">
-      <header><p class="label" data-i18n="f2.m"></p><h3 data-i18n="f2.t"></h3></header>
+    <article class="tile foldable is-open t-hold reveal" data-accent="cream" data-fold-mobile="collapse">
+      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f2.m"></p><h3 data-i18n="f2.t"></h3></div>
+        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
+      <div class="fold-body">
       <div class="holds" dir="ltr"><div><b>VT</b><span class="w" style="--w:46%"></span><i>46%</i></div><div><b>QQQ</b><span class="w" style="--w:28%"></span><i>28%</i></div><div><b>2330.TW</b><span class="w" style="--w:16%"></span><i>16%</i></div><div><b>Cash</b><span class="w" style="--w:10%"></span><i>10%</i></div></div>
       <p class="desc" data-i18n="f2.p"></p>
+      </div>
     </article>
-    <article class="tile t-code reveal" data-accent="lilac">
-      <header><p class="label" data-i18n="f6.m"></p><h3 data-i18n="f6.t"></h3></header>
+    <article class="tile foldable is-open t-code reveal" data-accent="lilac" data-fold-mobile="collapse">
+      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f6.m"></p><h3 data-i18n="f6.t"></h3></div>
+        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
+      <div class="fold-body">
       <pre class="code" dir="ltr"><code><span class="k">export default</span> {
   name: <span class="s">"obsidian"</span>,
   enabled: env =&gt; !!env.OBSIDIAN_REPO,
   <span class="k">async</span> write(ctx) { <span class="c">/* ctx.date, ctx.holdings … */</span> },
 };</code></pre>
       <p class="desc" data-i18n="f6.p"></p>
+      </div>
     </article>
   </div>
 </section>
@@ -263,7 +279,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.10.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.11.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>

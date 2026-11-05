@@ -5,6 +5,17 @@
 
 
 
+
+## [1.11.0] — 2026-11-05
+
+### Added
+- Product framing site-wide + READMEs (all locales): multi-end sync · daily review · auto previous-day ingest · day 0→600 annihilate unless newer version deployed. Setup voice = every forker is a product user.
+- Grail-inspired motion feel (vanilla): soft rise reveals, stagger, hover lift; `prefers-reduced-motion` safe.
+- Foldable secondary cards (chevron); phone starts secondary collapsed; tighter card padding.
+
+### Kept
+- Fonts locked, four palettes, no black cards, micro edges, read progress, full-bleed, donate, Feishu, signup, MIT.
+
 ## [1.10.0] — 2026-11-05
 
 ### Added
