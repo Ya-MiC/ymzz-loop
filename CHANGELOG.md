@@ -9,6 +9,12 @@
 
 
 
+## [1.16.1] — 2026-11-05
+
+### Changed
+- **Today-card to-dos unified with preview rows:** visitor items fill slots **03–08** (max 6), same numbered list as 01 / 02 / 09; add / edit / delete; 60h cookie+localStorage TTL unchanged. 7th attempt shows exact 繁中：「如果 6 個代辦不能滿足您的期待，那您剛才一定輸入了一個偽需求。」 (localized in en / zh-CN / ko / ar).
+- **Dark mode dividers only:** raised cream hairlines/separators/rings toward ~3:1 (WCAG 1.4.11 / Primer dark steps 7–8 / Material divider guidance). Soft Morandi kept; no resting card borders; light mode untouched.
+
 ## [1.16.0] — 2026-11-05
 
 ### Added

@@ -250,15 +250,18 @@
 
 
 
-  // demo to-dos: browser-only (localStorage + cookie), auto-destroy after 60h — never server-side
+  // demo to-dos 03–08: unified with Notion preview rows; max 6; browser-only 60h TTL
   (() => {
     const TTL_MS = 60 * 60 * 1000 * 60; // 60 hours
+    const MAX = 6;
+    const SLOT0 = 3; // first user number → 03
     const LS_KEY = "todos";
     const COOKIE = "ymzz_todos";
-    const list = $("#todoList"), form = $("#todoForm"), input = $("#todoInput");
+    const list = $("#todoList"), form = $("#todoForm"), input = $("#todoInput"), limitMsg = $("#todoLimitMsg");
     if (!list || !form || !input) return;
     const now = () => Date.now();
     const uid = () => "t" + now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const pad = n => String(n).padStart(2, "0");
     const readCookie = () => {
       const m = document.cookie.match(/(?:^|;\s*)ymzz_todos=([^;]*)/);
       if (!m) return null;
@@ -270,7 +273,7 @@
         + "; max-age=" + maxAge + "; path=/; SameSite=Lax";
     };
     const clearCookie = () => { document.cookie = COOKIE + "=; max-age=0; path=/; SameSite=Lax"; };
-    const purgeItems = (items, t0 = now()) => (items || []).filter(it => it && typeof it.created === "number" && (t0 - it.created) < TTL_MS);
+    const purgeItems = (items, t0 = now()) => (items || []).filter(it => it && typeof it.created === "number" && (t0 - it.created) < TTL_MS).slice(0, MAX);
     const load = () => {
       let payload = null;
       try { payload = store.get(LS_KEY, null); } catch { payload = null; }
@@ -279,9 +282,7 @@
       if (typeof payload.exp === "number" && now() >= payload.exp) {
         store.set(LS_KEY, null); clearCookie(); return { exp: now() + TTL_MS, items: [] };
       }
-      const items = purgeItems(payload.items);
-      const exp = typeof payload.exp === "number" ? payload.exp : now() + TTL_MS;
-      return { exp, items };
+      return { exp: typeof payload.exp === "number" ? payload.exp : now() + TTL_MS, items: purgeItems(payload.items) };
     };
     const save = (payload) => {
       payload.items = purgeItems(payload.items);
@@ -289,25 +290,40 @@
       store.set(LS_KEY, payload);
       writeCookie(payload);
     };
+    const showLimit = () => {
+      if (!limitMsg) return;
+      limitMsg.hidden = false;
+      limitMsg.textContent = t("todo.limit");
+      clearTimeout(showLimit._t);
+      showLimit._t = setTimeout(() => { limitMsg.hidden = true; }, 5200);
+    };
     let state = load();
+    const userRows = () => [...list.querySelectorAll(".todo-user")];
     const render = () => {
       state.items = purgeItems(state.items);
-      if (!state.items.length) {
-        list.innerHTML = `<li class="todo-empty">${t("todo.empty")}</li>`;
-        return;
-      }
-      list.innerHTML = state.items.map(it => `<li class="todo-item${it.done ? " is-done" : ""}" data-id="${it.id}">
-        <label><input type="checkbox" ${it.done ? "checked" : ""}><span>${esc(it.text)}</span></label>
-        <button type="button" class="todo-del" aria-label="${t("todo.clear")}" data-del="${it.id}">×</button>
-      </li>`).join("");
+      userRows().forEach(n => n.remove());
+      const anchor = list.querySelector('[data-fixed="09"]');
+      state.items.forEach((it, i) => {
+        const n = SLOT0 + i; // 03..08
+        const li = document.createElement("li");
+        li.className = "todo-user" + (it.done ? " is-done" : "");
+        li.dataset.id = it.id;
+        li.innerHTML = `<span class="pn" aria-hidden="true">${pad(n)}</span>`
+          + `<label class="todo-check"><input type="checkbox" ${it.done ? "checked" : ""}><span class="todo-text" data-edit="${it.id}" title="${t("todo.add")}">${esc(it.text)}</span></label>`
+          + `<button type="button" class="todo-del" aria-label="${t("todo.clear")}" data-del="${it.id}">×</button>`;
+        list.insertBefore(li, anchor);
+      });
+      // keep input enabled so a 7th attempt can show the limit copy
     };
     form.addEventListener("submit", e => {
       e.preventDefault();
       const text = input.value.trim().slice(0, 80);
       if (!text) return;
+      state.items = purgeItems(state.items);
+      if (state.items.length >= MAX) { showLimit(); input.value = ""; return; }
       state.items.push({ id: uid(), text, done: false, created: now() });
       if (!state.exp || state.exp < now()) state.exp = now() + TTL_MS;
-      save(state); input.value = ""; render();
+      save(state); input.value = ""; if (limitMsg) limitMsg.hidden = true; render();
     });
     list.addEventListener("change", e => {
       const cb = e.target.closest("input[type=checkbox]"); if (!cb) return;
@@ -316,14 +332,30 @@
       it.done = cb.checked; save(state); render();
     });
     list.addEventListener("click", e => {
-      const btn = e.target.closest("[data-del]"); if (!btn) return;
-      state.items = state.items.filter(x => x.id !== btn.getAttribute("data-del"));
-      save(state); render();
+      const btn = e.target.closest("[data-del]");
+      if (btn) {
+        state.items = state.items.filter(x => x.id !== btn.getAttribute("data-del"));
+        save(state); if (limitMsg) limitMsg.hidden = true; render(); return;
+      }
+      const tx = e.target.closest("[data-edit]");
+      if (!tx || tx.isContentEditable) return;
+      const id = tx.getAttribute("data-edit");
+      const it = state.items.find(x => x.id === id); if (!it) return;
+      tx.contentEditable = "true"; tx.focus();
+      const finish = () => {
+        tx.contentEditable = "false";
+        const next = tx.textContent.trim().slice(0, 80);
+        if (next) it.text = next; else state.items = state.items.filter(x => x.id !== id);
+        save(state); render();
+        tx.removeEventListener("blur", finish);
+        tx.removeEventListener("keydown", onKey);
+      };
+      const onKey = ev => { if (ev.key === "Enter") { ev.preventDefault(); tx.blur(); } if (ev.key === "Escape") { tx.textContent = it.text; tx.blur(); } };
+      tx.addEventListener("blur", finish);
+      tx.addEventListener("keydown", onKey);
     });
-    // re-render on lang change via MutationObserver-ish: hook apply by exposing
-    const _apply = window.__ymzzTodoRender = render;
+    window.__ymzzTodoRender = render;
     render();
-    // periodic purge (every 10 min) while tab open
     setInterval(() => { state = load(); render(); }, 600000);
   })();
 

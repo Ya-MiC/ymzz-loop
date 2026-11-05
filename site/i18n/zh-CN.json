@@ -265,8 +265,9 @@
   "todo.k": "我的待办",
   "todo.note": "只存浏览器 · 60 小时后自动销毁",
   "todo.add": "新增待办",
-  "todo.ph": "写下一件待办…",
+  "todo.ph": "新增 03…08（最多 6 条）",
   "todo.btn": "新增",
   "todo.empty": "新增一条，体验 fork 后的待办",
-  "todo.clear": "删除"
+  "todo.clear": "删除",
+  "todo.limit": "如果 6 个待办还不能满足您，那您刚才输入的多半是个伪需求。"
 }

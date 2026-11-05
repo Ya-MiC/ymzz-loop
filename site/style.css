@@ -3224,3 +3224,149 @@ html.nav-scrolled .nav,
     border-radius: 1.25rem !important;
   }
 }
+
+/* ===== v1.16.1 · unified 03–08 todos · dark divider clarity (Primer/WCAG ~3:1) ===== */
+
+/* User rows share .prompts look; sit between 02 and 09 */
+.todo-unified .todo-user{
+  display:flex;
+  gap:var(--s3);
+  align-items:baseline;
+  padding-block:var(--s2);
+  color:var(--ink-2);
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+  border-radius:0!important;
+}
+.todo-unified .todo-user .pn{
+  color:var(--cocoa, var(--accent-warm));
+  font-family:var(--f-mono), var(--f-body);
+  font-variant-numeric:tabular-nums;
+  flex:none;
+  min-inline-size:1.75rem;
+}
+.todo-unified .todo-check{
+  display:flex;
+  align-items:baseline;
+  gap:0.45rem;
+  flex:1;
+  cursor:pointer;
+  font-size:inherit;
+  color:inherit;
+}
+.todo-unified .todo-check input{
+  flex:none;
+  inline-size:0.95rem;
+  block-size:0.95rem;
+  accent-color:var(--accent-warm, var(--cocoa));
+  transform:translateY(0.1rem);
+}
+.todo-unified .todo-text{
+  outline:none;
+  border-radius:0.25rem;
+}
+.todo-unified .todo-text[contenteditable=true]{
+  background:color-mix(in srgb, var(--accent-soft) 28%, transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--accent) 35%, transparent);
+  padding-inline:0.25rem;
+}
+.todo-unified .todo-user.is-done .todo-text{
+  text-decoration:line-through;
+  color:var(--ink-3);
+}
+.todo-unified .todo-del{
+  border:0;
+  background:transparent;
+  color:var(--ink-3);
+  cursor:pointer;
+  font-size:1.05rem;
+  line-height:1;
+  padding:0.15rem 0.35rem;
+  border-radius:0.35rem;
+  margin-inline-start:auto;
+}
+.todo-unified .todo-del:hover,
+.todo-unified .todo-del:focus-visible{
+  color:var(--ink);
+  background:color-mix(in srgb, var(--ink) 8%, transparent);
+  outline:none;
+}
+.todo-unified-wrap .todo-add{
+  margin-block-start:var(--s3);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:var(--s2);
+}
+.todo-unified-wrap .todo-note{
+  margin:var(--s2) 0 0;
+  color:var(--ink-3);
+}
+.todo-limit{
+  margin:var(--s2) 0 0;
+  padding:0.55rem 0.75rem;
+  border-radius:var(--Ri, 0.75rem);
+  font-size:var(--t-sm);
+  line-height:1.55;
+  color:var(--ink);
+  background:color-mix(in srgb, var(--accent-soft) 32%, var(--v-inset, transparent));
+}
+.todo-limit[hidden]{display:none!important}
+
+/*
+ * Dark mode dividers only — research notes (v1.16.1):
+ * - WCAG 1.4.11: meaningful non-text cues ≥ 3:1 (decorative dividers have no floor,
+ *   but list separators that structure the today-card need to be findable).
+ * - Material 3: dividers can be decorative; still raise visibility for clustered rows.
+ * - GitHub Primer dark: neutral steps 7–8 for borders/dividers; step 8 ≈ min for
+ *   interactive control edges against muted bg.
+ * Target: cream-on-dusk ≈ 3:1 via rgba(230,225,213,.40) without restoring card rims.
+ */
+html[data-theme=dark],
+html[data-theme=dark][data-palette=cloud],
+html[data-theme=dark][data-palette=earth],
+[data-theme=dark]{
+  --line: rgba(230, 225, 213, .40);
+  --edge: rgba(230, 225, 213, .36);
+  --edge-strong: rgba(230, 225, 213, .48);
+  --divider: rgba(230, 225, 213, .40);
+}
+/* Separators / rings / hairlines — dark only; cards stay borderless at rest */
+[data-theme=dark] .prompts li,
+[data-theme=dark] .todo-unified li{
+  border-block-end: 1px solid var(--divider, rgba(230,225,213,.40)) !important;
+}
+[data-theme=dark] .prompts li:last-child,
+[data-theme=dark] .todo-unified li:last-child{
+  border-block-end: 0 !important;
+}
+[data-theme=dark] .week{
+  box-shadow: inset 0 1px 0 0 rgba(230, 225, 213, .40) !important;
+}
+[data-theme=dark] .chip-mock,
+[data-theme=dark] .todo-add input,
+[data-theme=dark] .btn.ghost:not(#donateCopy){
+  box-shadow: inset 0 0 0 1.5px rgba(230, 225, 213, .36) !important;
+}
+[data-theme=dark] .spy-track{
+  background: rgba(230, 225, 213, .28) !important;
+}
+[data-theme=dark] .dial line{ opacity: .55 !important; }
+[data-theme=dark] .dial line.h{ opacity: .82 !important; }
+[data-theme=dark] .holds .w{
+  background: rgba(230, 225, 213, .22) !important;
+}
+[data-theme=dark] .urgency{
+  border-inline-start-color: rgba(230, 225, 213, .42) !important;
+}
+/* still no resting card rims */
+[data-theme=dark] .panel,
+[data-theme=dark] .dayp,
+[data-theme=dark] .daycard,
+[data-theme=dark] .headp,
+[data-theme=dark] .dialp,
+[data-theme=dark] .hold-card,
+[data-theme=dark] .sec > .panel{
+  border: 0 !important;
+  box-shadow: none !important;
+}

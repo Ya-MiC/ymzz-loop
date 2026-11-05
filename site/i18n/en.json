@@ -265,8 +265,9 @@
   "todo.k": "My to-dos",
   "todo.note": "Stored in this browser only · auto-clears after 60 hours",
   "todo.add": "Add a to-do",
-  "todo.ph": "Write a to-do…",
+  "todo.ph": "Add 03…08 (max 6)",
   "todo.btn": "Add",
   "todo.empty": "Add a to-do to try the fork demo",
-  "todo.clear": "Remove"
+  "todo.clear": "Remove",
+  "todo.limit": "If six to-dos still aren’t enough, what you just typed was probably a false need."
 }
