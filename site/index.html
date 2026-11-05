@@ -29,7 +29,7 @@
   <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
   <button id="navToggle" class="chip nav-tog" type="button" aria-expanded="false" aria-controls="navLinks" data-i18n-aria="ui.menu"><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh" data-i18n="ui.menu">Menu</span></button>
   <nav class="links" id="navLinks" aria-label="Main">
-    <a href="#loop" data-i18n="nav.loop">The loop</a><a href="#intro" data-i18n="nav.intro">Benefits</a><a href="#features" data-i18n="nav.features">Features</a><a href="#diff" data-i18n="diff.k">vs. others</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a><a href="#donate" data-i18n="nav.donate">Donate</a>
+    <a href="#intro" data-i18n="nav.intro">Benefits</a><a href="#diff" data-i18n="diff.k">vs. others</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a><a href="#donate" data-i18n="nav.donate">Donate</a>
   </nav>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
@@ -42,14 +42,12 @@
 
 <main id="main">
 <!-- HERO: today-page panel + headline panel -->
-<section class="hero" id="top">
+<section class="hero" id="top" data-spy="Hero">
   <div class="panel headp">
-    <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
     <p class="label eyebrow reveal" data-i18n="hero.eyebrow">Open source · by 晏銘湛箴</p>
     <h1><span class="l1" data-i18n="hero.h1a">Your daily review,</span> <span class="l2" data-i18n="hero.h1b">already waiting.</span></h1>
     <p class="promise reveal" data-i18n="hero.promise"></p>
     <p class="urgency reveal" data-i18n="hero.urgency"></p>
-    <p class="lede reveal" data-i18n="hero.identity"></p>
     <p class="pillars label reveal" data-i18n="hero.pillars"></p>
     <div class="cta reveal">
       <a class="btn primary" href="#setup"><span data-i18n="hero.cta1">Start the 15-min setup</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
@@ -62,6 +60,7 @@
     </ul>
   </div>
   <div class="panel dayp reveal">
+    <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
     <div class="dayp-top"><p class="label" data-i18n="day.k">Today's page</p><p class="chip-mock" title="Static illustration — not a live counter"><span data-i18n="day.left">本章還剩</span> <bdi dir="ltr" class="mock-n">599</bdi> <span data-i18n="day.unit">天</span><span class="mock-note" data-i18n="day.mock">示意</span></p></div>
     <div class="daycard" aria-hidden="true">
       <p class="dwk" id="dWk"></p>
@@ -81,40 +80,11 @@
 </section>
 
 
-<!-- SYNC STRIP: three destinations, no absolute overlap -->
-<section class="sec syncstrip" aria-hidden="true">
-  <div class="syncrow">
-    <div class="fc fc1"><p class="label">Notion</p><p class="ft"><bdi class="today"></bdi></p><p class="fl">8 / 10 · calm</p><span class="bar"></span><span class="bar s"></span></div>
-    <div class="fc fc2"><p class="label"><svg class="i" aria-hidden="true"><use href="icons.svg#i-mail"/></svg> 07:00</p><p class="ft" data-i18n="mock.subj"></p></div>
-    <div class="fc fc3"><p class="label">git</p><p class="fl"><bdi>sync: <span class="yday"></span></bdi></p><p class="fl dim"><bdi class="fname"></bdi></p></div>
-  </div>
-</section>
-
-<!-- MARQUEE -->
-<section class="marquee" aria-label="Highlights" data-i18n-aria="mq.label">
-  <div class="mq-track"><ul class="mq-list" id="mq"></ul></div>
-</section>
-
-<!-- THE LOOP -->
-<section id="loop" class="sec">
-  <div class="panel loopp loop-rail">
-    <div class="prose"><p class="label reveal">01 — <span data-i18n="loop.k">The loop</span></p>
-      <h2 class="reveal" data-i18n="loop.h">How the loop works</h2>
-      <p class="reveal big" data-i18n="loop.p"></p></div>
-    <ol class="loop">
-      <li class="lp sky reveal"><span class="ln"><bdi dir="ltr">01</bdi></span><h3 data-i18n="loop.1t"></h3><p data-i18n="loop.1p"></p><p class="lt label"><bdi dir="ltr">GitHub Actions → Notion + Email</bdi></p></li>
-      <li class="lp lotus reveal"><span class="ln"><bdi dir="ltr">02</bdi></span><h3 data-i18n="loop.2t"></h3><p data-i18n="loop.2p"></p><p class="lt label"><bdi dir="ltr">Notion</bdi></p></li>
-      <li class="lp sage reveal"><span class="ln"><bdi dir="ltr">03</bdi></span><h3 data-i18n="loop.3t"></h3><p data-i18n="loop.3p"></p><p class="lt label"><bdi dir="ltr">→ Google Sheets + GitHub (.md)</bdi></p></li>
-    </ol>
-    <p class="again label reveal"><span aria-hidden="true">↻</span><span data-i18n="loop.again"></span></p>
-  </div>
-</section>
-
 <!-- BENEFITS: outcome, not feature spec -->
-<section id="intro" class="sec">
+<section id="intro" data-spy="Benefits" class="sec">
   <div class="panel intro benefits-rail">
     <div class="prose">
-      <p class="label reveal">02 — <span data-i18n="nav.intro">Benefits</span></p>
+      <p class="label reveal">01 — <span data-i18n="nav.intro">Benefits</span></p>
       <h2 class="reveal" data-i18n="intro.h">Less blank page. More day you actually kept.</h2>
       <p class="reveal big" data-i18n="intro.p1"></p>
     </div>
@@ -139,82 +109,11 @@
   </div>
 </section>
 
-<!-- BENTO -->
-<section id="features" class="sec">
-  <div class="head">
-    <p class="label reveal">03 — <span data-i18n="nav.features">Features</span></p>
-    <h2 class="reveal" data-i18n="feat.h">Small software, big order.</h2>
-  </div>
-  <div class="bento bento-rail">
-    <article class="tile t-notion reveal" data-accent="sky">
-      <header><p class="label" data-i18n="f1.m"></p><h3 data-i18n="f1.t"></h3></header>
-      <div class="paper notion">
-        <p class="mt"><bdi class="today"></bdi> · <span data-i18n="mock.title"></span></p>
-        <dl class="props">
-          <div class="prop"><dt data-i18n="mock.score"></dt><dd><span class="fill">8 / 10</span></dd></div>
-          <div class="prop"><dt data-i18n="mock.mood"></dt><dd><span class="fill pill">calm</span></dd></div>
-        </dl>
-        <div class="fields">
-          <div class="field">
-            <p class="secn"><bdi dir="ltr">01</bdi> <span data-i18n="mock.keep"></span></p>
-            <p class="fill line" data-i18n="mock.keepv"></p>
-          </div>
-          <div class="field">
-            <p class="secn"><bdi dir="ltr">09</bdi> <span data-i18n="mock.top3"></span></p>
-            <p class="fill line" data-i18n="mock.top3v"></p>
-          </div>
-        </div>
-        <p class="kw" data-i18n="f1.p"></p>
-      </div>
-    </article>
-    <article class="tile foldable is-open t-mail reveal" data-accent="lotus" data-fold-mobile="collapse">
-      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f3.m"></p><h3 data-i18n="f3.t"></h3></div>
-        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
-      <div class="fold-body">
-      <div class="paper mail"><p class="from"><svg class="i" aria-hidden="true"><use href="icons.svg#i-mail"/></svg><bdi dir="ltr">you@gmail.com</bdi><span class="label" style="margin-inline-start:auto">07:00</span></p><p class="subj" data-i18n="mock.subj"></p><p data-i18n="mock.body"></p><span class="btn small" data-i18n="mock.btn"></span></div>
-      </div>
-    </article>
-    <article class="tile foldable is-open t-tz reveal" data-accent="lilac" data-fold-mobile="collapse">
-      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f5.m"></p><h3 data-i18n="f5.t"></h3></div>
-        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
-      <div class="fold-body">
-      <ul class="cities" id="cities" dir="ltr"></ul>
-      <p class="desc" data-i18n="f5.p"></p>
-      </div>
-    </article>
-    <article class="tile t-sheet reveal" data-accent="sage">
-      <header><p class="label" data-i18n="f4.m"></p><h3 data-i18n="f4.t"></h3></header>
-      <div class="paper sheet"><table><thead><tr><th>Date</th><th>Score</th><th>Mood</th><th>Deep work</th></tr></thead><tbody dir="ltr" id="sheetRows"><tr><td><bdi class="rd" data-off="-3"></bdi></td><td>7</td><td>ok</td><td>3.5</td></tr><tr><td><bdi class="rd" data-off="-2"></bdi></td><td>6</td><td>tired</td><td>2</td></tr><tr><td><bdi class="rd" data-off="-1"></bdi></td><td>7</td><td>ok</td><td>3</td></tr><tr class="new" aria-current="date"><td><bdi class="rd" data-off="0"></bdi></td><td>8</td><td>calm</td><td>4</td></tr></tbody></table></div>
-    </article>
-    <article class="tile foldable is-open t-hold reveal" data-accent="cream" data-fold-mobile="collapse">
-      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f2.m"></p><h3 data-i18n="f2.t"></h3></div>
-        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
-      <div class="fold-body">
-      <div class="holds" dir="ltr"><div><b>VT</b><span class="w" style="--w:46%"></span><i>46%</i></div><div><b>QQQ</b><span class="w" style="--w:28%"></span><i>28%</i></div><div><b id="holdTicker" data-ticker-default="2330.TW">2330.TW</b><span class="w" style="--w:16%"></span><i>16%</i></div><div><b>Cash</b><span class="w" style="--w:10%"></span><i>10%</i></div></div>
-      <p class="desc" data-i18n="f2.p"></p>
-      </div>
-    </article>
-    <article class="tile foldable is-open t-code reveal" data-accent="lilac" data-fold-mobile="collapse">
-      <header class="tile-hd"><div class="tile-hd-text"><p class="label" data-i18n="f6.m"></p><h3 data-i18n="f6.t"></h3></div>
-        <button type="button" class="fold-tog" aria-expanded="true"><span class="fold-chev" aria-hidden="true"></span><span class="vh fold-tx" data-i18n="fold.less">Collapse</span></button></header>
-      <div class="fold-body">
-      <pre class="code" dir="ltr"><code><span class="k">export default</span> {
-  name: <span class="s">"obsidian"</span>,
-  enabled: env =&gt; !!env.OBSIDIAN_REPO,
-  <span class="k">async</span> write(ctx) { <span class="c">/* ctx.date, ctx.holdings … */</span> },
-};</code></pre>
-      <p class="desc" data-i18n="f6.p"></p>
-      </div>
-    </article>
-  </div>
-</section>
-
-
 <!-- OPEN-SOURCE SUPERIORITY: concrete, honest rows (no invented benchmarks) -->
-<section id="diff" class="sec">
+<section id="diff" data-spy="OSS" class="sec">
   <div class="panel diffp vs-rail">
     <div class="prose">
-      <p class="label reveal">04 — <span data-i18n="diff.k">Open-source edge</span></p>
+      <p class="label reveal">02 — <span data-i18n="diff.k">Open-source edge</span></p>
       <h2 class="reveal" data-i18n="diff.h">Where the open-source loop wins</h2>
       <p class="lede reveal" data-i18n="diff.p"></p>
     </div>
@@ -288,9 +187,9 @@
 </section>
 
 <!-- SETUP -->
-<section id="setup" class="sec">
+<section id="setup" data-spy="Setup" class="sec">
   <div class="panel tut">
-    <p class="label reveal">05 — <span data-i18n="nav.setup">Setup</span></p>
+    <p class="label reveal">03 — <span data-i18n="nav.setup">Setup</span></p>
     <h2 class="reveal" data-i18n="setup.h">Guided setup</h2>
     <p class="sub reveal" data-i18n="setup.sub"></p>
     <div class="progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-labelledby="pct"><i></i><span id="pct" dir="ltr">0%</span></div>
@@ -298,17 +197,18 @@
   </div>
 </section>
 
-<!-- FAQ + OSS -->
-<section id="faq" class="sec twin">
-  <div class="panel"><p class="label">06 — <span data-i18n="nav.faq">FAQ</span></p><h2 class="reveal" data-i18n="faq.h">Questions</h2><div id="faqList"></div></div>
-  <div class="panel oss"><div class="glow g3" aria-hidden="true"></div><p class="label">MIT</p><h2 class="reveal" data-i18n="oss.h"></h2><p class="reveal" data-i18n="oss.p"></p>
-    <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="ui.star">Star on GitHub</span></a></div>
+<!-- FAQ (minimal) -->
+<section id="faq" data-spy="FAQ" class="sec">
+  <div class="panel">
+    <p class="label">04 — <span data-i18n="nav.faq">FAQ</span></p>
+    <h2 class="reveal" data-i18n="faq.h">Questions</h2>
+    <div id="faqList"></div>
+  </div>
 </section>
 <!-- SIGNUP -->
-<section id="join" class="sec">
+<section id="join" data-spy="Join" class="sec">
   <div class="panel join">
-    <div class="glow g1" aria-hidden="true"></div><div class="glow g2" aria-hidden="true"></div>
-    <div class="prose"><p class="label reveal">07 — <span data-i18n="join.k">Stay in the loop</span></p>
+    <div class="prose"><p class="label reveal">05 — <span data-i18n="join.k">Stay in the loop</span></p>
       <h2 class="reveal" data-i18n="join.h">Get the next release in your inbox.</h2>
       <p class="reveal" data-i18n="join.p"></p></div>
     <form id="signup" class="signup reveal" novalidate>
@@ -326,10 +226,10 @@
 </section>
 
 <!-- DONATE: receive-only USDC on Arbitrum One — no wallet connect / sign / approve -->
-<section id="donate" class="sec">
+<section id="donate" data-spy="Donate" class="sec">
   <div class="panel donate">
     <div class="prose">
-      <p class="label reveal">08 — <span data-i18n="donate.k">Donate</span></p>
+      <p class="label reveal">06 — <span data-i18n="donate.k">Donate</span></p>
       <h2 class="reveal" data-i18n="donate.h">Donate / 贊助</h2>
       <p class="reveal" data-i18n="donate.p">ymzz-loop stays free and MIT. If it helps you, you can send a tip.</p>
       <p class="reveal warn" data-i18n="donate.warn">USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.</p>
@@ -362,11 +262,15 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.14.1 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.14.2 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
 </footer>
+
+<nav class="sec-spy" id="secSpy" aria-label="Section preview" data-i18n-aria="ui.secspy">
+  <ol class="spy-list" id="spyList"></ol>
+</nav>
 <script src="config.js"></script>
 <script src="app.js" defer></script>
 </body>

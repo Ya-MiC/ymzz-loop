@@ -2239,3 +2239,298 @@ button.mark{
 }
 .chip-mock .mock-n{font-variant-numeric:tabular-nums;color:var(--ink)}
 .chip-mock .mock-note{color:var(--ink-3);font-size:.9em;margin-inline-start:.25rem}
+
+/* ===== v1.14.2 · dark readability · date/time cohesion · section spy · subject glows ===== */
+
+/* Dark 暮靄/暮林: raise lines, edges, secondary ink — contrast not weight */
+html[data-theme=dark],
+html[data-theme=dark][data-palette=cloud],
+[data-theme=dark]{
+  --ink-3:#C2BBB0; /* was ~#7A/#8A — wash labels readable on surf */
+  --line:rgba(230,225,213,.28);
+  --edge:rgba(230,225,213,.26);
+  --edge-strong:rgba(230,225,213,.38);
+}
+html[data-theme=dark][data-palette=earth]{
+  --ink-3:#C8C0B4;
+  --line:rgba(230,225,213,.30);
+  --edge:rgba(230,225,213,.28);
+  --edge-strong:rgba(230,225,213,.40);
+}
+/* Hairlines / card rims use the stronger edge */
+[data-theme=dark] .panel,
+[data-theme=dark] .tile,
+[data-theme=dark] .fact,
+[data-theme=dark] .daycard,
+[data-theme=dark] .fc,
+[data-theme=dark] .addr,
+[data-theme=dark] .tpanel,
+[data-theme=dark] .donate-qr img{
+  box-shadow:var(--sh), inset 0 0 0 1px var(--edge)!important;
+}
+[data-theme=dark] .week{
+  border-block-start-color:var(--edge-strong);
+}
+[data-theme=dark] .chip-mock,
+[data-theme=dark] .btn.ghost{
+  box-shadow:inset 0 0 0 1.5px var(--edge-strong)!important;
+}
+/* Donate copy: solid, readable on dark — not washed ghost */
+#donateCopy.btn.ghost,
+[data-theme=dark] #donateCopy.btn.ghost{
+  color:var(--ink)!important;
+  background:color-mix(in srgb,var(--accent-warm, #CDBFE0) 28%, var(--surf-2, #423A2F))!important;
+  box-shadow:inset 0 0 0 1.5px var(--edge-strong)!important;
+  font-weight:var(--wght-ui, 400)!important;
+}
+#donateCopy.btn.ghost:hover,
+#donateCopy.btn.ghost:focus-visible,
+[data-theme=dark] #donateCopy.btn.ghost:hover,
+[data-theme=dark] #donateCopy.btn.ghost:focus-visible{
+  background:color-mix(in srgb,var(--accent-warm, #CDBFE0) 42%, var(--surf-2, #423A2F))!important;
+  box-shadow:inset 0 0 0 2px var(--ink-2)!important;
+  outline:2px solid color-mix(in srgb,var(--accent) 55%,transparent);
+  outline-offset:2px;
+}
+[data-theme=dark] #donateCopy .i{opacity:1;color:var(--ink)}
+[data-theme=dark] .label,
+[data-theme=dark] .chip-mock,
+[data-theme=dark] .week li,
+[data-theme=dark] .small,
+[data-theme=dark] .lede,
+[data-theme=dark] figcaption,
+[data-theme=dark] .mock-note{
+  color:var(--ink-3);
+}
+[data-theme=dark] .ink-2,
+[data-theme=dark] .urgency,
+[data-theme=dark] .dwk,
+[data-theme=dark] .dmo{
+  color:var(--ink-2);
+}
+
+/* Date hero + week strip: one cohesive unit (was s5+s4 apart) */
+.dayp{
+  gap:var(--s3)!important;
+  justify-content:flex-start!important;
+}
+.daycard{
+  display:flex;
+  flex-direction:column;
+  gap:0.15rem;
+}
+.dmo{margin-block-end:0.35rem!important}
+.week{
+  margin-block-start:0.35rem!important;
+  padding-block-start:0.55rem!important;
+}
+.daycard .dnum{line-height:0.95}
+
+/* Colour serves the SUBJECT (today mock), not decorative hero wash */
+.headp,.hero > .headp,.panel.headp{
+  background:var(--panel)!important; /* quiet — copy is text, not wash stage */
+}
+.dayp,.panel.dayp{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(70% 65% at 88% 12%, color-mix(in srgb,var(--accent) 48%,transparent), transparent 68%),
+    radial-gradient(60% 55% at 10% 90%, color-mix(in srgb,var(--accent-soft) 40%,transparent), transparent 65%),
+    radial-gradient(45% 50% at 55% 45%, color-mix(in srgb,var(--accent-warm) 26%,transparent), transparent 70%),
+    var(--panel)!important;
+}
+.dayp > .glow{z-index:0;opacity:.55}
+[data-theme=dark] .dayp > .glow{opacity:.32}
+.dayp > .dayp-top,
+.dayp > .daycard,
+.dayp > .foldable{position:relative;z-index:1}
+.join .glow,.oss .glow{display:none!important} /* no decorative pull */
+
+/* Section preview strip — WHAT section (top bar stays % read) */
+.sec-spy{
+  position:fixed;
+  inset-inline:0;
+  inset-block-end:0;
+  z-index:40;
+  display:flex;
+  justify-content:center;
+  padding:0.55rem 0.75rem calc(0.55rem + env(safe-area-inset-bottom, 0px));
+  pointer-events:none;
+  background:linear-gradient(180deg, transparent, color-mix(in srgb,var(--ground) 88%,transparent) 45%);
+}
+.spy-list{
+  pointer-events:auto;
+  list-style:none;
+  margin:0;
+  padding:0.35rem 0.55rem;
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:0.2rem 0.15rem;
+  max-inline-size:min(42rem, 96vw);
+  border-radius:99rem;
+  background:color-mix(in srgb,var(--panel) 92%,transparent);
+  box-shadow:var(--sh), inset 0 0 0 1px var(--edge);
+  backdrop-filter:blur(0.6rem);
+}
+.spy-list a{
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+  padding:0.3rem 0.55rem;
+  border-radius:99rem;
+  font:400 var(--t-xs)/1.2 var(--f-body);
+  color:var(--ink-3);
+  text-decoration:none;
+  letter-spacing:0.02em;
+  transition:color .2s var(--ease, cubic-bezier(.22,1,.36,1)), background .2s var(--ease, cubic-bezier(.22,1,.36,1));
+}
+.spy-list a i{
+  display:block;
+  inline-size:0.35rem;
+  block-size:0.35rem;
+  border-radius:50%;
+  background:var(--ink-3);
+  opacity:.55;
+  flex:none;
+}
+.spy-list a.is-on{
+  color:var(--ink);
+  background:color-mix(in srgb,var(--accent-soft) 35%,transparent);
+}
+.spy-list a.is-on i{
+  background:var(--accent-warm, var(--cocoa));
+  opacity:1;
+  transform:scale(1.25);
+}
+.spy-list a:hover,
+.spy-list a:focus-visible{
+  color:var(--ink);
+  outline:none;
+}
+.spy-list a:focus-visible{
+  box-shadow:inset 0 0 0 1.5px var(--edge-strong);
+}
+@media (max-width:40rem){
+  .spy-list a span{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+  .spy-list a{padding:0.45rem}
+  .spy-list a i{inline-size:0.45rem;block-size:0.45rem}
+}
+@media (prefers-reduced-motion:reduce){
+  .spy-list a{transition:none}
+  .spy-list a.is-on i{transform:none}
+}
+/* room so fixed strip doesn't cover donate */
+main{padding-block-end:3.5rem}
+
+/* ===== v1.14.2b · reactbits-style nav: flush → glass + contained ===== */
+/* At load: full-bleed flush. On scroll: shrink to content width + glass. */
+:root{
+  --nav-content:min(72rem, calc(100% - (2 * var(--edge-x))));
+}
+.nav{
+  --nav-p:0;
+  position:sticky;
+  inset-block-start:0;
+  z-index:50;
+  box-sizing:border-box;
+  /* interpolate flush → contained */
+  width:calc(100% - (var(--nav-p) * (100% - var(--nav-content))));
+  max-inline-size:100%;
+  margin-inline:auto!important;
+  margin-block-start:calc(var(--nav-p) * var(--frame))!important;
+  margin-block-end:var(--frame)!important;
+  border-radius:calc(0.25rem + (var(--nav-p) * 5rem))!important;
+  padding-block:calc(0.85rem - (var(--nav-p) * 0.25rem))!important;
+  padding-inline:clamp(0.85rem, 2vw, 1.5rem)!important;
+  /* glass grows with scroll */
+  --nav-alpha:calc(0.92 - (var(--nav-p) * 0.42));
+  --nav-blur:calc(0px + (var(--nav-p) * 16px));
+  background:color-mix(in srgb, var(--panel) calc(var(--nav-alpha) * 100%), transparent)!important;
+  backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.45))!important;
+  -webkit-backdrop-filter:blur(var(--nav-blur)) saturate(calc(1 + var(--nav-p) * 0.45))!important;
+  box-shadow:
+    0 calc(var(--nav-p) * 0.75rem) calc(var(--nav-p) * 1.75rem) calc(var(--nav-p) * -0.35rem) rgba(42,36,29,calc(var(--nav-p) * 0.18)),
+    inset 0 0 0 1px color-mix(in srgb, var(--edge) calc((0.35 + var(--nav-p) * 0.65) * 100%), transparent)!important;
+  transition:
+    width .45s cubic-bezier(.22,1,.36,1),
+    margin .45s cubic-bezier(.22,1,.36,1),
+    border-radius .45s cubic-bezier(.22,1,.36,1),
+    padding .45s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s cubic-bezier(.22,1,.36,1),
+    backdrop-filter .35s cubic-bezier(.22,1,.36,1);
+  will-change:width, margin, border-radius;
+}
+[data-theme=dark] .nav{
+  --nav-alpha:calc(0.88 - (var(--nav-p) * 0.38));
+  box-shadow:
+    0 calc(var(--nav-p) * 0.85rem) calc(var(--nav-p) * 2rem) calc(var(--nav-p) * -0.4rem) rgba(0,0,0,calc(var(--nav-p) * 0.35)),
+    inset 0 0 0 1px color-mix(in srgb, var(--edge-strong, var(--edge)) calc((0.45 + var(--nav-p) * 0.55) * 100%), transparent)!important;
+}
+/* top-of-page: truly flush to viewport edges (no side gutter) */
+html:not(.nav-scrolled) .nav,
+.nav:not(.is-scrolled){
+  width:100%!important;
+  border-radius:0!important;
+  margin-block-start:0!important;
+}
+@media (prefers-reduced-motion:reduce){
+  .nav{
+    transition:none!important;
+    /* parked in scrolled glass+contained state for clarity without motion */
+    width:var(--nav-content)!important;
+    border-radius:99rem!important;
+    margin-block-start:var(--frame)!important;
+    --nav-p:1;
+    --nav-blur:14px;
+    --nav-alpha:0.55;
+  }
+}
+@media (max-width:48rem){
+  .nav{
+    width:calc(100% - (var(--nav-p) * 1.2rem))!important;
+  }
+  html:not(.nav-scrolled) .nav,
+  .nav:not(.is-scrolled){
+    width:100%!important;
+    border-radius:0!important;
+  }
+  .nav.is-scrolled,
+  html.nav-scrolled .nav{
+    border-radius:1.25rem!important;
+  }
+}
+
+/* v1.14.2c · donate copy + addr contrast hard override */
+[data-theme=dark] #donateCopy.btn,
+[data-theme=dark] #donateCopy.btn.ghost{
+  color:#F8F6EF!important;
+  background:color-mix(in srgb,var(--accent-warm,#CDBFE0) 55%, #5a4a78)!important;
+  box-shadow:0 .35rem .9rem -.35rem rgba(0,0,0,.45), inset 0 0 0 1px rgba(248,246,239,.35)!important;
+}
+[data-theme=dark] #donateCopy.btn:hover,
+[data-theme=dark] #donateCopy.btn:focus-visible{
+  filter:brightness(1.08);
+  outline:2px solid #E6E1D5;
+  outline-offset:3px;
+}
+[data-theme=dark] #donateCopy .i,
+[data-theme=dark] #donateCopy span{color:#F8F6EF!important;opacity:1!important;fill:#F8F6EF}
+[data-theme=dark] #donateAddr.addr,
+[data-theme=dark] .addr{
+  color:#E6E1D5!important;
+  background:#423A2F!important;
+  box-shadow:inset 0 0 0 1px rgba(230,225,213,.28)!important;
+}
+[data-theme=dark] #donateCopy.btn.ghost svg,
+[data-theme=dark] #donateCopy.btn.ghost svg use{
+  color:#F8F6EF!important;
+  fill:currentColor!important;
+  stroke:currentColor!important;
+  opacity:1!important;
+}
+[data-theme=dark] #donateCopy.btn.ghost .i{
+  color:#F8F6EF!important;
+  opacity:1!important;
+}

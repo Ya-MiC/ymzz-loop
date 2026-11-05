@@ -81,7 +81,8 @@ No React Bits / GSAP / award-site source is vendored.
 | [Linear](https://linear.app/) | Hero 內放產品 mock、Fig. 編號、先承諾再展示產品 | 僅觀察公開頁面；未複製原始碼 |
 | [Raycast](https://www.raycast.com/) | 一句承諾 + 密集證據，而非功能長清單 | 同上 |
 | [Cal.com](https://cal.com/) | 開源／自託管的清楚敘事 | 同上 |
-| [Grail](https://grail-app.com/) / [Awwwards SOTD](https://www.awwwards.com/sites/grail) | 柔和上浮 reveal、單軸章節節奏 | 同上 |
+| [Grail](https://grail-app.com/) / [Awwwards SOTD](https://www.awwwards.com/sites/grail) | 柔和上浮 reveal、單軸章節節奏、頁內章節預覽條 | 同上 |
+| [React Bits](https://reactbits.dev/) | 捲動後導覽收縮 + 玻璃質感 | 寬度／圓角／blur 隨 `--nav-p`；reduced-motion 固定收斂態 |
 | MDN `IntersectionObserver` 模式 | 進場 class 切換；本站既有 `app.js` 已採此標準 API | Web 標準，無額外授權 |
 
 既有 `IntersectionObserver` reveal、`<details>` FAQ、CSS motion tokens 均沿用 Web 標準，不新增第三方 JS 依賴。

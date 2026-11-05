@@ -9,6 +9,16 @@
 
 
 
+## [1.14.2] — 2026-11-05
+
+### Changed
+- **Dark readability (暮靄/暮林):** raised `--line` / `--edge` / `--ink-3` so borders and labels clear WCAG-ish contrast without bumping font-weight (weight stays −1). Donate `#donateCopy` ghost → solid accent wash with visible hover/focus.
+- **Date + week cohesion:** tightened `.dmo`→`.week` gap inside `.daycard`; `.dayp` uses flex-start + smaller gap so the date hero and week strip read as one unit.
+- **Cut redundancy:** removed sync strip, marquee, The Loop, Features bento, FAQ twin OSS panel (vs table already covers OSS), FAQ trimmed to 3 (free / data / 600 chapter), dropped hero.identity (pillars cover it). Kept: hero+today mock, short benefits, short OSS vs, setup, donate, signup, minimal FAQ.
+- **Section preview strip (Grail-inspired):** fixed bottom labelled dots (Hero → Benefits → OSS → Setup → FAQ → Join → Donate); IntersectionObserver highlights the active section. Complements top `%` readbar — strip = *what*, bar = *how far*. Reduced-motion + mobile (dots-only) safe.
+- **Colour on the subject:** palette washes/glows sit behind the today mock (`.dayp`); quieted headp / join decorative glows.
+- **Nav (reactbits-style):** at load full-bleed flush; on scroll (~120px) glass blur + shrinks to content width (`--nav-content`), pill radius. `--nav-p` decoupled from read `%`. Reduced-motion parks in contained glass state.
+
 ## [1.14.1] — 2026-11-05
 
 ### Changed

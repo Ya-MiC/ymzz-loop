@@ -16,15 +16,16 @@
 
   // faq built from keys
   const renderStatic = () => {
-    $("#faqList").innerHTML = [1, 2, 3, 4, 5].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
+    $("#faqList").innerHTML = [1, 2, 4].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
   };
 
   // world-clock tile (feature demo only; no hero clock)
   function drawCities() {
+    const el = $("#cities"); if (!el) return;
     const now = new Date(), zones = [["America/Los_Angeles", "LA"], ["Etc/UTC", "UTC"], ["Europe/London", "London"], ["Asia/Seoul", "Seoul"], ["Asia/Taipei", "Taipei"]];
-    $("#cities").innerHTML = zones.map(([z, n], i) => `<li class="${i === 1 ? "me" : ""}"><span>${n}</span><b>${new Intl.DateTimeFormat("en-GB", { timeZone: z, hour: "2-digit", minute: "2-digit" }).format(now)}</b></li>`).join("");
+    el.innerHTML = zones.map(([z, n], i) => `<li class="${i === 1 ? "me" : ""}"><span>${n}</span><b>${new Intl.DateTimeFormat("en-GB", { timeZone: z, hour: "2-digit", minute: "2-digit" }).format(now)}</b></li>`).join("");
   }
-  drawCities(); setInterval(drawCities, 60000);
+  drawCities(); if ($("#cities")) setInterval(drawCities, 60000);
 
   // preloader: brief, skippable, reduced-motion aware; content stays in DOM for crawlers / no-JS
   (() => {
@@ -98,20 +99,25 @@
   function renderDates() {
     const L = loc(), d = day(0), y = day(-1);
     $$(".today").forEach(e => e.textContent = iso(d)); $$(".yday").forEach(e => e.textContent = md(y));
-    $(".fname").textContent = `${md(y).replace("-", "")}_0700_utc.md`;
+    const fn = $(".fname"); if (fn) fn.textContent = `${md(y).replace("-", "")}_0700_utc.md`;
     const f = o => new Intl.DateTimeFormat(L, o);
     $$("#sheetRows .rd").forEach(e => { const x = day(+e.dataset.off); e.textContent = f({ month: "2-digit", day: "2-digit" }).format(x); e.parentElement.title = iso(x); });
-    $("#dWk").textContent = f({ weekday: "long" }).format(d);
-    $("#dNum").textContent = String(d.getDate());
-    $("#dMo").textContent = f({ year: "numeric", month: "long" }).format(d);
-    const wd = f({ weekday: "narrow" });
-    $("#week").innerHTML = Array.from({ length: 7 }, (_, i) => { const x = day(i - 6); return `<li class="${i === 6 ? "on" : "done"}"><span>${wd.format(x)}</span><b>${x.getDate()}</b></li>`; }).join("");
+    const dWk = $("#dWk"), dNum = $("#dNum"), dMo = $("#dMo"), week = $("#week");
+    if (dWk) dWk.textContent = f({ weekday: "long" }).format(d);
+    if (dNum) dNum.textContent = String(d.getDate());
+    if (dMo) dMo.textContent = f({ year: "numeric", month: "long" }).format(d);
+    if (week) {
+      const wd = f({ weekday: "narrow" });
+      week.innerHTML = Array.from({ length: 7 }, (_, i) => { const x = day(i - 6); return `<li class="${i === 6 ? "on" : "done"}"><span>${wd.format(x)}</span><b>${x.getDate()}</b></li>`; }).join("");
+    }
   }
-  // marquee (duplicated list for a seamless loop)
+  // marquee (optional — section may be removed)
   function renderMarquee() {
+    const mq = $("#mq"), track = $(".mq-track");
+    if (!mq || !track) return;
     const items = [1, 2, 3, 4, 5, 6].map(i => `<li><span class="dot" aria-hidden="true"></span>${t("mq." + i)}</li>`).join("");
-    $("#mq").innerHTML = items; const clone = $("#mq").cloneNode(true); clone.removeAttribute("id"); clone.setAttribute("aria-hidden", "true");
-    $(".mq-track").querySelectorAll(".mq-list:not(#mq)").forEach(n => n.remove()); $(".mq-track").append(clone);
+    mq.innerHTML = items; const clone = mq.cloneNode(true); clone.removeAttribute("id"); clone.setAttribute("aria-hidden", "true");
+    track.querySelectorAll(".mq-list:not(#mq)").forEach(n => n.remove()); track.append(clone);
   }
   // signup
   const CFG = window.YMZZ_CONFIG || {}, TAGS = ["student", "trader", "developer", "creator", "other"];
@@ -231,20 +237,56 @@
         bar.style.setProperty("--read-p", v);
         bar.setAttribute("aria-valuenow", String(Math.round(p * 100)));
       }
+      // reactbits-style: glass + shrink kicks in over first ~120px, not full-page %
       if (nav) {
-        if (reduce) {
-          root.style.setProperty("--nav-p", "0.85");
-          nav.style.setProperty("--nav-p", "0.85");
-        } else {
-          root.style.setProperty("--nav-p", v);
-          nav.style.setProperty("--nav-p", v);
-        }
+        const np = reduce ? 1 : Math.min(1, Math.max(0, scrollY / 120));
+        const nv = np.toFixed(4);
+        root.style.setProperty("--nav-p", nv);
+        nav.style.setProperty("--nav-p", nv);
+        nav.classList.toggle("is-scrolled", np > 0.15);
+        root.classList.toggle("nav-scrolled", np > 0.15);
       }
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };
     addEventListener("scroll", onScroll, { passive: true });
     addEventListener("resize", onScroll, { passive: true });
     apply();
+  })();
+
+
+  // section preview strip (what you're looking at) — complements top % readbar
+  (() => {
+    const list = $("#spyList"), spy = $("#secSpy");
+    if (!list || !spy) return;
+    const secs = $$("[data-spy]");
+    if (!secs.length) { spy.hidden = true; return; }
+    list.innerHTML = secs.map((s, i) => {
+      const id = s.id || ("spy-" + i);
+      const label = s.getAttribute("data-spy") || id;
+      return `<li><a href="#${id}" data-spy-link="${id}"><i aria-hidden="true"></i><span>${label}</span></a></li>`;
+    }).join("");
+    const links = $$("[data-spy-link]", list);
+    const setActive = (id) => {
+      links.forEach(a => {
+        const on = a.getAttribute("data-spy-link") === id;
+        a.classList.toggle("is-on", on);
+        if (on) a.setAttribute("aria-current", "true"); else a.removeAttribute("aria-current");
+      });
+    };
+    if ("IntersectionObserver" in window) {
+      const ratios = new Map();
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => ratios.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0));
+        let best = null, bestR = 0;
+        ratios.forEach((r, id) => { if (r > bestR) { bestR = r; best = id; } });
+        if (best) setActive(best);
+      }, { rootMargin: "-28% 0px -45% 0px", threshold: [0, 0.1, 0.25, 0.5, 0.75, 1] });
+      secs.forEach(s => io.observe(s));
+    } else {
+      setActive(secs[0].id);
+    }
+    // initial
+    setActive(secs[0].id);
   })();
 
   // mobile nav drawer

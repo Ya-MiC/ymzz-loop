@@ -153,5 +153,6 @@
   "hero.urgency": "600→0 is not a threat — it is the gentle clock on this chapter. Write the day before it becomes a blur.",
   "day.left": "Left in chapter",
   "day.unit": "days",
-  "day.mock": "mock"
+  "day.mock": "mock",
+  "ui.secspy": "معاينة الأقسام"
 }
