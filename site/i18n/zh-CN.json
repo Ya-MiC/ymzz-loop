@@ -269,5 +269,11 @@
   "todo.btn": "新增",
   "todo.empty": "新增一条，体验 fork 后的待办",
   "todo.clear": "删除",
-  "todo.limit": "如果 6 个待办还不能满足您，那您刚才输入的多半是个伪需求。"
+  "todo.limit": "如果 6 个待办还不能满足您，那您刚才输入的多半是个伪需求。",
+  "hold.reset": "还原默认",
+  "hold.note": "只存浏览器 · 拖曳调整占比 · 可加链接",
+  "hold.label": "名称",
+  "hold.link": "链接",
+  "hold.linkPh": "https://…",
+  "hold.pct": "占比"
 }

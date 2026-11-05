@@ -269,5 +269,11 @@
   "todo.btn": "Add",
   "todo.empty": "Add a to-do to try the fork demo",
   "todo.clear": "Remove",
-  "todo.limit": "If six to-dos still aren’t enough, what you just typed was probably a false need."
+  "todo.limit": "If six to-dos still aren’t enough, what you just typed was probably a false need.",
+  "hold.reset": "Reset",
+  "hold.note": "Saved in this browser only · drag to set % · optional link",
+  "hold.label": "Label",
+  "hold.link": "Link",
+  "hold.linkPh": "https://…",
+  "hold.pct": "Percent"
 }

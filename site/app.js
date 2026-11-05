@@ -89,22 +89,8 @@
     $$("[data-i18n-placeholder]").forEach(el => { el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder)); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
     $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
-    // holdings 彩蛋: zh-CN + UTC+8 → 600519.SH (貴州茅台); else 2330.TW — all .js-hold-ticker
-    (() => {
-      const els = $$(".js-hold-ticker"); if (!els.length) return;
-      const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })();
-      const utc8 = /^(Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar)|Etc\/GMT-8)$/.test(tz)
-        || (() => { try { return new Date().getTimezoneOffset() === -480; } catch { return false; } })();
-      const ashare = lang === "zh-CN" && utc8;
-      const label = ashare ? "600519.SH" : null;
-      els.forEach(el => {
-        const v = label || (el.dataset.tickerDefault || "2330.TW");
-        el.textContent = v;
-        el.dataset.egg = ashare ? "ashare" : "tw";
-        el.title = ashare ? "贵州茅台 · A-share" : "";
-      });
-    })();
-    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme); if (window.__ymzzTodoRender) window.__ymzzTodoRender();
+    if (window.__ymzzHoldSync) window.__ymzzHoldSync(lang);
+    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme); if (window.__ymzzTodoRender) window.__ymzzTodoRender(); if (window.__ymzzHoldRender) window.__ymzzHoldRender();
   };
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 
@@ -249,6 +235,156 @@
   }
 
 
+
+
+  // holdings editor: 4 sliders · label + % + optional link · browser-only · egg on row 3
+  (() => {
+    const LS = "holds";
+    const COOKIE = "ymzz_holds";
+    const root = $("#holdEdit"), resetBtn = $("#holdReset");
+    if (!root) return;
+    const isAshare = (l = lang) => {
+      const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })();
+      const utc8 = /^(Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar)|Etc\/GMT-8)$/.test(tz)
+        || (() => { try { return new Date().getTimezoneOffset() === -480; } catch { return false; } })();
+      return l === "zh-CN" && utc8;
+    };
+    const eggLabel = (l = lang) => isAshare(l) ? "600519.SH" : "2330.TW";
+    const defaults = (l = lang) => ([
+      { id: "vt", label: "VT", pct: 46, url: "" },
+      { id: "qqq", label: "QQQ", pct: 28, url: "" },
+      { id: "egg", label: eggLabel(l), pct: 16, url: "", egg: true },
+      { id: "cash", label: "Cash", pct: 10, url: "" },
+    ]);
+    const clamp = (n) => Math.max(0, Math.min(100, Math.round(Number(n) || 0)));
+    const safeUrl = (u) => {
+      const s = String(u || "").trim().slice(0, 300);
+      if (!s) return "";
+      try {
+        const x = new URL(s, location.origin);
+        if (x.protocol !== "http:" && x.protocol !== "https:") return "";
+        return x.href;
+      } catch { return ""; }
+    };
+    const readCookie = () => {
+      const m = document.cookie.match(/(?:^|;\s*)ymzz_holds=([^;]*)/);
+      if (!m) return null;
+      try { return JSON.parse(decodeURIComponent(m[1])); } catch { return null; }
+    };
+    const writeCookie = (payload) => {
+      document.cookie = COOKIE + "=" + encodeURIComponent(JSON.stringify(payload))
+        + "; max-age=" + (60 * 60 * 24 * 365) + "; path=/; SameSite=Lax";
+    };
+    const normalize = (items, l = lang) => {
+      const d = defaults(l);
+      if (!Array.isArray(items) || items.length !== 4) return d;
+      return d.map((def, i) => {
+        const it = items[i] || {};
+        const label = String(it.label ?? def.label).trim().slice(0, 24) || def.label;
+        return {
+          id: def.id,
+          label,
+          pct: clamp(it.pct ?? def.pct),
+          url: safeUrl(it.url),
+          egg: !!def.egg,
+          customEgg: def.egg ? !!it.customEgg : false,
+        };
+      });
+    };
+    const load = () => {
+      let payload = null;
+      try { payload = store.get(LS, null); } catch { payload = null; }
+      if (!payload) payload = readCookie();
+      if (!payload || typeof payload !== "object") return { items: defaults(), touched: false };
+      return { items: normalize(payload.items), touched: !!payload.touched };
+    };
+    const save = (state) => {
+      const payload = { items: state.items.map(({ id, label, pct, url, egg, customEgg }) => ({ id, label, pct, url, egg, customEgg })), touched: true };
+      store.set(LS, payload);
+      writeCookie(payload);
+    };
+    let state = load();
+    const syncEgg = (l = lang) => {
+      const row = state.items.find(x => x.egg);
+      if (!row) return;
+      if (row.customEgg) return; // user overrode label
+      row.label = eggLabel(l);
+    };
+    const mirrorSection = () => {
+      // keep legacy #holdings static card in sync (read-only visual)
+      const card = $(".hold-card .holds");
+      if (!card) return;
+      const rows = card.querySelectorAll(":scope > div");
+      state.items.forEach((it, i) => {
+        const row = rows[i]; if (!row) return;
+        const b = row.querySelector("b"); const w = row.querySelector(".w"); const pct = row.querySelector("i");
+        if (b) { b.textContent = it.label; if (it.egg) b.classList.add("js-hold-ticker"); }
+        if (w) w.style.setProperty("--w", it.pct + "%");
+        if (pct) pct.textContent = it.pct + "%";
+      });
+    };
+    const render = () => {
+      syncEgg();
+      root.innerHTML = state.items.map((it, i) => {
+        const linkOpen = it.url ? `<a class="hold-go" href="${esc(it.url)}" rel="noopener noreferrer" target="_blank" title="${esc(it.url)}">↗</a>` : "";
+        return `<li class="hold-row" data-i="${i}">
+          <input class="hold-label" type="text" maxlength="24" value="${esc(it.label)}" aria-label="${t("hold.label")} ${i + 1}" data-k="label">
+          <label class="hold-range">
+            <span class="vh">${t("hold.pct")}</span>
+            <input type="range" min="0" max="100" step="1" value="${it.pct}" style="--hold-fill:${it.pct}%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${it.pct}" aria-label="${t("hold.pct")} ${esc(it.label)}" data-k="pct">
+          </label>
+          <output class="hold-pct" for="">${it.pct}%</output>
+          <div class="hold-link">
+            <input class="hold-url" type="url" inputmode="url" maxlength="300" placeholder="${t("hold.linkPh")}" value="${esc(it.url)}" aria-label="${t("hold.link")} ${i + 1}" data-k="url">
+            ${linkOpen}
+          </div>
+        </li>`;
+      }).join("");
+      mirrorSection();
+    };
+    root.addEventListener("input", e => {
+      const row = e.target.closest(".hold-row"); if (!row) return;
+      const i = +row.dataset.i; const it = state.items[i]; if (!it) return;
+      const k = e.target.getAttribute("data-k");
+      if (k === "pct") {
+        it.pct = clamp(e.target.value);
+        e.target.setAttribute("aria-valuenow", String(it.pct));
+        e.target.style.setProperty("--hold-fill", it.pct + "%");
+        const out = row.querySelector(".hold-pct"); if (out) out.textContent = it.pct + "%";
+      } else if (k === "label") {
+        it.label = e.target.value.slice(0, 24);
+        if (it.egg) it.customEgg = true;
+      } else if (k === "url") {
+        // don't sanitize on every keystroke; save will
+        it.url = e.target.value.slice(0, 300);
+      }
+      save(state); mirrorSection();
+    });
+    root.addEventListener("change", e => {
+      const row = e.target.closest(".hold-row"); if (!row) return;
+      const i = +row.dataset.i; const it = state.items[i]; if (!it) return;
+      if (e.target.getAttribute("data-k") === "url") {
+        it.url = safeUrl(e.target.value);
+        e.target.value = it.url;
+        save(state); render();
+      }
+    });
+    resetBtn && resetBtn.addEventListener("click", () => {
+      state = { items: defaults(), touched: false };
+      store.set(LS, null);
+      document.cookie = COOKIE + "=; max-age=0; path=/; SameSite=Lax";
+      // re-save clean defaults so egg sticks for current locale
+      store.set(LS, { items: state.items, touched: false });
+      writeCookie({ items: state.items, touched: false });
+      render();
+    });
+    window.__ymzzHoldSync = (l) => { syncEgg(l); save(state); render(); };
+    window.__ymzzHoldRender = render;
+    // expose for tests
+    window.__ymzzHoldDefaults = defaults;
+    window.__ymzzHoldIsAshare = isAshare;
+    render();
+  })();
 
   // demo to-dos 03–08: unified with Notion preview rows; max 6; browser-only 60h TTL
   (() => {

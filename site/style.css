@@ -3370,3 +3370,206 @@ html[data-theme=dark][data-palette=earth],
   border: 0 !important;
   box-shadow: none !important;
 }
+
+/* ===== v1.17.0 · dark date/holdings AA text · editable hold sliders ===== */
+
+/* Dark calendar + holdings TEXT — WCAG AA ~4.5:1 on warm panels; weight only where needed locally */
+html[data-theme=dark] .dayp .label,
+html[data-theme=dark] .dayp-top .label{
+  color:#E8E2D6!important;
+  font-weight:500!important; /* local bump; global UI stays −1 */
+}
+html[data-theme=dark] .chip-mock{
+  color:#E6E1D5!important;
+}
+html[data-theme=dark] .chip-mock .mock-n{
+  color:#F8F6EF!important;
+  font-weight:600!important;
+}
+html[data-theme=dark] .dwk,
+html[data-theme=dark] .dmo{
+  color:#E4DED2!important;
+  font-weight:500!important;
+}
+html[data-theme=dark] .dnum,
+html[data-theme=dark] .dnum bdi{
+  color:#F8F6EF!important;
+  font-weight:500!important;
+}
+html[data-theme=dark] .week li{
+  color:#DCD5C8!important;
+  font-weight:500!important;
+}
+/* Inactive week circles: darker wash + cream numerals (was pale-on-pale) */
+html[data-theme=dark] .week b{
+  background:color-mix(in srgb, var(--accent) 28%, #4A4338)!important;
+  color:#F8F6EF!important;
+  font-weight:600!important;
+  box-shadow:none!important;
+}
+html[data-theme=dark] .week li.on b{
+  background:color-mix(in srgb, var(--accent-warm) 58%, #5C4E3E)!important;
+  color:#F8F6EF!important;
+  font-weight:600!important;
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--accent-warm) 40%, transparent)!important;
+}
+html[data-theme=dark] .hold-mini .label,
+html[data-theme=dark] .hold-label,
+html[data-theme=dark] .hold-pct,
+html[data-theme=dark] .hold-url,
+html[data-theme=dark] .hold-reset,
+html[data-theme=dark] .hold-card .holds b,
+html[data-theme=dark] .hold-card .holds i{
+  color:#E8E2D6!important;
+}
+html[data-theme=dark] .hold-pct{font-weight:600!important}
+
+/* Editable holdings sliders */
+.hold-mini-hd{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--s2);
+}
+.hold-reset{
+  border:0;
+  background:color-mix(in srgb, var(--ink) 8%, transparent);
+  color:var(--ink-2);
+  font:500 var(--t-xs)/1.2 var(--f-body);
+  padding:0.35rem 0.65rem;
+  border-radius:99rem;
+  cursor:pointer;
+}
+.hold-reset:hover,.hold-reset:focus-visible{
+  color:var(--ink);
+  outline:2px solid color-mix(in srgb, var(--accent) 55%, transparent);
+  outline-offset:2px;
+}
+.hold-edit{
+  list-style:none;
+  margin:0;
+  padding:0;
+  display:grid;
+  gap:0.65rem;
+}
+.hold-row{
+  display:grid;
+  grid-template-columns:minmax(4.5rem, 5.75rem) minmax(0,1fr) 3rem;
+  grid-template-areas:"label range pct" "link link link";
+  gap:0.35rem 0.55rem;
+  align-items:center;
+}
+.hold-label{
+  grid-area:label;
+  min-block-size:2rem;
+  padding:0.25rem 0.4rem;
+  border:0!important;
+  border-radius:0.45rem;
+  background:var(--v-inset, color-mix(in srgb, #fff 18%, var(--ground)));
+  color:var(--ink);
+  font:500 var(--t-sm)/1.2 var(--f-mono), var(--f-body);
+  font-variant-numeric:tabular-nums;
+  box-shadow:none!important;
+  width:100%;
+}
+.hold-range{grid-area:range; display:block; margin:0}
+.hold-range input[type=range]{
+  -webkit-appearance:none;
+  appearance:none;
+  width:100%;
+  height:0.55rem;
+  border-radius:99rem;
+  background:color-mix(in srgb, var(--ink) 12%, transparent);
+  outline:none;
+  cursor:pointer;
+  margin:0;
+  /* fill via accent — JS updates value; use accent track trick */
+  background-image:linear-gradient(90deg, var(--accent-warm, var(--cocoa)), var(--accent, var(--tea)));
+  background-size:var(--hold-fill, 46%) 100%;
+  background-repeat:no-repeat;
+}
+.hold-range input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;
+  appearance:none;
+  width:1.15rem; height:1.15rem;
+  border-radius:50%;
+  background:var(--ink);
+  border:2px solid var(--panel, #F8F6EF);
+  box-shadow:0 0.2rem 0.45rem rgba(42,36,29,.25);
+  cursor:grab;
+}
+.hold-range input[type=range]::-moz-range-thumb{
+  width:1.15rem; height:1.15rem;
+  border-radius:50%;
+  background:var(--ink);
+  border:2px solid var(--panel, #F8F6EF);
+  cursor:grab;
+}
+.hold-range input[type=range]:focus-visible{
+  outline:2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  outline-offset:3px;
+}
+.hold-pct{
+  grid-area:pct;
+  font:600 var(--t-sm)/1 var(--f-mono), var(--f-body);
+  font-variant-numeric:tabular-nums;
+  color:var(--ink);
+  text-align:end;
+}
+.hold-link{
+  grid-area:link;
+  display:flex;
+  gap:0.35rem;
+  align-items:center;
+}
+.hold-url{
+  flex:1;
+  min-block-size:1.85rem;
+  padding:0.2rem 0.5rem;
+  border:0!important;
+  border-radius:99rem;
+  background:var(--v-inset, color-mix(in srgb, #fff 14%, var(--ground)));
+  color:var(--ink-2);
+  font:400 var(--t-xs)/1.2 var(--f-body);
+  box-shadow:none!important;
+}
+.hold-url:focus-visible,.hold-label:focus-visible{
+  outline:2px solid color-mix(in srgb, var(--accent) 60%, transparent);
+  outline-offset:2px;
+}
+.hold-go{
+  flex:none;
+  display:grid;
+  place-items:center;
+  inline-size:1.75rem;
+  block-size:1.75rem;
+  border-radius:50%;
+  text-decoration:none;
+  color:var(--ink);
+  background:color-mix(in srgb, var(--accent-soft) 40%, transparent);
+  font-size:0.85rem;
+}
+[data-theme=dark] .hold-label,
+[data-theme=dark] .hold-url{
+  background:color-mix(in srgb, #fff 12%, #352E25)!important;
+  color:#E8E2D6!important;
+}
+[data-theme=dark] .hold-range input[type=range]{
+  background-color:rgba(230,225,213,.18);
+}
+[data-theme=dark] .hold-range input[type=range]::-webkit-slider-thumb{
+  background:#F0EBE0;
+  border-color:#352E25;
+}
+[data-theme=dark] .hold-range input[type=range]::-moz-range-thumb{
+  background:#F0EBE0;
+  border-color:#352E25;
+}
+@media (prefers-reduced-motion:reduce){
+  .hold-range input[type=range]{ transition:none!important; }
+}
+@media (max-width:28rem){
+  .hold-row{
+    grid-template-columns:minmax(4rem,1fr) minmax(0,1.4fr) 2.75rem;
+  }
+}

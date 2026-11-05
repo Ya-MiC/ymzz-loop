@@ -99,15 +99,14 @@
         <p class="todo-limit" id="todoLimitMsg" role="status" aria-live="polite" hidden></p>
       </div>
     </div>
-    <!-- Holdings 彩蛋 (compact) · zh-CN+UTC8 → 600519.SH else 2330.TW -->
-    <div class="hold-mini" aria-label="Holdings mock">
-      <p class="label" data-i18n="f2.m">Database · Holdings</p>
-      <div class="holds holds-mini" dir="ltr">
-        <div><b>VT</b><span class="w" style="--w:46%"></span><i>46%</i></div>
-        <div><b>QQQ</b><span class="w" style="--w:28%"></span><i>28%</i></div>
-        <div><b class="js-hold-ticker" id="holdTicker" data-ticker-default="2330.TW">2330.TW</b><span class="w" style="--w:16%"></span><i>16%</i></div>
-        <div><b>Cash</b><span class="w" style="--w:10%"></span><i>10%</i></div>
+    <!-- Holdings: 4 editable sliders · browser-only · egg on row 3 -->
+    <div class="hold-mini" id="holdMini" aria-label="Holdings">
+      <div class="hold-mini-hd">
+        <p class="label" data-i18n="f2.m">Database · Holdings</p>
+        <button type="button" class="hold-reset" id="holdReset" data-i18n="hold.reset">Reset</button>
       </div>
+      <ul class="hold-edit" id="holdEdit" dir="ltr"></ul>
+      <p class="todo-note small" data-i18n="hold.note">Browser only · drag bars · optional links</p>
     </div>
   </div>
 </section>
@@ -313,7 +312,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.16.1 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.17.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>

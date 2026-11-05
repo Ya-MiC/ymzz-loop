@@ -269,5 +269,11 @@
   "todo.btn": "추가",
   "todo.empty": "포크 데모용 할 일을 추가해 보세요",
   "todo.clear": "삭제",
-  "todo.limit": "할 일 6개로도 부족하다면, 방금 입력한 건 아마 가짜 요구일 겁니다."
+  "todo.limit": "할 일 6개로도 부족하다면, 방금 입력한 건 아마 가짜 요구일 겁니다.",
+  "hold.reset": "기본값",
+  "hold.note": "이 브라우저에만 저장 · 바로 % 조절 · 링크 선택",
+  "hold.label": "이름",
+  "hold.link": "링크",
+  "hold.linkPh": "https://…",
+  "hold.pct": "비중"
 }

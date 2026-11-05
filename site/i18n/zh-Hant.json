@@ -269,5 +269,11 @@
   "todo.btn": "新增",
   "todo.empty": "新增一筆，體驗 fork 後的待辦",
   "todo.clear": "刪除",
-  "todo.limit": "如果 6 個代辦不能滿足您的期待，那您剛才一定輸入了一個偽需求。"
+  "todo.limit": "如果 6 個代辦不能滿足您的期待，那您剛才一定輸入了一個偽需求。",
+  "hold.reset": "還原預設",
+  "hold.note": "只存瀏覽器 · 拖曳調整占比 · 可加連結",
+  "hold.label": "名稱",
+  "hold.link": "連結",
+  "hold.linkPh": "https://…",
+  "hold.pct": "占比"
 }

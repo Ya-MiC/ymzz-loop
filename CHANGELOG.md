@@ -9,6 +9,12 @@
 
 
 
+## [1.17.0] — 2026-11-05
+
+### Changed
+- **Dark today-card text (AA):** weekday / big date / month / week-circle numerals and holdings labels/% raised to cream on warm dusk (~4.5:1). Inactive week circles use darker wash + cream digits (no pale-on-pale). Local weight only where needed; global dark weight stay −1. No new resting borders; light untouched.
+- **Holdings → 4 editable sliders:** edit label, drag % (0–100, keyboard/touch), optional https link per row; browser `localStorage` + cookie only; Reset restores defaults. Row 3 easter egg still zh-CN+UTC8 → `600519.SH` (贵州茅台) unless the visitor customized that label.
+
 ## [1.16.1] — 2026-11-05
 
 ### Changed
