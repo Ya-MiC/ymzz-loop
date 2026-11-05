@@ -3,6 +3,18 @@
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
 
+
+## [1.9.1] — 2026-11-05
+
+### Fixed
+- Restored soft pastel 光斑 (pink / blue / purple / sage radial glows) on hero and feature cards — kept, not stripped.
+- Calendar today marker: soft lilac→sky pastel fill (never charcoal / `--cta` near-black).
+- Git sync (`.fc3`) card: light paper + lilac/sky wash (never dark terminal fill).
+- Marquee/ticker: light paper strip with soft pastel wash + ink text (never dark banner).
+
+### Kept
+- No black backgrounds, one-layer soft edges, concentric radii, Inter UI + tabular nums, dark weight −1, 4 palettes, donate, 600-day, Feishu, signup, MIT.
+
 ## [1.9.0] — 2026-11-05
 
 ### Changed

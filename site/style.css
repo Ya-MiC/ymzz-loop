@@ -449,7 +449,7 @@ body{background:var(--ground);color:var(--ink)}
 }
 .tile[data-accent=ink] .label{color:var(--ink-3)!important}
 .tile[data-accent=ink] .desc{color:var(--ink-2)!important}
-.tile::after{opacity:0!important} /* kill pointer glow wash that stacked */
+.tile::after{opacity:.55!important} /* soft pastel pointer wash restored */
 .paper{transform:none!important;margin-inline:0!important;background:color-mix(in srgb,#fff 88%,var(--ground));box-shadow:var(--sh)}
 [data-theme=dark] .paper{background:#352E25;color:var(--ink)}
 .notion,.mail{transform:none!important}
@@ -701,7 +701,7 @@ main{
   --v2:color-mix(in srgb,#fff 88%,var(--ground));
   --v3:color-mix(in srgb,#fff 96%,var(--ground));
   --edge:color-mix(in srgb,var(--ink) 8%,transparent); /* one soft same-family edge */
-  --cta:#3D3833; /* warm deep brown for buttons — not pure black */
+  --cta:#A38E7A; /* soft cocoa — never near-black */
   --R:1.75rem;--pad-card:clamp(1.25rem,2.4vw,2rem);--Ri:calc(var(--R) - var(--pad-card)); /* concentric */
   --wght-label:600;--wght-ui:500;--wght-body:400;
 }
@@ -1029,4 +1029,158 @@ body{font-weight:var(--wght-body);font-variant-numeric:tabular-nums lining-nums!
 }
 [data-theme=dark] h1,[data-theme=dark] h2,[data-theme=dark] .huge,[data-theme=dark] .big,[data-theme=dark] .dnum,[data-theme=dark] .bign{
   font-weight:400!important;
+}
+
+/* ===== v1.9.1 · restore pastel 光斑 · soft calendar/git/marquee · keep no-black ===== */
+
+/* Soft pastel glow blobs (pink / blue / purple / sage) — DO NOT strip */
+.glow{
+  position:absolute;z-index:0;border-radius:50%;filter:blur(4.5rem);pointer-events:none;
+  opacity:.78!important;mix-blend-mode:multiply;
+}
+.g1{background:var(--sky)!important;opacity:.85!important}          /* soft blue */
+.g2{background:var(--lotus)!important;opacity:.8!important}         /* soft pink */
+.g3{background:var(--lilac)!important;inline-size:28rem;block-size:28rem;inset-block-start:-8rem;inset-inline-start:30%;opacity:.7!important}
+.headp .glow,.join .glow,.oss .glow,.dayp .glow{opacity:.85!important}
+[data-theme=dark] .glow{opacity:.28!important;mix-blend-mode:screen}
+
+/* Hero / panels: paper + soft pastel radial blobs (光斑), not flat wipe */
+.hero > .headp,
+.headp.panel,
+.panel.headp{
+  background:
+    radial-gradient(55% 60% at 92% 8%, color-mix(in srgb,var(--sky) 55%,transparent), transparent 70%),
+    radial-gradient(50% 55% at 8% 92%, color-mix(in srgb,var(--lotus) 48%,transparent), transparent 68%),
+    radial-gradient(40% 45% at 70% 55%, color-mix(in srgb,var(--lilac) 32%,transparent), transparent 70%),
+    var(--surf-1, color-mix(in srgb,#fff 72%,var(--ground)))!important;
+  overflow:hidden;
+}
+.dayp.panel,
+.hero > .dayp{
+  background:
+    radial-gradient(70% 60% at 0% 0%, color-mix(in srgb,var(--sky) 40%,transparent), transparent 65%),
+    radial-gradient(60% 55% at 100% 100%, color-mix(in srgb,var(--lilac) 36%,transparent), transparent 65%),
+    var(--surf-1, color-mix(in srgb,#fff 72%,var(--ground)))!important;
+}
+
+/* Feature tiles: soft pastel accent wash + light spot */
+.tile{
+  background:
+    radial-gradient(90% 70% at 100% 0%, color-mix(in srgb,var(--accent) 42%,transparent), transparent 60%),
+    radial-gradient(70% 60% at 0% 100%, color-mix(in srgb,var(--accent-soft,var(--lotus)) 28%,transparent), transparent 65%),
+    var(--surf-1, color-mix(in srgb,#fff 72%,var(--ground)))!important;
+}
+.tile[data-accent=sky]{--accent:var(--sky);--accent-soft:var(--lilac)}
+.tile[data-accent=lotus]{--accent:var(--lotus);--accent-soft:var(--sky)}
+.tile[data-accent=lilac]{--accent:var(--lilac);--accent-soft:var(--lotus)}
+.tile[data-accent=sage]{--accent:var(--sage);--accent-soft:var(--cream)}
+.tile[data-accent=cream]{--accent:var(--tea);--accent-soft:var(--lotus)}
+.tile::after{
+  opacity:.4!important;
+  background:radial-gradient(28rem circle at var(--mx,70%) var(--my,10%),
+    color-mix(in srgb,var(--accent) 35%,#fff), transparent 50%)!important;
+}
+
+/* (a) Calendar TODAY marker — soft pastel lilac/sky, NEVER charcoal */
+.week li b{
+  background:color-mix(in srgb,var(--sage) 45%,#fff)!important;
+  color:var(--ink)!important;
+}
+.week li.on b,
+.week li.on > b{
+  background:
+    linear-gradient(145deg,
+      color-mix(in srgb,var(--lilac) 70%,#fff),
+      color-mix(in srgb,var(--sky) 65%,#fff))!important;
+  color:var(--ink)!important;
+  box-shadow:0 .2rem .6rem -.1rem color-mix(in srgb,var(--lilac) 45%,transparent)!important;
+}
+.week li.done b{background:color-mix(in srgb,var(--sage) 40%,#fff)!important;color:var(--ink)!important}
+/* kill any leftover cta/cocoa fill on the today marker */
+.btn.primary,.btn.small,.mark,.skip:focus{
+  background:var(--cocoa,#A38E7A)!important;
+  color:#F8F6EF!important;
+}
+/* do NOT reuse primary fill for week.on */
+.week li.on b{background:linear-gradient(145deg,color-mix(in srgb,var(--lilac) 70%,#fff),color-mix(in srgb,var(--sky) 65%,#fff))!important;color:var(--ink)!important}
+
+/* (b) Git sync / fc3 — light paper + soft pastel lilac wash, never dark */
+.fc3,
+.syncrow .fc3,
+.fc.fc3{
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb,var(--lilac) 55%,transparent), transparent 60%),
+    radial-gradient(90% 80% at 0% 100%, color-mix(in srgb,var(--sky) 40%,transparent), transparent 65%),
+    color-mix(in srgb,#fff 88%,var(--cream))!important;
+  color:var(--ink)!important;
+}
+.fc3 .label,.fc3 .fl,.fc3 .dim{color:var(--ink)!important}
+.fc3 .label{color:var(--ink-3)!important}
+.fc3 .dim{opacity:.65}
+
+/* sync siblings keep soft pastel too */
+.fc1{
+  background:
+    radial-gradient(100% 80% at 0% 0%, color-mix(in srgb,var(--sage) 50%,transparent), transparent 65%),
+    color-mix(in srgb,#fff 85%,var(--sage))!important;
+  color:var(--ink)!important;
+}
+.fc2{
+  background:
+    radial-gradient(100% 80% at 50% 0%, color-mix(in srgb,var(--lotus) 45%,transparent), transparent 65%),
+    color-mix(in srgb,#fff 88%,var(--cream))!important;
+  color:var(--ink)!important;
+}
+
+/* (c) Marquee — light paper strip + soft pastel wash, soft ink text, NEVER dark banner */
+.marquee{
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb,var(--sky) 28%,#F8F6EF),
+      color-mix(in srgb,var(--lotus) 30%,#F8F6EF) 45%,
+      color-mix(in srgb,var(--lilac) 28%,#F8F6EF))!important;
+  color:var(--ink)!important;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)!important;
+  mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)!important;
+  box-shadow:var(--sh)!important;
+}
+.mq-list li{color:var(--ink)!important;font-family:var(--f-body)!important}
+.mq-list .dot{background:var(--c,var(--lilac))!important}
+[data-theme=dark] .marquee{
+  background:
+    linear-gradient(90deg,
+      color-mix(in srgb,var(--sky) 18%,#352E25),
+      color-mix(in srgb,var(--lotus) 16%,#352E25) 50%,
+      color-mix(in srgb,var(--lilac) 18%,#423A2F))!important;
+  color:var(--ink)!important;
+}
+
+/* Soft stage-glow / how-it-works pastel blobs kept vivid */
+.stage-glow{
+  background:radial-gradient(circle,
+    color-mix(in srgb,var(--lilac) 55%,transparent),
+    color-mix(in srgb,var(--sky) 28%,transparent) 45%,
+    transparent 70%)!important;
+  opacity:.9!important;filter:blur(1.25rem);
+}
+.lp::before{opacity:.75!important}
+
+/* Dark mode: today marker still soft pastel (lighter lilac), never near-black */
+[data-theme=dark] .week li.on b{
+  background:linear-gradient(145deg,
+    color-mix(in srgb,var(--lilac) 55%,#423A2F),
+    color-mix(in srgb,var(--sky) 45%,#352E25))!important;
+  color:var(--ink)!important;
+}
+[data-theme=dark] .fc3{
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb,var(--lilac) 28%,transparent), transparent 60%),
+    #423A2F!important;
+  color:var(--ink)!important;
+}
+[data-theme=dark] .hero > .headp,.headp.panel{
+  background:
+    radial-gradient(55% 60% at 92% 8%, color-mix(in srgb,var(--sky) 22%,transparent), transparent 70%),
+    radial-gradient(50% 55% at 8% 92%, color-mix(in srgb,var(--lotus) 18%,transparent), transparent 68%),
+    var(--surf-1)!important;
 }
