@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT · ymzz-notion signup worker (Cloudflare Workers free plan)
+// SPDX-License-Identifier: MIT · ymzz-loop signup worker (Cloudflare Workers free plan)
 // Secrets (set by the owner, never committed):  wrangler secret put NOTION_TOKEN / NOTION_SIGNUP_DB
 // Var: ALLOWED_ORIGIN (comma-separated), e.g. "https://ya-mic.github.io"
 const TAG_RE = /^[\p{L}\p{N} _\-/+.&]{1,32}$/u;

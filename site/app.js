@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT · ymzz-notion site — vanilla JS, no dependencies, network: same-origin i18n JSON + optional signup endpoint from config.js
+// SPDX-License-Identifier: MIT · ymzz-loop site — vanilla JS, no dependencies, network: same-origin i18n JSON + optional signup endpoint from config.js
 (() => {
   document.documentElement.classList.add("js");
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -113,7 +113,7 @@
     if ($("#suHp").value) return; // bot
     const tags = [...picked, ...(custom ? [custom] : [])];
     if (!CFG.SIGNUP_ENDPOINT) {
-      if (CFG.SIGNUP_MAILTO) { location.href = `mailto:${CFG.SIGNUP_MAILTO}?subject=${encodeURIComponent("ymzz-notion signup")}&body=${encodeURIComponent(`email: ${email}\ntags: ${tags.join(", ")}`)}`; return say("join.mailto", true); }
+      if (CFG.SIGNUP_MAILTO) { location.href = `mailto:${CFG.SIGNUP_MAILTO}?subject=${encodeURIComponent("ymzz-loop signup")}&body=${encodeURIComponent(`email: ${email}\ntags: ${tags.join(", ")}`)}`; return say("join.mailto", true); }
       return say("join.closed", false);
     }
     const btn = $("#signup button[type=submit]"); btn.disabled = true; say("join.sending", true);
@@ -133,7 +133,7 @@
   // guided setup
   const SECRETS = ["NOTION_TOKEN", "GOOGLE_SERVICE_ACCOUNT_JSON", "SHEET_ID", "SMTP_USER", "SMTP_PASS", "MAIL_TO"];
   const EXTRA = {
-    3: () => pre(`git clone https://github.com/<you>/ymzz-notion && cd ymzz-notion\nNOTION_TOKEN=<token> ./setup.sh "<Notion page URL>"\ngit add sync.config.json && git commit -m "setup ids" && git push`) + pre(`# Windows PowerShell\n$env:NOTION_TOKEN="<token>"; npm install; node scripts/setup-notion.mjs "<Notion page URL>"`),
+    3: () => pre(`git clone https://github.com/<you>/ymzz-loop && cd ymzz-loop\nNOTION_TOKEN=<token> ./setup.sh "<Notion page URL>"\ngit add sync.config.json && git commit -m "setup ids" && git push`) + pre(`# Windows PowerShell\n$env:NOTION_TOKEN="<token>"; npm install; node scripts/setup-notion.mjs "<Notion page URL>"`),
     6: () => SECRETS.map(s => pre(s)).join(""),
     7: () => tzPanel(),
   };

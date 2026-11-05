@@ -11,7 +11,7 @@
 原則：全部動效遵守 `prefers-reduced-motion`；不用 WebGL、不載外部字型/追蹤，保持 Lighthouse 高分與零成本。
 
 ## 產品創意 Product ideas
-| 來源 | 觀察 | 對 ymzz-notion 的啟發 |
+| 來源 | 觀察 | 對 ymzz-loop 的啟發 |
 |---|---|---|
 | GitHub · [perinchiang/notion-automated-diary](https://github.com/perinchiang/log2notion) | 用 Actions 每日建日記頁、字數回寫 | 驗證「Actions + Notion 日記」需求；我們多了持倉、Sheet、信件與任意時區 |
 | GitHub · [henu-wang/decision-journal-template](https://github.com/henu-wang/decision-journal-template) | 決策日誌，強調結果與決策品質分開 | 模板保留「決策 Decisions」欄位，未來可加 30 天回顧 |

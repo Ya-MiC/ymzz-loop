@@ -1,4 +1,4 @@
-name: daily-review
+name: ymzz-loop · daily-review
 # 每小時醒來一次，閘門 <10 秒；只有「本地時間 ≥ 提醒時間 且 今天還沒跑過」才繼續。
 # Wakes hourly; a <10s gate continues only when local time ≥ REMIND_TIME and today hasn't run yet.
 # 時區/時間 time zone & time: repo Settings → Variables → YMZZ_TZ (e.g. Asia/Seoul), YMZZ_REMIND_TIME (e.g. 07:00)

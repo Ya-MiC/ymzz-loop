@@ -2,6 +2,13 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [1.4.0] - 2026-11-05
+### Changed
+- **Renamed ymzz-notion → ymzz-loop** (the daily-review loop): repo, site, READMEs, locales, package name, docs, workflow display name. New URLs: https://github.com/Ya-MiC/ymzz-loop · https://ya-mic.github.io/ymzz-loop/ (GitHub redirects the old repo URL). `YMZZ_*` env vars and `.ymzz/` paths are unchanged, so existing forks keep working.
+- Tagline: "Your daily review, on a loop: Notion to write, Google Sheets + your own GitHub to keep."
+### Added
+- "How the loop works" — mermaid diagram in all READMEs and a 3-step loop section at the top of the site (template in → you write → backed up to Google Sheets + your GitHub fork, daily).
+
 ## [1.3.0] - 2026-11-05
 ### Added
 - Brief, skippable intro preloader (~1.4 s, once per session, off for reduced motion / no-JS; `?nopre` to skip).

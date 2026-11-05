@@ -22,7 +22,7 @@ Method: fetched HTML + CSS with curl, read the `:root` tokens and the most frequ
 | Cards | Real product UI inside every card (quest text, avatars, timers) — never an empty icon card |
 | Motion | Scroll-linked 3D rotation of the card cloud, glow scale, giant countdown numerals behind cards |
 
-## Takeaways applied to ymzz-notion
+## Takeaways applied to ymzz-loop
 1. **Frame + panels**: a warm ground with inset rounded panels instead of full-width stripes; nested bezel cards (outer rim 6px, inner radius = outer − rim).
 2. **Living data**: a live 24-hour dial in the hero showing the visitor's local time and the next reminder (default 07:00 UTC) — the product's core idea made visible.
 3. **Real content in every card**: the bento grid shows the Notion page, email, Sheet, Git log, a time-zone clock and code — not icons.

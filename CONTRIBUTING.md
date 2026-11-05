@@ -9,4 +9,4 @@
 4. 介面文字一律繁中 + 英文。UI copy: Traditional Chinese + English.
 5. 提交訊息用祈使句，例如 `add: notion → obsidian sink`。
 
-Bug / 想法請開 [Issue](https://github.com/Ya-MiC/ymzz-notion/issues/new/choose)。
+Bug / 想法請開 [Issue](https://github.com/Ya-MiC/ymzz-loop/issues/new/choose)。

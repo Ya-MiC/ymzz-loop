@@ -5,26 +5,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'none'">
-<title>ymzz-notion — Your daily review, already waiting</title>
-<meta name="description" content="Free, open-source automation: every morning GitHub Actions creates your Notion daily review, emails you the link, and syncs yesterday to Google Sheets and Git.">
-<meta property="og:title" content="ymzz-notion — Your daily review, already waiting">
+<title>ymzz-loop — Your daily review, on a loop</title>
+<meta name="description" content="Your daily review, on a loop: Notion to write, Google Sheets + your own GitHub to keep. Free, open-source GitHub Actions template.">
+<meta property="og:title" content="ymzz-loop — Your daily review, on a loop">
 <meta property="og:image" content="og.svg">
 <meta name="theme-color" content="#ECE7DC">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ymzz-notion","applicationCategory":"ProductivityApplication","operatingSystem":"GitHub Actions","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"YanMing Cao"}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ymzz-loop","applicationCategory":"ProductivityApplication","operatingSystem":"GitHub Actions","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"YanMing Cao"}}</script>
 </head>
 <body>
-<div class="pre" id="pre" aria-hidden="true"><div class="pre-in"><p class="pre-word">ymzz<b>·</b>notion</p><p class="pre-n mono"><bdi dir="ltr" id="preN">00</bdi></p><span class="pre-bar"><i></i></span><p class="pre-t mono">小軟體，大秩序</p></div></div>
+<div class="pre" id="pre" aria-hidden="true"><div class="pre-in"><p class="pre-word">ymzz<b>·</b>loop</p><p class="pre-n mono"><bdi dir="ltr" id="preN">00</bdi></p><span class="pre-bar"><i></i></span><p class="pre-t mono">小軟體，大秩序</p></div></div>
 <a class="skip" href="#main" data-i18n="skip">Skip to content</a>
 <div class="grain" aria-hidden="true"></div>
 
 <header class="nav">
-  <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>notion</span></a>
+  <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
   <nav class="links" aria-label="Main">
-    <a href="#intro" data-i18n="nav.intro">Intro</a><a href="#features" data-i18n="nav.features">Features</a><a href="#flow" data-i18n="nav.flow">How it works</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a>
+    <a href="#loop" data-i18n="nav.loop">The loop</a><a href="#intro" data-i18n="nav.intro">Intro</a><a href="#features" data-i18n="nav.features">Features</a><a href="#flow" data-i18n="nav.flow">How it works</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a>
   </nav>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
@@ -57,7 +57,7 @@
     <p class="lede reveal" data-i18n="hero.identity"></p>
     <div class="cta reveal">
       <a class="btn primary" href="#setup"><span data-i18n="hero.cta1">Start the 15-min setup</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
-      <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-notion/generate" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="hero.cta2">Use this template</span></a>
+      <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/generate" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="hero.cta2">Use this template</span></a>
     </div>
     <div class="float" aria-hidden="true">
       <div class="fc fc1 tilt"><p class="mono">Notion</p><p class="ft"><bdi class="today"></bdi></p><p class="fl">8 / 10 · calm</p><span class="bar"></span><span class="bar s"></span></div>
@@ -77,12 +77,27 @@
   <div class="mq-track"><ul class="mq-list" id="mq"></ul></div>
 </section>
 
+<!-- THE LOOP -->
+<section id="loop" class="sec">
+  <div class="panel loopp">
+    <div class="prose"><p class="mono reveal">00 — <span data-i18n="loop.k">The loop</span></p>
+      <h2 class="reveal" data-i18n="loop.h">How the loop works</h2>
+      <p class="reveal big" data-i18n="loop.p"></p></div>
+    <ol class="loop">
+      <li class="lp sky reveal"><span class="ln mono"><bdi>1</bdi></span><h3 data-i18n="loop.1t"></h3><p data-i18n="loop.1p"></p><p class="lt mono"><bdi dir="ltr">GitHub Actions → Notion + Email</bdi></p></li>
+      <li class="lp lotus reveal"><span class="ln mono"><bdi>2</bdi></span><h3 data-i18n="loop.2t"></h3><p data-i18n="loop.2p"></p><p class="lt mono"><bdi dir="ltr">Notion</bdi></p></li>
+      <li class="lp sage reveal"><span class="ln mono"><bdi>3</bdi></span><h3 data-i18n="loop.3t"></h3><p data-i18n="loop.3p"></p><p class="lt mono"><bdi dir="ltr">→ Google Sheets + GitHub (.md)</bdi></p></li>
+    </ol>
+    <p class="again mono reveal"><span aria-hidden="true">↻</span><span data-i18n="loop.again"></span></p>
+  </div>
+</section>
+
 <!-- INTRO -->
 <section id="intro" class="sec">
   <div class="panel intro">
     <div class="prose">
       <p class="mono reveal">01 — <span data-i18n="nav.intro">Intro</span></p>
-      <h2 class="reveal" data-i18n="intro.h">What is ymzz-notion?</h2>
+      <h2 class="reveal" data-i18n="intro.h">What is ymzz-loop?</h2>
       <p class="reveal big" data-i18n="intro.p1"></p>
       <p class="reveal" data-i18n="intro.p2"></p>
     </div>
@@ -179,7 +194,7 @@
 <section id="faq" class="sec twin">
   <div class="panel"><p class="mono">06 — <span data-i18n="nav.faq">FAQ</span></p><h2 class="reveal" data-i18n="faq.h">Questions</h2><div id="faqList"></div></div>
   <div class="panel oss"><div class="glow g3" aria-hidden="true"></div><p class="mono">MIT</p><h2 class="reveal" data-i18n="oss.h"></h2><p class="reveal" data-i18n="oss.p"></p>
-    <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-notion" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="ui.star">Star on GitHub</span></a></div>
+    <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="ui.star">Star on GitHub</span></a></div>
 </section>
 <!-- SIGNUP -->
 <section id="join" class="sec">
@@ -204,12 +219,12 @@
 </main>
 
 <footer class="foot">
-  <p class="huge" aria-hidden="true">ymzz<span>·</span>notion</p>
+  <p class="huge" aria-hidden="true">ymzz<span>·</span>loop</p>
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.3.0 · MIT © 2026 YanMing Cao</bdi></p>
-  <p class="mono"><a href="https://github.com/Ya-MiC/ymzz-notion" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-notion/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-notion/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.4.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p class="mono"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
 </footer>

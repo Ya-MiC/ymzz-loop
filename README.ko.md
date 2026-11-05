@@ -1,17 +1,33 @@
-<p align="center"><img src="assets/banner.svg" alt="ymzz-notion · Daily Review" width="100%"></p>
+<p align="center"><img src="assets/banner.svg" alt="ymzz-loop · Daily Review Loop" width="100%"></p>
 
 <p align="center"><a href="README.md">English</a> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.zh-CN.md">简体中文</a> · <b>한국어</b></p>
 
 <p align="center">
-<a href="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
 <img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
 <img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
 </p>
 
-<h1 align="center">ymzz-notion</h1>
-<p align="center"><b>매일의 회고가 이미 기다리고 있습니다.</b><br>매일 아침 내 시간대에 맞춰 GitHub Actions가 Notion에 오늘의 빈 회고 페이지를 만들고, 링크를 메일로 보내고, 어제 기록을 Google Sheets와 Git에 동기화합니다.<br>$0 · 모든 시간대 · 서버 없음 · AI 사용량 없음</p>
-<p align="center"><a href="https://ya-mic.github.io/ymzz-notion/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
+<h1 align="center">ymzz-loop</h1>
+<p align="center"><b>매일의 회고를 순환으로: Notion에서 쓰고, Google Sheets와 내 GitHub에 보관.</b><br>Notion, Google, 이메일은 한 번만 연결하세요. 그 뒤로 매일 내 포크에서 실행되는 GitHub Actions가 새 회고 템플릿을 Notion에 넣고 메일로 알려 주며, 다음 실행 때 작성한 내용을 Google Sheets와 저장소의 Markdown으로 백업합니다.<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
+
+
+## 순환은 이렇게 작동합니다
+
+```mermaid
+flowchart LR
+  A["1 · 템플릿 → Notion<br>+ 메일 알림"] --> B["2 · Notion에서 작성"]
+  B --> C["3 · 다음 실행 때 어제 백업"]
+  C --> D["Google Sheets"]
+  C --> E["내 GitHub 포크 (.md)"]
+  D -. "↻" .-> A
+```
+
+1. **도착** — 정한 시간에 빈 회고 템플릿이 Notion에 만들어지고 링크가 담긴 메일이 옵니다.
+2. **작성** — 어떤 기기에서든 작성하세요.
+3. **보관** — 다음 실행 때 어제 기록이 Google Sheets와 내 포크의 `notion/YYYY/*.md`로 복사됩니다. 그리고 매일 반복됩니다.
 
 ## 하는 일
 정한 시각(기본 **07:00 UTC**)에 GitHub Actions가:
@@ -28,7 +44,7 @@ GitHub 무료 Actions 시간과 무료 Notion/Google API만 사용합니다. 실
 1. **Notion 통합** — https://www.notion.so/profile/integrations → New integration(Internal) `ymzz` → 토큰 복사 → 회고 페이지 `⋯` → Connections → `ymzz` 추가.
 2. **데이터베이스 생성**(Node.js 20+):
    ```bash
-   git clone https://github.com/<you>/ymzz-notion && cd ymzz-notion
+   git clone https://github.com/<you>/ymzz-loop && cd ymzz-loop
    NOTION_TOKEN=<token> ./setup.sh "https://www.notion.so/<페이지>"
    git add sync.config.json && git commit -m "setup ids" && git push
    ```
@@ -43,4 +59,4 @@ GitHub 무료 Actions 시간과 무료 Notion/Google API만 사용합니다. 실
 
 ## 라이선스
 [MIT](LICENSE) © 2026 YanMing Cao · **晏銘湛箴** — 작은 소프트웨어, 큰 질서.
-ymzz-notion은 독립 프로젝트이며 Notion, Google, GitHub, Interactive Brokers와 제휴하지 않았습니다.
+ymzz-loop은 독립 프로젝트이며 Notion, Google, GitHub, Interactive Brokers와 제휴하지 않았습니다.

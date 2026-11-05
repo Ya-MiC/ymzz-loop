@@ -1,21 +1,37 @@
-<p align="center"><img src="assets/banner.svg" alt="ymzz-notion · 每日復盤 Daily Review" width="100%"></p>
+<p align="center"><img src="assets/banner.svg" alt="ymzz-loop · 每日復盤 Daily Review" width="100%"></p>
 
 <p align="center"><a href="README.md">English</a> · <b>繁體中文</b> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko.md">한국어</a></p>
 
 <p align="center">
-<a href="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
 <img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
 <img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
-<a href="https://ya-mic.github.io/ymzz-notion/"><img src="https://img.shields.io/badge/官網-guided%20setup-F4DDE7" alt="website"></a>
+<a href="https://ya-mic.github.io/ymzz-loop/"><img src="https://img.shields.io/badge/官網-guided%20setup-F4DDE7" alt="website"></a>
 </p>
 
-<h1 align="center">ymzz-notion · 每日復盤</h1>
-<p align="center"><b>每天早上，復盤頁已在 Notion 等你；昨天的內容已同步到 Google Sheet 與 Git。<br>Your daily review is waiting in Notion every morning — yesterday already synced to Google Sheets and Git.</b><br>零成本 · 任意時區 · 無伺服器 · 無 AI 額度 / $0 · any time zone · serverless · no AI quota</p>
+<h1 align="center">ymzz-loop · 每日復盤</h1>
+<p align="center"><b>每日復盤，自動循環：在 Notion 寫，存到 Google Sheets 與你自己的 GitHub。</b><br>Notion、Google、郵箱只綁定一次。之後每天由你自己 fork 的倉庫裡的 GitHub Actions 把新的每日復盤模板送進 Notion 並寄信提醒；下一次運行再把你寫好的內容備份到 Google Sheets 與倉庫的 Markdown。<br>$0 · any time zone · no servers · no AI quota</p>
 
-<p align="center"><a href="https://ya-mic.github.io/ymzz-notion/">🌐 官網與互動教學 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官網與互動教學 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
 ---
+
+
+## 循環如何運作
+
+```mermaid
+flowchart LR
+  A["1 · 模板送進 Notion<br>+ 郵件提醒"] --> B["2 · 你在 Notion 書寫"]
+  B --> C["3 · 下次運行備份昨天"]
+  C --> D["Google Sheets"]
+  C --> E["你的 GitHub fork（.md）"]
+  D -. "↻" .-> A
+```
+
+1. **送入**——在你選的時間，Notion 自動建好空白的每日復盤模板，並寄出附連結的提醒信。
+2. **書寫**——任何裝置都能填。
+3. **留存**——下一次運行把昨天的內容複製到 Google Sheets 與你 fork 裡的 `notion/YYYY/*.md`。然後每天重複。
 
 ## 它做什麼 What it does
 每天在**你設定的時區與時間**（預設 **07:00 UTC**），GitHub Actions 自動：
@@ -26,7 +42,7 @@
 不用 Grok / AI 額度，只用 GitHub 免費分鐘。長期免維護：每小時閘門數秒結束、每天只真正執行一次（去重）、每次執行重新啟用排程、45 天無提交自動補一次（避開 GitHub 60 天停用規則）、10 分鐘逾時、失敗寄信。
 No AI quota; free GitHub minutes only. Built to run unattended.
 
-| | ymzz-notion | 一般 Notion 模板 | 付費日記 App |
+| | ymzz-loop | 一般 Notion 模板 | 付費日記 App |
 |---|---|---|---|
 | 每日自動建頁 + 提醒信 | ✅ | ❌ | ⚠️ |
 | 同步 Google Sheet + Git 歷史 | ✅ | ❌ | ❌ |
@@ -53,7 +69,7 @@ Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds un
 1. **Notion integration**：到 https://www.notion.so/profile/integrations → New integration（Internal）名稱 `ymzz` → 複製 token。打開你要放復盤的 Notion 頁面 → 右上 `⋯` → Connections → 加入 `ymzz`。
 2. **建立資料庫 Create databases**（在電腦上 / on your PC，需 Node.js 20+）：
    ```bash
-   git clone https://github.com/Ya-MiC/ymzz-notion && cd ymzz-notion
+   git clone https://github.com/Ya-MiC/ymzz-loop && cd ymzz-loop
    NOTION_TOKEN=你的token ./setup.sh "https://www.notion.so/你的頁面網址"
    git add sync.config.json && git commit -m "setup ids" && git push
    ```
@@ -71,7 +87,7 @@ Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds un
    | `SMTP_PASS` | 16 位應用程式密碼 |
    | `MAIL_TO` | 收提醒的信箱 |
    | `SMTP_HOST` / `SMTP_PORT` | 選填，預設 smtp.gmail.com / 465 |
-6. **時區與提醒時間 Time zone（選填 optional）**：Settings → Secrets and variables → Actions → **Variables** 分頁 → New repository variable：`YMZZ_TZ`（IANA 名稱，例如 `Asia/Taipei`、`America/New_York`）、`YMZZ_REMIND_TIME`（`HH:MM`，例如 `21:30`）。不設就是 `Etc/UTC` `07:00`。也可直接改 `sync.config.json` 的 `timezone` / `remind_time`。官網的[時區產生器](https://ya-mic.github.io/ymzz-notion/#setup)會幫你算好。
+6. **時區與提醒時間 Time zone（選填 optional）**：Settings → Secrets and variables → Actions → **Variables** 分頁 → New repository variable：`YMZZ_TZ`（IANA 名稱，例如 `Asia/Taipei`、`America/New_York`）、`YMZZ_REMIND_TIME`（`HH:MM`，例如 `21:30`）。不設就是 `Etc/UTC` `07:00`。也可直接改 `sync.config.json` 的 `timezone` / `remind_time`。官網的[時區產生器](https://ya-mic.github.io/ymzz-loop/#setup)會幫你算好。
 7. **第一次手動執行 First run**：Actions → daily-review → Run workflow。收到信、Notion 出現今天的頁、Sheet 出現兩個分頁就成功。
 
 ## 擴充 Extend

@@ -1,17 +1,33 @@
-<p align="center"><img src="assets/banner.svg" alt="ymzz-notion · Daily Review" width="100%"></p>
+<p align="center"><img src="assets/banner.svg" alt="ymzz-loop · Daily Review Loop" width="100%"></p>
 
 <p align="center"><b>English</b> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko.md">한국어</a></p>
 
 <p align="center">
-<a href="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-notion/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
 <img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
 <img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
 </p>
 
-<h1 align="center">ymzz-notion</h1>
-<p align="center"><b>Your daily review, already waiting.</b><br>Every morning in your time zone, GitHub Actions creates today's blank review in Notion, emails you the link, and syncs yesterday to Google Sheets and Git.<br>$0 · any time zone · no servers · no AI quota</p>
-<p align="center"><a href="https://ya-mic.github.io/ymzz-notion/">Website & guided setup</a> · <a href="docs/architecture.md">Architecture</a> · <a href="CHANGELOG.md">Changelog</a></p>
+<h1 align="center">ymzz-loop</h1>
+<p align="center"><b>Your daily review, on a loop: Notion to write, Google Sheets + your own GitHub to keep.</b><br>Bind Notion, Google and email once. Every day GitHub Actions — running in your own fork — drops a fresh daily-review template into Notion and emails you; the next run backs up what you wrote to Google Sheets and to Markdown in your repo.<br>$0 · any time zone · no servers · no AI quota</p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">Website & guided setup</a> · <a href="docs/architecture.md">Architecture</a> · <a href="CHANGELOG.md">Changelog</a></p>
+
+
+## How the loop works
+
+```mermaid
+flowchart LR
+  A["1 · Template → Notion<br>+ email reminder"] --> B["2 · You write in Notion"]
+  B --> C["3 · Next run backs up yesterday"]
+  C --> D["Google Sheets"]
+  C --> E["Your GitHub fork (.md)"]
+  D -. "↻" .-> A
+```
+
+1. **In** — at your chosen time, a blank daily-review template is created in your Notion and you get an email with the link.
+2. **Write** — fill it in on any device.
+3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats, every day.
 
 ## What it does
 At the time you choose (default **07:00 UTC**), GitHub Actions:
@@ -39,7 +55,7 @@ Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in 
 1. **Notion integration** — https://www.notion.so/profile/integrations → New integration (Internal) named `ymzz` → copy the token. Open your review page → `⋯` → Connections → add `ymzz`.
 2. **Create databases** (Node.js 20+):
    ```bash
-   git clone https://github.com/<you>/ymzz-notion && cd ymzz-notion
+   git clone https://github.com/<you>/ymzz-loop && cd ymzz-loop
    NOTION_TOKEN=<token> ./setup.sh "https://www.notion.so/<your-page>"
    git add sync.config.json && git commit -m "setup ids" && git push
    ```
@@ -68,4 +84,4 @@ A new destination is one file: `scripts/sinks/<name>.mjs` implementing `{ name, 
 
 ## License
 [MIT](LICENSE) © 2026 YanMing Cao · **晏銘湛箴** — Small software, big order.
-ymzz-notion is independent and not affiliated with or endorsed by Notion, Google, GitHub, or Interactive Brokers.
+ymzz-loop is independent and not affiliated with or endorsed by Notion, Google, GitHub, or Interactive Brokers.
