@@ -276,5 +276,7 @@
   "hold.link": "链接",
   "hold.linkPh": "https://…",
   "hold.pct": "占比",
+  "hold.edit": "编辑",
+  "hold.done": "完成",
   "hero.cta2title": "打开仅含自动化的 product 分支（不含展示网站）。可 Download ZIP 或 git clone -b product。"
 }

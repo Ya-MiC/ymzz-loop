@@ -1,4 +1,4 @@
-// v1.17.2 · top capsule hero→content elastic + bottom spy has no % / progress
+// v1.17.3 · top capsule hero→content elastic + bottom spy has no % / progress
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,16 +11,15 @@ const js = readFileSync(join(root, "site/app.js"), "utf8");
 const html = readFileSync(join(root, "site/index.html"), "utf8");
 const cfg = readFileSync(join(root, "site/config.js"), "utf8");
 
-describe("v1.17.2 nav elastic + glass spy", () => {
-  it("versions say 1.17.2", () => {
-    assert.match(cfg, /VERSION:\s*"1\.17\.2"/);
-    assert.match(html, /v1\.17\.2/);
+describe("v1.17.3 nav elastic + glass spy", () => {
+  it("versions say 1.17.3", () => {
+    assert.match(cfg, /VERSION:\s*"1.17.3"/);
+    assert.match(html, /v1.17.3/);
   });
 
-  it("restores large dial/clock (no 15.5rem shrink)", () => {
-    assert.doesNotMatch(css, /15\.5rem/);
-    assert.match(css, /inline-size:min\(100%,\s*22rem\)/);
-    assert.match(css, /clamp\(2\.25rem,\s*4\.5vw,\s*3\.75rem\)/);
+  it("editorial dial mid-size with breathing room", () => {
+    assert.match(css, /inline-size:min\(100%,\s*17rem\)/);
+    assert.match(css, /v1\.17\.3/);
   });
 
   it("nav width formula interpolates --nav-p between hero-w and content-w", () => {
@@ -48,10 +47,15 @@ describe("v1.17.2 nav elastic + glass spy", () => {
     assert.match(html, /tree\/product/);
   });
 
-  it("soft dayp stretch only (no dialp flex rewrite)", () => {
-    // v1.17.2 soft stretch targets dayp; must not force dialp min-block-size 100% flex rewrite
-    const block = css.slice(css.indexOf("v1.17.2"));
-    assert.match(block, /\.hero\.hero-urgency\s*>\s*\.dayp/);
-    assert.doesNotMatch(block, /\.hero\.hero-urgency\s*>\s*\.dialp\{[^}]*min-block-size:100%/);
+  it("holdings default view is calm bars; edit behind toggle", () => {
+    assert.match(js, /data-hold-mode|holdEditTog|is-view/);
+    assert.match(css, /\.hold-row\.is-view/);
+    assert.match(css, /hold-edit-tog/);
+  });
+
+  it("content-driven equal card edges (stretch, no 100svh min)", () => {
+    const block = css.slice(css.indexOf("v1.17.3"));
+    assert.match(block, /min-block-size:0!important/);
+    assert.match(block, /0\.88fr.*1\.22fr.*1\.05fr/s);
   });
 });

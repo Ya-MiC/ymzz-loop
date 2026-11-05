@@ -276,5 +276,7 @@
   "hold.link": "링크",
   "hold.linkPh": "https://…",
   "hold.pct": "비중",
+  "hold.edit": "편집",
+  "hold.done": "완료",
   "hero.cta2title": "사이트 없는 product 전용 브랜치. ZIP 다운로드 또는 clone -b product."
 }

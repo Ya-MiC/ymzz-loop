@@ -3756,3 +3756,265 @@ html.nav-scrolled .nav,
   }
   .sec-spy{ --spy-glass: 0.72; }
 }
+
+/* ===== v1.17.3 · editorial hero rebalance · compact holdings view · content-driven height ===== */
+
+/*
+ * Proportions (why):
+ * - 22rem dial filled ~90% of dialp and forced 100svh stretch → hero taller than viewport,
+ *   empty voids in left/center. Loved refs show dial with breathing room (~70–75% card width)
+ *   and a first screen that fits.
+ * - Editable sliders+URL on every row (~396px) dominated right card; default is now calm
+ *   bars; edit behind toggle.
+ * - Shared row height from content (stretch), not min 100svh.
+ */
+
+/* Column ratios: slightly narrower dial, roomier headline, calm day column */
+@media screen and (min-width:1089px){
+  .hero.hero-urgency{
+    grid-template-columns:minmax(0,0.88fr) minmax(0,1.22fr) minmax(0,1.05fr)!important;
+    /* content-driven: fit first screen without manufacturing empty height */
+    min-block-size:0!important;
+    align-items:stretch!important;
+    padding-block:clamp(0.35rem, 1.2vh, 0.85rem)!important;
+    gap:clamp(0.85rem, 1.6vw, 1.35rem)!important;
+  }
+  .hero.hero-urgency > .dialp,
+  .hero.hero-urgency > .headp,
+  .hero.hero-urgency > .dayp{
+    min-block-size:100%!important;
+    height:auto!important;
+    align-self:stretch!important;
+    display:flex!important;
+    flex-direction:column!important;
+  }
+  .hero.hero-urgency > .dialp{
+    justify-content:space-between!important;
+    gap:var(--s2)!important;
+    padding:clamp(0.85rem, 1.6vw, 1.15rem)!important;
+  }
+  .hero.hero-urgency > .headp{
+    justify-content:center!important;
+    gap:var(--s4)!important;
+  }
+  .hero.hero-urgency > .dayp{
+    justify-content:flex-start!important;
+    gap:var(--s2)!important;
+    padding:clamp(0.85rem, 1.6vw, 1.15rem)!important;
+  }
+}
+
+/* Dial: mid size — presence without swallowing the card (~17rem ≈ 70% of ~24rem col) */
+.dialp .label{ margin-block-end:0.15rem; }
+.dial{
+  inline-size:min(100%, 17rem)!important;
+  max-inline-size:17rem!important;
+  margin-inline:auto!important;
+  margin-block:0.15rem auto!important;
+}
+.clock{
+  font:500 clamp(1.85rem, 3.1vw, 2.75rem)/1 var(--f-display)!important;
+  letter-spacing:-.03em;
+  font-variant-numeric:tabular-nums;
+}
+.dialfoot{
+  padding-block-start:var(--s2)!important;
+  gap:var(--s3)!important;
+  margin-block-start:auto;
+}
+.dialfoot dd{
+  font:500 1.1rem var(--f-display)!important;
+}
+@media (max-width:68rem){
+  .dial{ inline-size:min(100%, 16rem)!important; max-inline-size:16rem!important; }
+}
+
+/* Center: calmer type scale / CTA rhythm (don't fight locked fonts — only size steps) */
+@media screen and (min-width:1089px){
+  .hero.hero-urgency > .headp h1{
+    font-size:clamp(1.85rem, 2.1rem + 1.1vw, 2.85rem)!important;
+    line-height:1.12!important;
+    margin-block:0.15rem 0.55rem!important;
+  }
+  .hero.hero-urgency > .headp .lead,
+  .hero.hero-urgency > .headp .dek{
+    font-size:var(--t-sm)!important;
+    line-height:1.45!important;
+  }
+  .hero.hero-urgency .cta{
+    margin-block-start:0.35rem!important;
+    gap:var(--s2)!important;
+  }
+  .hero.hero-urgency .stats,
+  .hero.hero-urgency .facts{
+    margin-block-start:auto;
+    padding-block-start:var(--s3);
+  }
+}
+
+/* Right card: tighten calendar + todos so holdings fit calmly */
+.hero.hero-urgency .daycard{
+  padding:0.55rem 0.15rem 0.35rem!important;
+}
+.hero.hero-urgency .daycard .dnum{
+  font-size:clamp(2.4rem, 4vw, 3.25rem)!important;
+}
+.hero.hero-urgency .week{
+  gap:0.25rem!important;
+  margin-block:0.35rem 0.15rem!important;
+}
+.hero.hero-urgency .week b{
+  inline-size:1.85rem!important;
+  block-size:1.85rem!important;
+  font-size:0.78rem!important;
+}
+.hero.hero-urgency .todo-unified-wrap,
+.hero.hero-urgency .prompts-wrap{
+  margin-block:0.15rem 0!important;
+}
+.hero.hero-urgency .todo-unified .todo-user,
+.hero.hero-urgency .todo-unified .prompts li,
+.hero.hero-urgency .prompts li{
+  padding-block:0.35rem!important;
+}
+.hero.hero-urgency .todo-add input,
+.hero.hero-urgency .todo-add .btn.small{
+  min-block-size:2.15rem!important;
+}
+
+/* Holdings: default VIEW = calm bars (loved density); EDIT = full controls */
+.hold-mini{
+  margin-block-start:auto;
+  padding-block-start:0.35rem;
+  gap:0.35rem!important;
+}
+.hold-mini-acts{
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+}
+.hold-edit-tog{
+  border:0;
+  background:color-mix(in srgb, var(--ink) 8%, transparent);
+  color:var(--ink-2);
+  font:500 var(--t-xs)/1.2 var(--f-body);
+  padding:0.3rem 0.65rem;
+  border-radius:99rem;
+  cursor:pointer;
+}
+.hold-edit-tog:hover,
+.hold-edit-tog:focus-visible,
+.hold-edit-tog[aria-expanded=true]{
+  color:var(--ink);
+  background:color-mix(in srgb, var(--accent-soft) 35%, transparent);
+  outline:2px solid color-mix(in srgb, var(--accent) 50%, transparent);
+  outline-offset:2px;
+}
+.hold-edit{
+  gap:0.2rem !important;
+}
+
+/* View rows — editorial bars like the loved full-page shot */
+.hold-row.is-view{
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  min-block-size: 0 !important;
+  padding-block: 0.12rem !important;
+  grid-template-columns: none !important;
+  grid-template-areas: none !important;
+}
+.hold-row.is-view .hold-name{
+  flex: 0 0 4.25rem;
+  max-inline-size: 4.25rem;
+  font: 600 var(--t-xs)/1.15 var(--f-mono), var(--f-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.15 !important;
+}
+.hold-row.is-view .hold-bar{
+  flex: 1 1 auto;
+  display: block;
+  block-size: 0.32rem !important;
+  border-radius: 99rem;
+  background: color-mix(in srgb, var(--ink) 10%, transparent);
+  overflow: hidden;
+  min-inline-size: 3rem;
+}
+.hold-row.is-view .hold-bar > i{
+  display: block;
+  block-size: 100%;
+  inline-size: var(--w, 46%);
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-warm, var(--cocoa)), var(--accent, var(--tea)));
+}
+.hold-row.is-view .hold-pct{
+  flex: 0 0 2.4rem;
+  font: 600 var(--t-xs)/1 var(--f-mono), var(--f-body);
+  text-align: end;
+  color: var(--ink-2);
+}
+.hold-row.is-view .hold-go{
+  flex: none;
+  inline-size: 1.25rem;
+  block-size: 1.25rem;
+  font-size: 0.65rem;
+}
+.hold-row.is-view .hold-go.is-empty{ display: none !important; }
+
+/* Edit rows — unchanged controls, slightly tighter */
+.hold-row.is-edit{
+  gap:0.3rem 0.45rem!important;
+}
+.hold-row.is-edit .hold-label{ min-block-size:1.75rem; font-size:var(--t-xs); }
+.hold-row.is-edit .hold-url{ min-block-size:1.65rem; }
+.hold-row.is-edit .hold-range input[type=range]{ height:0.45rem; }
+.hold-row.is-edit .hold-range input[type=range]::-webkit-slider-thumb{
+  width:1rem; height:1rem;
+}
+.hold-row.is-edit .hold-range input[type=range]::-moz-range-thumb{
+  width:1rem; height:1rem;
+}
+
+[data-hold-mode=view] .hold-reset,
+[data-hold-mode=view] .hold-note-edit{ display:none!important; }
+[data-hold-mode=edit] .hold-reset{ display:inline-flex!important; }
+[data-hold-mode=edit] .hold-note-edit{ display:block!important; }
+
+html[data-theme=dark] .hold-row.is-view .hold-name,
+html[data-theme=dark] .hold-row.is-view .hold-pct{
+  color:#E8E2D6!important;
+}
+html[data-theme=dark] .hold-edit-tog{
+  color:#E8E2D6!important;
+  background:color-mix(in srgb, #fff 10%, transparent);
+}
+
+/* Kill prior 22rem / soft-only stretch that fought this block */
+@media screen and (min-width:1089px){
+  .hero.hero-urgency > .dayp > .hold-mini{
+    margin-block-start:auto;
+  }
+}
+
+
+/* v1.17.3b · fit first screen: tighter day stack after view-row fix */
+.hold-mini{ gap:0.25rem !important; padding-block-start:0.2rem !important; }
+.hold-mini-hd{ margin-block-end:0.1rem; }
+.hold-row.is-view .hold-bar{ block-size:0.32rem !important; }
+.hero.hero-urgency .dayp-top{ margin-block-end:0 !important; }
+@media screen and (min-width:1089px) and (max-height:920px){
+  .hero.hero-urgency{
+    padding-block:0.25rem !important;
+  }
+  .dial{ inline-size:min(100%, 15.5rem) !important; max-inline-size:15.5rem !important; }
+  .clock{ font-size:clamp(1.7rem, 2.8vw, 2.45rem) !important; }
+  .hero.hero-urgency .daycard .dnum{ font-size:clamp(2.1rem, 3.4vw, 2.85rem) !important; }
+  .hero.hero-urgency .week b{ inline-size:1.65rem !important; block-size:1.65rem !important; }
+}

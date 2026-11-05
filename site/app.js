@@ -324,23 +324,51 @@
         if (pct) pct.textContent = it.pct + "%";
       });
     };
+    const mini = $("#holdMini");
+    const tog = $("#holdEditTog");
+    const noteEdit = $(".hold-note-edit", mini) || $(".hold-note-edit");
+    let editing = false;
+    const setMode = (on) => {
+      editing = !!on;
+      if (mini) mini.dataset.holdMode = editing ? "edit" : "view";
+      if (tog) {
+        tog.setAttribute("aria-expanded", editing ? "true" : "false");
+        tog.textContent = t(editing ? "hold.done" : "hold.edit");
+      }
+      if (resetBtn) resetBtn.hidden = !editing;
+      if (noteEdit) noteEdit.hidden = !editing;
+      render();
+    };
     const render = () => {
       syncEgg();
-      root.innerHTML = state.items.map((it, i) => {
-        const linkOpen = it.url ? `<a class="hold-go" href="${esc(it.url)}" rel="noopener noreferrer" target="_blank" title="${esc(it.url)}">↗</a>` : "";
-        return `<li class="hold-row" data-i="${i}">
-          <input class="hold-label" type="text" maxlength="24" value="${esc(it.label)}" aria-label="${t("hold.label")} ${i + 1}" data-k="label">
-          <label class="hold-range">
-            <span class="vh">${t("hold.pct")}</span>
-            <input type="range" min="0" max="100" step="1" value="${it.pct}" style="--hold-fill:${it.pct}%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${it.pct}" aria-label="${t("hold.pct")} ${esc(it.label)}" data-k="pct">
-          </label>
-          <output class="hold-pct" for="">${it.pct}%</output>
-          <div class="hold-link">
-            <input class="hold-url" type="url" inputmode="url" maxlength="300" placeholder="${t("hold.linkPh")}" value="${esc(it.url)}" aria-label="${t("hold.link")} ${i + 1}" data-k="url">
-            ${linkOpen}
-          </div>
-        </li>`;
-      }).join("");
+      if (!editing) {
+        // calm read view — bars only (edit behind toggle)
+        root.innerHTML = state.items.map((it, i) => {
+          const go = it.url ? `<a class="hold-go" href="${esc(it.url)}" rel="noopener noreferrer" target="_blank" title="${esc(it.url)}" aria-label="${esc(it.label)}">↗</a>` : "";
+          return `<li class="hold-row is-view" data-i="${i}">
+            <b class="hold-name${it.egg ? " js-hold-ticker" : ""}">${esc(it.label)}</b>
+            <div class="hold-bar" aria-hidden="true"><i style="--w:${it.pct}%"></i></div>
+            <span class="hold-pct">${it.pct}%</span>
+            ${go}
+          </li>`;
+        }).join("");
+      } else {
+        root.innerHTML = state.items.map((it, i) => {
+          const linkOpen = it.url ? `<a class="hold-go" href="${esc(it.url)}" rel="noopener noreferrer" target="_blank" title="${esc(it.url)}">↗</a>` : "";
+          return `<li class="hold-row is-edit" data-i="${i}">
+            <input class="hold-label" type="text" maxlength="24" value="${esc(it.label)}" aria-label="${t("hold.label")} ${i + 1}" data-k="label">
+            <label class="hold-range">
+              <span class="vh">${t("hold.pct")}</span>
+              <input type="range" min="0" max="100" step="1" value="${it.pct}" style="--hold-fill:${it.pct}%" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${it.pct}" aria-label="${t("hold.pct")} ${esc(it.label)}" data-k="pct">
+            </label>
+            <output class="hold-pct" for="">${it.pct}%</output>
+            <div class="hold-link">
+              <input class="hold-url" type="url" inputmode="url" maxlength="300" placeholder="${t("hold.linkPh")}" value="${esc(it.url)}" aria-label="${t("hold.link")} ${i + 1}" data-k="url">
+              ${linkOpen}
+            </div>
+          </li>`;
+        }).join("");
+      }
       mirrorSection();
     };
     root.addEventListener("input", e => {
@@ -370,6 +398,7 @@
         save(state); render();
       }
     });
+    tog && tog.addEventListener("click", () => setMode(!editing));
     resetBtn && resetBtn.addEventListener("click", () => {
       state = { items: defaults(), touched: false };
       store.set(LS, null);
@@ -379,12 +408,13 @@
       writeCookie({ items: state.items, touched: false });
       render();
     });
-    window.__ymzzHoldSync = (l) => { syncEgg(l); save(state); render(); };
+    window.__ymzzHoldSync = (l) => { syncEgg(l); save(state); if (tog) tog.textContent = t(editing ? "hold.done" : "hold.edit"); render(); };
     window.__ymzzHoldRender = render;
     // expose for tests
     window.__ymzzHoldDefaults = defaults;
     window.__ymzzHoldIsAshare = isAshare;
-    render();
+    window.__ymzzHoldSetMode = setMode;
+    setMode(false);
   })();
 
   // demo to-dos 03–08: unified with Notion preview rows; max 6; browser-only 60h TTL
