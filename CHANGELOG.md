@@ -2,6 +2,19 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+
+## [1.9.0] — 2026-11-05
+
+### Changed
+- Soft Morandi paper surfaces site-wide (雲箋/陶土 light; 暮靄/暮林 warm dark). Deleted black / charcoal / near-black card fills.
+- Value-contrast scale (維對比色階): depth via shade/tint of the same hue family; at most one soft same-family edge; no coloured borders.
+- Concentric nested radii (`--Ri = --R − pad`); no multi-rim nesting.
+- UI typography unified to Inter; Fraunces kept for display headlines only. Tabular lining numerals everywhere. Dark mode font-weight one step down.
+- How-it-works / stage / marquee / code / git tiles: soft paper, never ink fills.
+
+### Kept
+- Four wenrun palettes, i18n + RTL, Arbitrum USDC donate, 600-day gate, signup, Feishu sink, scroll-nav opacity, MIT credit.
+
 ## [1.8.0] - 2026-11-05
 ### Changed
 - Site layout: one consistent vertical axis (centered column, shared paper family) — no left/right theme flip; fewer 1px borders, soft tonal surfaces and spacing instead.
