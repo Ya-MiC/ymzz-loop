@@ -261,5 +261,12 @@
   "ui.secspy": "章節預覽",
   "dial.local": "你的本地時間",
   "dial.next": "距離下次復盤",
-  "dial.at": "提醒時刻"
+  "dial.at": "提醒時刻",
+  "todo.k": "我的待辦",
+  "todo.note": "只存瀏覽器 · 60 小時後自動銷毀",
+  "todo.add": "新增待辦",
+  "todo.ph": "寫下一件待辦…",
+  "todo.btn": "新增",
+  "todo.empty": "新增一筆，體驗 fork 後的待辦",
+  "todo.clear": "刪除"
 }

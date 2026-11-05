@@ -86,21 +86,25 @@
     dict = lang === "en" ? en : await load(lang).catch(() => en);
     const h = document.documentElement; h.lang = dict._lang || lang; h.dir = dict._dir || "ltr";
     $$("[data-i18n]").forEach(el => { el.innerHTML = t(el.dataset.i18n); });
+    $$("[data-i18n-placeholder]").forEach(el => { el.setAttribute("placeholder", t(el.dataset.i18nPlaceholder)); });
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
     $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
-    // holdings 彩蛋: zh-CN locale AND UTC+8 zone → A-share 600519.SH; else 2330.TW (no IBKR)
+    // holdings 彩蛋: zh-CN + UTC+8 → 600519.SH (貴州茅台); else 2330.TW — all .js-hold-ticker
     (() => {
-      const el = $("#holdTicker"); if (!el) return;
+      const els = $$(".js-hold-ticker"); if (!els.length) return;
       const tz = (() => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || ""; } catch { return ""; } })();
       const utc8 = /^(Asia\/(Shanghai|Chongqing|Urumqi|Harbin|Kashgar)|Etc\/GMT-8)$/.test(tz)
-        || (() => { try { // offset minutes east of UTC is negative for east… getTimezoneOffset: UTC+8 → -480
-          return new Date().getTimezoneOffset() === -480;
-        } catch { return false; } })();
+        || (() => { try { return new Date().getTimezoneOffset() === -480; } catch { return false; } })();
       const ashare = lang === "zh-CN" && utc8;
-      el.textContent = ashare ? "600519.SH" : (el.dataset.tickerDefault || "2330.TW");
-      el.dataset.egg = ashare ? "ashare" : "tw";
+      const label = ashare ? "600519.SH" : null;
+      els.forEach(el => {
+        const v = label || (el.dataset.tickerDefault || "2330.TW");
+        el.textContent = v;
+        el.dataset.egg = ashare ? "ashare" : "tw";
+        el.title = ashare ? "贵州茅台 · A-share" : "";
+      });
     })();
-    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme);
+    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme); if (window.__ymzzTodoRender) window.__ymzzTodoRender();
   };
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 
@@ -245,6 +249,84 @@
   }
 
 
+
+  // demo to-dos: browser-only (localStorage + cookie), auto-destroy after 60h — never server-side
+  (() => {
+    const TTL_MS = 60 * 60 * 1000 * 60; // 60 hours
+    const LS_KEY = "todos";
+    const COOKIE = "ymzz_todos";
+    const list = $("#todoList"), form = $("#todoForm"), input = $("#todoInput");
+    if (!list || !form || !input) return;
+    const now = () => Date.now();
+    const uid = () => "t" + now().toString(36) + Math.random().toString(36).slice(2, 7);
+    const readCookie = () => {
+      const m = document.cookie.match(/(?:^|;\s*)ymzz_todos=([^;]*)/);
+      if (!m) return null;
+      try { return JSON.parse(decodeURIComponent(m[1])); } catch { return null; }
+    };
+    const writeCookie = (payload) => {
+      const maxAge = Math.max(0, Math.floor((payload.exp - now()) / 1000));
+      document.cookie = COOKIE + "=" + encodeURIComponent(JSON.stringify(payload))
+        + "; max-age=" + maxAge + "; path=/; SameSite=Lax";
+    };
+    const clearCookie = () => { document.cookie = COOKIE + "=; max-age=0; path=/; SameSite=Lax"; };
+    const purgeItems = (items, t0 = now()) => (items || []).filter(it => it && typeof it.created === "number" && (t0 - it.created) < TTL_MS);
+    const load = () => {
+      let payload = null;
+      try { payload = store.get(LS_KEY, null); } catch { payload = null; }
+      if (!payload) payload = readCookie();
+      if (!payload || typeof payload !== "object") return { exp: now() + TTL_MS, items: [] };
+      if (typeof payload.exp === "number" && now() >= payload.exp) {
+        store.set(LS_KEY, null); clearCookie(); return { exp: now() + TTL_MS, items: [] };
+      }
+      const items = purgeItems(payload.items);
+      const exp = typeof payload.exp === "number" ? payload.exp : now() + TTL_MS;
+      return { exp, items };
+    };
+    const save = (payload) => {
+      payload.items = purgeItems(payload.items);
+      if (!payload.items.length) { store.set(LS_KEY, null); clearCookie(); return; }
+      store.set(LS_KEY, payload);
+      writeCookie(payload);
+    };
+    let state = load();
+    const render = () => {
+      state.items = purgeItems(state.items);
+      if (!state.items.length) {
+        list.innerHTML = `<li class="todo-empty">${t("todo.empty")}</li>`;
+        return;
+      }
+      list.innerHTML = state.items.map(it => `<li class="todo-item${it.done ? " is-done" : ""}" data-id="${it.id}">
+        <label><input type="checkbox" ${it.done ? "checked" : ""}><span>${esc(it.text)}</span></label>
+        <button type="button" class="todo-del" aria-label="${t("todo.clear")}" data-del="${it.id}">×</button>
+      </li>`).join("");
+    };
+    form.addEventListener("submit", e => {
+      e.preventDefault();
+      const text = input.value.trim().slice(0, 80);
+      if (!text) return;
+      state.items.push({ id: uid(), text, done: false, created: now() });
+      if (!state.exp || state.exp < now()) state.exp = now() + TTL_MS;
+      save(state); input.value = ""; render();
+    });
+    list.addEventListener("change", e => {
+      const cb = e.target.closest("input[type=checkbox]"); if (!cb) return;
+      const li = cb.closest("[data-id]"); if (!li) return;
+      const it = state.items.find(x => x.id === li.dataset.id); if (!it) return;
+      it.done = cb.checked; save(state); render();
+    });
+    list.addEventListener("click", e => {
+      const btn = e.target.closest("[data-del]"); if (!btn) return;
+      state.items = state.items.filter(x => x.id !== btn.getAttribute("data-del"));
+      save(state); render();
+    });
+    // re-render on lang change via MutationObserver-ish: hook apply by exposing
+    const _apply = window.__ymzzTodoRender = render;
+    render();
+    // periodic purge (every 10 min) while tab open
+    setInterval(() => { state = load(); render(); }, 600000);
+  })();
+
   // donate: copy receive-only address (never wallet connect / sign / approve)
   const DONATE_ADDR = "0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A";
   (() => {
@@ -259,15 +341,25 @@
   })();
 
 
-  // reading progress (top bar) + nav frost from scroll (rAF)
-  // reduced-motion: still update read position (snap), nav stays frosted
+  // reading progress + nav capsule: hero-width → content-width only AFTER hero fully past
   (() => {
     const nav = $(".nav");
     const bar = $(".readbar");
+    const hero = $(".hero");
     const root = document.documentElement;
+    const spyFill = $("#spyFill"), spyPct = $("#spyPct");
     let ticking = false;
+    const measureHeroW = () => {
+      if (!hero) return;
+      const r = hero.getBoundingClientRect();
+      // outer width of the 3-card row (hero already padded)
+      const w = Math.round(r.width);
+      root.style.setProperty("--nav-hero-w", w + "px");
+      if (nav) nav.style.setProperty("--nav-hero-w", w + "px");
+    };
     const apply = () => {
       ticking = false;
+      measureHeroW();
       const max = Math.max(1, root.scrollHeight - innerHeight);
       const p = Math.min(1, Math.max(0, scrollY / max));
       const v = p.toFixed(4);
@@ -276,14 +368,23 @@
         bar.style.setProperty("--read-p", v);
         bar.setAttribute("aria-valuenow", String(Math.round(p * 100)));
       }
-      // reactbits-style: glass + shrink kicks in over first ~120px, not full-page %
-      if (nav) {
-        const np = reduce ? 1 : Math.min(1, Math.max(0, scrollY / 120));
+      // bottom spy 0–100 fill (complements section dots)
+      const pct = Math.round(p * 100);
+      if (spyFill) spyFill.style.transform = "scaleX(" + v + ")";
+      if (spyPct) spyPct.textContent = String(pct);
+      if (nav && hero) {
+        const hb = hero.getBoundingClientRect().bottom;
+        // shrink only after entire first screen has scrolled past (hero bottom ≤ 0)
+        let np;
+        if (reduce) np = 1;
+        else if (hb > 0) np = 0;
+        else np = Math.min(1, Math.max(0, (-hb) / 96)); // ease over ~96px after past
         const nv = np.toFixed(4);
         root.style.setProperty("--nav-p", nv);
         nav.style.setProperty("--nav-p", nv);
-        nav.classList.toggle("is-scrolled", np > 0.15);
-        root.classList.toggle("nav-scrolled", np > 0.15);
+        const scrolled = np > 0.02;
+        nav.classList.toggle("is-scrolled", scrolled);
+        root.classList.toggle("nav-scrolled", scrolled);
       }
     };
     const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(apply); } };

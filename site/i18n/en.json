@@ -261,5 +261,12 @@
   "ui.secspy": "Section preview",
   "dial.local": "Your local time",
   "dial.next": "Next review in",
-  "dial.at": "Reminder"
+  "dial.at": "Reminder",
+  "todo.k": "My to-dos",
+  "todo.note": "Stored in this browser only · auto-clears after 60 hours",
+  "todo.add": "Add a to-do",
+  "todo.ph": "Write a to-do…",
+  "todo.btn": "Add",
+  "todo.empty": "Add a to-do to try the fork demo",
+  "todo.clear": "Remove"
 }

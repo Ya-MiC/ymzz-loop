@@ -261,5 +261,12 @@
   "ui.secspy": "구역 미리보기",
   "dial.local": "내 로컬 시간",
   "dial.next": "다음 복기까지",
-  "dial.at": "알림"
+  "dial.at": "알림",
+  "todo.k": "내 할 일",
+  "todo.note": "이 브라우저에만 저장 · 60시간 후 자동 삭제",
+  "todo.add": "할 일 추가",
+  "todo.ph": "할 일을 적으세요…",
+  "todo.btn": "추가",
+  "todo.empty": "포크 데모용 할 일을 추가해 보세요",
+  "todo.clear": "삭제"
 }

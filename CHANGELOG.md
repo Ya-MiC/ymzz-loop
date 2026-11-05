@@ -9,6 +9,17 @@
 
 
 
+## [1.16.0] — 2026-11-05
+
+### Added
+- **Today card (right):** keeps Notion preview rows (保持/學到/明日); adds compact holdings 彩蛋 + interactive to-do.
+- **Today-card to-do demo:** visitors can add/check/remove to-dos. Stored only in `localStorage` + `ymzz_todos` cookie (60h `max-age`); items and store auto-purge after 60 hours. Note:「只存瀏覽器 · 60 小時後自動銷毀」. No server / signup DB.
+- **Bottom spy 0–100:** section capsule shows live read % fill + number; dots stay clickable for jump.
+
+### Changed
+- **Top nav capsule:** never full-bleed. Screen 1 width = three hero cards (`--nav-hero-w`). Shrinks to `--content-w` only after the entire hero has scrolled past (not at 120px).
+- **Font license re-check** in CREDITS.md — Fraunces / Inter / JetBrains Mono still SIL OFL-1.1 only; no new fonts.
+
 ## [1.15.1] — 2026-11-05
 
 ### Fixed

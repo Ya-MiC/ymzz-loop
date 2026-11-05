@@ -21,6 +21,19 @@ All fonts, icons and libraries below allow commercial use under their licenses. 
 
 CJK / 韓文 / 阿拉伯文回退系統字（若已安裝則優先 Noto）；**未打包** Noto 字檔進倉庫，故無額外 OFL 嵌入義務。若你自行嵌入 Noto，請另附其 OFL。
 
+
+## 字體授權複核 · Font license re-check (v1.16.0)
+
+Audit date: 2026-11-05. Self-hosted files under `site/fonts/` only:
+
+| File | Family | License | Commercial OK |
+|------|--------|---------|---------------|
+| `fraunces.woff2` | Fraunces | SIL OFL-1.1 (`site/licenses/Fraunces-OFL.txt`) | ✅ |
+| `inter.woff2` | Inter | SIL OFL-1.1 (`site/licenses/Inter-OFL.txt`) | ✅ |
+| `jetbrains-mono.woff2` | JetBrains Mono | SIL OFL-1.1 (`site/licenses/JetBrains-Mono-OFL.txt`) | ✅ |
+
+No additional `@font-face` / webfont CDN / Google Fonts. CJK/Arabic fall back to **system** fonts (not bundled). Icons: Tabler (MIT). **Result: no new font risk; all bundled fonts remain SIL OFL-1.1 (commercial-safe).** MIT is not required for fonts — OFL is the correct open-font license here.
+
 ## 圖標 · Icons
 
 | 資產 | 授權 | 來源 | 商用 |

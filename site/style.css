@@ -2958,3 +2958,269 @@ html:not(.nav-scrolled) .nav,
 [data-theme=dark] .hold-card{background:var(--v-card)!important}
 [data-theme=dark] .holds .w{background:color-mix(in srgb, #F0EBE0 12%, transparent)}
 [data-theme=dark] #holdTicker{color:#F0EBE0}
+
+/* ===== v1.16.0 · hero-aligned nav · hero-bottom shrink · todo cookie · spy 0–100 ===== */
+
+:root{
+  --nav-hero-w: calc(100vw - (2 * var(--edge-x)));
+  --content-w: min(72rem, calc(100vw - (2 * var(--edge-x))));
+  --nav-content: var(--content-w);
+}
+
+/* Top capsule: NEVER full-bleed. Screen 1 = 3-card hero width; after hero past → content-w */
+.nav{
+  --nav-p: 0;
+  --nav-hero-w: var(--nav-hero-w, calc(100vw - (2 * var(--edge-x))));
+  position: sticky;
+  inset-block-start: var(--frame);
+  z-index: 50;
+  box-sizing: border-box;
+  /* interpolate hero-row width → single content column */
+  width: calc(var(--nav-hero-w) - (var(--nav-p) * (var(--nav-hero-w) - var(--content-w)))) !important;
+  max-inline-size: var(--nav-hero-w) !important;
+  margin-inline: auto !important;
+  margin-block-start: var(--frame) !important;
+  margin-block-end: var(--frame) !important;
+  border-radius: calc(1.1rem + (var(--nav-p) * 4rem)) !important;
+  padding-block: 0.55rem !important;
+  padding-inline: clamp(0.75rem, 1.5vw, 1.25rem) !important;
+  --nav-alpha: calc(0.78 - (var(--nav-p) * 0.28));
+  --nav-blur: calc(8px + (var(--nav-p) * 10px));
+  background: color-mix(in srgb, var(--panel) calc(var(--nav-alpha) * 100%), transparent) !important;
+  backdrop-filter: blur(var(--nav-blur)) saturate(1.35) !important;
+  -webkit-backdrop-filter: blur(var(--nav-blur)) saturate(1.35) !important;
+  box-shadow:
+    0 0.45rem 1.25rem -0.55rem rgba(42, 36, 29, calc(0.12 + var(--nav-p) * 0.12)),
+    inset 0 0 0 1px color-mix(in srgb, var(--edge) 55%, transparent) !important;
+  transition:
+    width .5s cubic-bezier(.22,1,.36,1),
+    border-radius .5s cubic-bezier(.22,1,.36,1),
+    background .35s cubic-bezier(.22,1,.36,1),
+    box-shadow .45s cubic-bezier(.22,1,.36,1);
+}
+/* kill prior full-bleed flush overrides */
+html:not(.nav-scrolled) .nav,
+.nav:not(.is-scrolled),
+html.nav-scrolled .nav,
+.nav.is-scrolled{
+  /* width driven solely by --nav-p formula above */
+  margin-inline: auto !important;
+}
+@media (prefers-reduced-motion: reduce){
+  .nav{
+    transition: none !important;
+    width: var(--content-w) !important;
+    --nav-p: 1;
+  }
+}
+@media (max-width: 48rem){
+  .nav{
+    width: calc(100% - (2 * var(--edge-x))) !important;
+    max-inline-size: none !important;
+    border-radius: 1.25rem !important;
+  }
+}
+
+/* Align hero cards to same outer measure as top capsule */
+.hero.hero-urgency{
+  width: var(--nav-hero-w) !important;
+  max-inline-size: var(--nav-hero-w) !important;
+  margin-inline: auto !important;
+  padding-inline: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* --- Todo demo (browser-only) --- */
+.todo-wrap{
+  display: grid;
+  gap: var(--s3);
+  position: relative;
+  z-index: 1;
+}
+.todo-hd{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+}
+.todo-note{
+  margin: 0;
+  color: var(--ink-3);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: var(--t-xs);
+}
+.todo-list{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+.todo-item{
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  padding: 0.4rem 0.5rem;
+  border-radius: var(--Ri, 0.75rem);
+  background: var(--v-inset, color-mix(in srgb, #fff 18%, var(--ground)));
+}
+.todo-item label{
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex: 1;
+  cursor: pointer;
+  font-size: var(--t-sm);
+  color: var(--ink);
+}
+.todo-item input[type=checkbox]{
+  inline-size: 1rem;
+  block-size: 1rem;
+  accent-color: var(--accent-warm, var(--cocoa));
+}
+.todo-item.is-done label span{
+  text-decoration: line-through;
+  color: var(--ink-3);
+}
+.todo-del{
+  border: 0;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.4rem;
+}
+.todo-del:hover, .todo-del:focus-visible{
+  color: var(--ink);
+  background: color-mix(in srgb, var(--ink) 8%, transparent);
+  outline: none;
+}
+.todo-empty{
+  margin: 0;
+  padding: 0.55rem 0.35rem;
+  color: var(--ink-3);
+  font-size: var(--t-sm);
+  background: transparent !important;
+}
+.todo-add{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s2);
+  align-items: center;
+}
+.todo-add input{
+  margin: 0;
+  min-block-size: 2.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 0 !important;
+  border-radius: 99rem;
+  background: var(--v-inset, color-mix(in srgb, #fff 22%, var(--ground)));
+  color: var(--ink);
+  font: 400 var(--t-sm)/1.3 var(--f-body);
+  box-shadow: none !important;
+}
+.todo-add input:focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--accent) 65%, transparent);
+  outline-offset: 2px;
+}
+.todo-add .btn.small{
+  min-block-size: 2.5rem;
+  padding-inline: 1rem;
+}
+[data-theme=dark] .todo-item,
+[data-theme=dark] .todo-add input{
+  background: var(--v-inset) !important;
+  color: var(--ink);
+}
+
+/* --- Bottom spy: 0–100 progress + clickable dots --- */
+.sec-spy{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+.spy-meter{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.25rem 0.55rem 0.15rem;
+  pointer-events: none;
+}
+.spy-track{
+  display: block;
+  inline-size: min(12rem, 42vw);
+  block-size: 0.28rem;
+  border-radius: 99rem;
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+  overflow: hidden;
+}
+.spy-track > i{
+  display: block;
+  block-size: 100%;
+  inline-size: 100%;
+  transform-origin: left center;
+  transform: scaleX(var(--read-p, 0));
+  background: linear-gradient(90deg, var(--accent), var(--accent-warm), var(--accent-soft));
+  border-radius: inherit;
+  transition: transform .05s linear;
+}
+[dir=rtl] .spy-track > i{ transform-origin: right center; }
+.spy-pct{
+  font: 500 var(--t-xs)/1 var(--f-mono), var(--f-body);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-2);
+  min-inline-size: 2.2ch;
+}
+.spy-pct::after{ content: "%"; font-size: 0.85em; opacity: 0.75; }
+@media (prefers-reduced-motion: reduce){
+  .spy-track > i{ transition: none !important; }
+  .nav{ transition: none !important; }
+}
+
+/* v1.16.0b · dayp lower: Notion preview + compact holdings egg + todo (simple) */
+.hold-mini{
+  display:grid;
+  gap:var(--s2);
+  padding:0.35rem 0 0;
+}
+.hold-mini > .label{margin:0}
+.holds-mini div{grid-template-columns:4.75rem 1fr 2.5rem;gap:var(--s2);font-size:var(--t-xs)}
+.holds-mini .w{block-size:0.4rem}
+.holds-mini b.js-hold-ticker{color:var(--ink);font-weight:600}
+[data-theme=dark] .holds-mini b.js-hold-ticker{color:#F0EBE0}
+.dayp .todo-wrap{margin-block-start:0.15rem}
+.dayp .prompts-wrap{margin:0}
+
+/* v1.16.0c · beat full-bleed flush rules — capsule = hero width, never 100vw */
+html .nav,
+html:not(.nav-scrolled) .nav,
+html.nav-scrolled .nav,
+.nav:not(.is-scrolled),
+.nav.is-scrolled{
+  width: calc(var(--nav-hero-w) - (var(--nav-p, 0) * (var(--nav-hero-w) - var(--content-w)))) !important;
+  max-inline-size: var(--nav-hero-w) !important;
+  margin-inline: auto !important;
+  border-radius: calc(1.1rem + (var(--nav-p, 0) * 4rem)) !important;
+  margin-block-start: var(--frame) !important;
+}
+html.nav-scrolled .nav,
+.nav.is-scrolled{
+  /* width still from --nav-p formula; max stays hero-w so shrink can animate */
+  max-inline-size: var(--nav-hero-w) !important;
+}
+@media (max-width: 48rem){
+  html .nav,
+  html:not(.nav-scrolled) .nav,
+  .nav:not(.is-scrolled),
+  html.nav-scrolled .nav,
+  .nav.is-scrolled{
+    width: calc(100% - (2 * var(--edge-x))) !important;
+    max-inline-size: none !important;
+    border-radius: 1.25rem !important;
+  }
+}
