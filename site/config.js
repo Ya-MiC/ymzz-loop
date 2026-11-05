@@ -12,6 +12,6 @@
 window.YMZZ_CONFIG = {
   SIGNUP_ENDPOINT: "",
   SIGNUP_MAILTO: "",
-  VERSION: "1.17.3",
+  VERSION: "1.18.0",
   FONTS_LOCKED: true
 };

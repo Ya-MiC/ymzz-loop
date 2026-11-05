@@ -1,4 +1,4 @@
-// v1.17.3 · top capsule hero→content elastic + bottom spy has no % / progress
+// v1.18.0 · top capsule hero→content elastic + bottom spy has no % / progress
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -11,15 +11,18 @@ const js = readFileSync(join(root, "site/app.js"), "utf8");
 const html = readFileSync(join(root, "site/index.html"), "utf8");
 const cfg = readFileSync(join(root, "site/config.js"), "utf8");
 
-describe("v1.17.3 nav elastic + glass spy", () => {
-  it("versions say 1.17.3", () => {
-    assert.match(cfg, /VERSION:\s*"1.17.3"/);
-    assert.match(html, /v1.17.3/);
+describe("v1.18.0 nav elastic + glass spy", () => {
+  it("versions say 1.18.0", () => {
+    assert.match(cfg, /VERSION:\s*"1.18.0"/);
+    assert.match(html, /v1.18.0/);
   });
 
-  it("editorial dial mid-size with breathing room", () => {
-    assert.match(css, /inline-size:min\(100%,\s*17rem\)/);
-    assert.match(css, /v1\.17\.3/);
+  it("clock tabular lining + mid dial (v1.18 skill polish)", () => {
+    assert.match(css, /16\.25rem/);
+    assert.match(css, /font-feature-settings:\s*"tnum" 1,\s*"lnum" 1/);
+    assert.match(css, /v1\.18\.0/);
+    assert.match(html, /clock-h/);
+    assert.match(js, /clock-h/);
   });
 
   it("nav width formula interpolates --nav-p between hero-w and content-w", () => {
@@ -56,6 +59,6 @@ describe("v1.17.3 nav elastic + glass spy", () => {
   it("content-driven equal card edges (stretch, no 100svh min)", () => {
     const block = css.slice(css.indexOf("v1.17.3"));
     assert.match(block, /min-block-size:0!important/);
-    assert.match(block, /0\.88fr.*1\.22fr.*1\.05fr/s);
+    assert.match(block, /0\.88fr[\s\S]*1\.22fr[\s\S]*1\.05fr/);
   });
 });

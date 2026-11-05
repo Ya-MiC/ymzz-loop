@@ -4018,3 +4018,207 @@ html[data-theme=dark] .hold-edit-tog{
   .hero.hero-urgency .daycard .dnum{ font-size:clamp(2.1rem, 3.4vw, 2.85rem) !important; }
   .hero.hero-urgency .week b{ inline-size:1.65rem !important; block-size:1.65rem !important; }
 }
+
+/* ===== v1.18.0 · Ludi skill polish · clock typography excellence (final) =====
+ * Applied: desktop-agent-ui (tabular live metrics, optical center, hierarchy),
+ * b-end tokens (optical ≠ math center), mobile (viewport-fit/safe-area/44px),
+ * CDS principles only (opsz, dark weight compensate, mono timestamps) — no brand assets.
+ */
+
+/* Self-hosted first for clock metrics — reduce OS fallback reflow */
+.clock,
+.clock-h,
+.clock-m,
+.clock-colon{
+  font-family: "Fraunces", var(--f-display) !important;
+  font-optical-sizing: auto;
+  font-variation-settings: "opsz" 48, "SOFT" 40, "WONK" 0;
+  font-variant-numeric: tabular-nums lining-nums !important;
+  font-feature-settings: "tnum" 1, "lnum" 1, "kern" 0 !important;
+  font-kerning: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+}
+
+.dial{
+  /* excellent mid — neither giant nor tiny */
+  inline-size: min(100%, 16.25rem) !important;
+  max-inline-size: 16.25rem !important;
+  margin-inline: auto !important;
+  margin-block: 0.2rem auto !important;
+}
+
+.dial-c{
+  /* optical center: glyphs sit slightly low in em-box → nudge up */
+  place-content: center;
+  align-content: center;
+  justify-items: center;
+  gap: 0.2rem !important;
+  transform: translateY(-0.06em);
+}
+
+.clock{
+  display: inline-flex !important;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0;
+  min-inline-size: 4.75ch; /* tabular lock — OS fallback can't collapse width */
+  font-weight: 500 !important;
+  font-size: clamp(1.7rem, 0.55rem + 2.35vw, 2.55rem) !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--ink) !important;
+  margin: 0;
+  padding: 0;
+  font-style: normal !important;
+}
+.clock-h,
+.clock-m{
+  display: inline-block;
+  min-inline-size: 2ch;
+  text-align: center;
+  font: inherit !important;
+}
+.clock-colon{
+  display: inline-block;
+  inline-size: 0.55ch;
+  text-align: center;
+  font: inherit !important;
+  opacity: 0.72;
+  transform: translateY(-0.02em);
+}
+
+.tzname{
+  display: block !important;
+  margin-inline: auto;
+  max-inline-size: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: "JetBrains Mono", var(--f-mono), ui-monospace, monospace !important;
+  font-size: clamp(0.65rem, 0.55rem + 0.35vw, 0.78rem) !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: none !important;
+  color: var(--ink-3) !important;
+  font-variant-numeric: tabular-nums lining-nums !important;
+  line-height: 1.2 !important;
+}
+
+/* Dial ring / ticks / hour labels — mono tabular hour marks */
+.dial svg{ overflow: visible; }
+.dial line{ stroke-width: 0.4; opacity: 0.3; }
+.dial line.h{ opacity: 0.58; stroke-width: 0.7; }
+.dial line.now{ stroke-width: 1.2; opacity: 1; }
+.dial line.rem{ stroke-width: 1.15; opacity: 0.95; }
+.dial .arc{
+  stroke-width: 5.5;
+  opacity: 0.92;
+}
+.dial text,
+.dial text.dial-h{
+  font-family: "JetBrains Mono", var(--f-mono), ui-monospace, monospace !important;
+  font-size: 5.25px !important;
+  font-weight: 500 !important;
+  fill: var(--ink-3) !important;
+  text-anchor: middle;
+  dominant-baseline: central;
+  font-variant-numeric: tabular-nums lining-nums;
+  letter-spacing: 0;
+}
+.dial text.rem{
+  font-size: 4.5px !important;
+  fill: var(--accent-warm, #7d6aa8) !important;
+  font-weight: 700 !important;
+}
+
+.dialfoot dd,
+.dialfoot dd bdi,
+#nextIn{
+  font-family: "JetBrains Mono", var(--f-mono), ui-monospace, monospace !important;
+  font-variant-numeric: tabular-nums lining-nums !important;
+  font-feature-settings: "tnum" 1, "lnum" 1 !important;
+  font-size: 1.05rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em;
+  color: var(--ink) !important;
+}
+.dialfoot dt{
+  letter-spacing: 0.08em;
+}
+
+/* Dark: retinal weight compensation (skills) — slightly less heavy figures */
+html[data-theme=dark] .clock,
+html[data-theme=dark] .clock-h,
+html[data-theme=dark] .clock-m,
+html[data-theme=dark] .clock-colon{
+  font-weight: 450 !important;
+  font-variation-settings: "opsz" 48, "SOFT" 35, "WONK" 0, "wght" 450;
+  color: #F0EBE0 !important;
+}
+html[data-theme=dark] .tzname{ color: #B3AC9F !important; }
+html[data-theme=dark] .dial text,
+html[data-theme=dark] .dial text.dial-h{ fill: #C9C2B6 !important; }
+html[data-theme=dark] .dial line{ opacity: 0.42; }
+html[data-theme=dark] .dial line.h{ opacity: 0.7; }
+
+@media (max-width: 68rem){
+  .dial{
+    inline-size: min(100%, 15.25rem) !important;
+    max-inline-size: 15.25rem !important;
+  }
+  .clock{ font-size: clamp(1.55rem, 4.5vw, 2.15rem) !important; }
+  .dial-c{ transform: translateY(-0.04em); }
+}
+@media (max-width: 28rem){
+  .dial{
+    inline-size: min(100%, 13.75rem) !important;
+    max-inline-size: 13.75rem !important;
+  }
+}
+
+/* Short viewports: keep excellence without overflow */
+@media screen and (min-width:1089px) and (max-height:860px){
+  .dial{
+    inline-size: min(100%, 14.75rem) !important;
+    max-inline-size: 14.75rem !important;
+  }
+  .clock{ font-size: clamp(1.55rem, 2vw, 2.15rem) !important; }
+}
+
+/* Mobile safe-area + touch targets (mobile skill redlines) */
+.sec-spy{
+  padding-block-end: max(0.55rem, env(safe-area-inset-bottom, 0px)) !important;
+}
+.spy-list a{
+  min-block-size: 2.5rem;
+  padding-block: 0.45rem !important;
+  padding-inline: 0.6rem !important;
+}
+@media (pointer: coarse){
+  .spy-list a,
+  .hold-edit-tog,
+  .fold-tog,
+  .todo-add .btn.small,
+  .chip{
+    min-block-size: 2.75rem !important; /* ≥44px */
+  }
+  .hold-edit-tog,
+  .fold-tog{ padding-inline: 0.85rem !important; }
+}
+
+/* Reduced motion: no dial chrome animation extras */
+@media (prefers-reduced-motion: reduce){
+  .dial-c{ transition: none !important; }
+  .clock, .clock-h, .clock-m, .clock-colon{ transition: none !important; }
+}
+
+/* Force mono face load for clock metrics (beat Inter-everywhere) */
+.mono,
+.mono.tzname,
+.tzname,
+.dialfoot dd,
+.dialfoot dd bdi,
+#nextIn{
+  font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+}

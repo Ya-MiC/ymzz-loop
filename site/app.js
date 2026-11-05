@@ -42,7 +42,11 @@
     for (let i = 0; i < 96; i++) {
       const m = i * 15, a = ang(m), hour = i % 4 === 0, [x1, y1] = pt(a, hour ? 70 : 76), [x2, y2] = pt(a, 84);
       h += `<line x1="${x1.toFixed(2)}" y1="${y1.toFixed(2)}" x2="${x2.toFixed(2)}" y2="${y2.toFixed(2)}" class="${hour ? "h" : ""}"/>`;
-      if (hour && (i / 4) % 3 === 0) { const [tx, ty] = pt(a, 94); h += `<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}">${String(i / 4).padStart(2, "0")}</text>`; }
+      if (hour && (i / 4) % 3 === 0) {
+        const [tx, ty] = pt(a, 93.5);
+        const lab = String(i / 4).padStart(2, "0");
+        h += `<text class="dial-h" x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" dy="0.05em">${lab}</text>`;
+      }
     }
     let span = (remLocal - localMin + 1440) % 1440 || 1440;
     const a0 = ang(localMin), a1 = ang(localMin + span), [sx, sy] = pt(a0, 58), [ex, ey] = pt(a1, 58);
@@ -51,10 +55,18 @@
     h += `<line class="now" x1="${(nx*.62).toFixed(2)}" y1="${(ny*.62).toFixed(2)}" x2="${nx.toFixed(2)}" y2="${ny.toFixed(2)}"/><line class="rem" x1="${(rx * .66).toFixed(2)}" y1="${(ry * .66).toFixed(2)}" x2="${rx.toFixed(2)}" y2="${ry.toFixed(2)}"/><text class="rem" x="${rt.toFixed(1)}" y="${rty.toFixed(1)}">●</text>`;
     svg.innerHTML = h;
     const clock = $("#clock"), tz = $("#tzName"), next = $("#nextIn");
-    if (clock) clock.textContent = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+    if (clock) {
+      const hh = String(now.getHours()).padStart(2, "0");
+      const mm = String(now.getMinutes()).padStart(2, "0");
+      const hEl = clock.querySelector(".clock-h");
+      const mEl = clock.querySelector(".clock-m");
+      if (hEl && mEl) { hEl.textContent = hh; mEl.textContent = mm; }
+      else clock.textContent = hh + ":" + mm;
+    }
     if (tz) tz.textContent = Intl.DateTimeFormat().resolvedOptions().timeZone || "Local";
     if (next) next.textContent = `${Math.floor(span / 60)}h ${String(span % 60).padStart(2, "0")}m`;
   }
+  try { document.fonts && document.fonts.load('500 1em "JetBrains Mono"'); document.fonts.load('500 2.5rem Fraunces'); } catch {}
   drawDial(); setInterval(drawDial, reduce ? 60000 : 30000);
 
 
