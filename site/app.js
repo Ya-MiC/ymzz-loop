@@ -103,7 +103,14 @@
     document.title = t("meta.title"); $('meta[name=description]').content = t("meta.desc");
     $("#lang").value = lang; if ($("#palette")) { const o=$("#palette").options; if(o[0]) o[0].text=t("ui.cloud"); if(o[1]) o[1].text=t("ui.earth"); } renderDates();
     if (window.__ymzzHoldSync) window.__ymzzHoldSync(lang);
-    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria))); renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme); if (window.__ymzzTodoRender) window.__ymzzTodoRender(); if (window.__ymzzHoldRender) window.__ymzzHoldRender();
+    renderMarquee(); renderTags(); $$("[data-i18n-aria]").forEach(el => el.setAttribute("aria-label", t(el.dataset.i18nAria)));
+    $$("[data-spy-link]").forEach(a => {
+      const sec = document.getElementById(a.getAttribute("data-spy-link"));
+      const key = sec && sec.getAttribute("data-spy-i18n");
+      const span = a.querySelector("span");
+      if (span && key) span.textContent = t(key);
+    });
+    renderStatic(); renderSteps(); renderPanel(); setTheme(document.documentElement.dataset.theme); if (window.__ymzzTodoRender) window.__ymzzTodoRender(); if (window.__ymzzHoldRender) window.__ymzzHoldRender();
   };
   $("#lang").onchange = e => { lang = e.target.value; store.set("lang", lang); apply(); };
 
@@ -637,7 +644,8 @@
     const n = secs.length;
     list.innerHTML = secs.map((s, i) => {
       const id = s.id || ("spy-" + i);
-      const label = s.getAttribute("data-spy") || id;
+      const key = s.getAttribute("data-spy-i18n");
+      const label = (key && t(key)) || s.getAttribute("data-spy") || id;
       return `<li><a href="#${id}" data-spy-link="${id}" data-spy-i="${i}" style="--spy-i:${i};--spy-fill:0"><i aria-hidden="true"></i><span>${label}</span></a></li>`;
     }).join("");
     const links = $$("[data-spy-link]", list);

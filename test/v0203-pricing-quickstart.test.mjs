@@ -18,13 +18,14 @@ function ldBlocks(html) {
 }
 
 describe("v0.20.3 pricing + quickstart + use cases", () => {
-  it("versions say 0.20.3", () => {
-    assert.equal(pkg.version, "0.20.3");
-    assert.match(read("site/config.js"), /VERSION:\s*"0\.20\.3"/);
-    assert.match(read("site/index.html"), /v0\.20\.3/);
-    assert.match(read("site/start.html"), /v0\.20\.3/);
-    assert.match(read("site/support.html"), /v0\.20\.3/);
-    assert.match(read("site/humans.txt"), /0\.20\.3/);
+  it("versions track package.json (0.20.x) and keep 0.20.3 changelog", () => {
+    assert.match(pkg.version, /^0\.20\.\d+$/);
+    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
+    const ver = pkg.version.replaceAll(".", "\\.");
+    assert.match(read("site/index.html"), new RegExp(`v${ver}`));
+    assert.match(read("site/start.html"), new RegExp(`v${ver}`));
+    assert.match(read("site/support.html"), new RegExp(`v${ver}`));
+    assert.match(read("site/humans.txt"), new RegExp(ver));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.3\]/);
   });
 
