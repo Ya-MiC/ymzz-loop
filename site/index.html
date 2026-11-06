@@ -29,7 +29,164 @@
 <link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"SoftwareApplication","name":"ymzz-loop","applicationCategory":"ProductivityApplication","operatingSystem":"GitHub Actions","license":"https://opensource.org/licenses/MIT","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"author":{"@type":"Person","name":"YanMing Cao"}}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "SoftwareApplication",
+      "@id": "https://ya-mic.github.io/ymzz-loop/#software",
+      "name": "ymzz-loop",
+      "alternateName": [
+        "ymzz loop",
+        "晏銘湛箴 loop"
+      ],
+      "url": "https://ya-mic.github.io/ymzz-loop/",
+      "description": "Zero-cost daily review and holdings journal: GitHub Actions creates today's blank Notion page, emails a reminder, and syncs yesterday to Google Sheets plus Markdown in your fork. One deploy opens a 600-day chapter that ends in a summary. MIT, any time zone, no AI quota.",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "GitHub Actions; Node.js >=20",
+      "softwareVersion": "0.20.2",
+      "license": "https://opensource.org/licenses/MIT",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "programmingLanguage": [
+        "JavaScript",
+        "Node.js"
+      ],
+      "runtimePlatform": "GitHub Actions",
+      "codeRepository": "https://github.com/Ya-MiC/ymzz-loop",
+      "sameAs": [
+        "https://github.com/Ya-MiC/ymzz-loop"
+      ],
+      "author": {
+        "@id": "https://github.com/Ya-MiC#person"
+      },
+      "creator": {
+        "@id": "https://github.com/Ya-MiC#person"
+      },
+      "brand": {
+        "@id": "https://ya-mic.github.io/ymzz-loop/#brand"
+      },
+      "downloadUrl": "https://github.com/Ya-MiC/ymzz-loop/tree/product",
+      "installUrl": "https://ya-mic.github.io/ymzz-loop/start.html",
+      "softwareHelp": "https://ya-mic.github.io/ymzz-loop/start.html"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://github.com/Ya-MiC#person",
+      "name": "YanMing Cao",
+      "alternateName": [
+        "曹晏銘",
+        "晏銘湛箴"
+      ],
+      "url": "https://github.com/Ya-MiC",
+      "sameAs": [
+        "https://github.com/Ya-MiC"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://ya-mic.github.io/ymzz-loop/#brand",
+      "name": "晏銘湛箴",
+      "alternateName": [
+        "YanMing Cao",
+        "ymzz"
+      ],
+      "url": "https://ya-mic.github.io/ymzz-loop/",
+      "sameAs": [
+        "https://github.com/Ya-MiC",
+        "https://github.com/Ya-MiC/ymzz-loop"
+      ],
+      "founder": {
+        "@id": "https://github.com/Ya-MiC#person"
+      }
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://ya-mic.github.io/ymzz-loop/#faq",
+      "url": "https://ya-mic.github.io/ymzz-loop/#faq",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Is it really free?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. It runs on GitHub's free Actions minutes and free Notion/Google APIs. There is no paid tier."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Where is my data?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "In your Notion, your Google account and your repository. This website stores language, theme and setup progress in your browser (localStorage). Demo to-dos on this page use a 60-hour first-party cookie, then disappear. No trackers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What if a run fails?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You get an email with a link to the failed run. The next hour retries automatically, because a day is only marked done after success."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Will it run forever?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "By design: first success starts a 600-day chapter (countdown 600→0). At 0 the daily loop pauses and the chapter is meant to close with a 600-day summary. Your Notion, Sheets and Markdown stay yours. Deploy a newer ymzz-loop version to open the next 600-day chapter."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I change the template?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes — every field is defined in one file, scripts/schema.mjs."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What do I need before setup?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A GitHub account (fork the product branch), a Notion workspace you can connect an integration to, a Google account for Sheets and the reminder email, and about 10 minutes (see the start guide). No paid plan required on any of them."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is this website the product?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. This page is the showcase. The automation lives on the product-only GitHub branch — fork or download that branch so you do not copy the website into your repo."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Why can I add to-dos on today’s page?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It is a browser-only demo of slots 03–08 (up to 6 items). They stay in this browser via localStorage and a 60-hour cookie, then disappear. Nothing is sent to a server."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How did you compare Day One, Zapier, and Obsidian?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Qualitatively, from public product docs as of November 2026 — not from speed tests or invented user counts. See Day One, Zapier, and Obsidian public pricing pages. We compare ownership, cost model, and whether yesterday is ingested automatically."
+          }
+        }
+      ]
+    }
+  ]
+}
+</script>
 </head>
 <body>
 <div class="pre" id="pre" aria-hidden="true"><div class="pre-in"><p class="pre-word">ymzz<b>·</b>loop</p><p class="pre-n label"><bdi dir="ltr" id="preN">00</bdi></p><span class="pre-bar"><i></i></span><p class="pre-t label">小軟體，大秩序</p></div></div>
@@ -319,7 +476,17 @@
   <div class="panel">
     <p class="label">04 — <span data-i18n="nav.faq">FAQ</span></p>
     <h2 class="reveal" data-i18n="faq.h">Questions</h2>
-    <div id="faqList"></div>
+        <div id="faqList">
+      <details><summary>Is it really free?</summary><p>Yes. It runs on GitHub's free Actions minutes and free Notion/Google APIs. There is no paid tier.</p></details>
+      <details><summary>Where is my data?</summary><p>In your Notion, your Google account and your repository. This website stores language, theme and setup progress in your browser (localStorage). Demo to-dos on this page use a 60-hour first-party cookie, then disappear. No trackers.</p></details>
+      <details><summary>What if a run fails?</summary><p>You get an email with a link to the failed run. The next hour retries automatically, because a day is only marked done after success.</p></details>
+      <details><summary>Will it run forever?</summary><p>By design: first success starts a 600-day chapter (countdown 600→0). At 0 the daily loop pauses and the chapter is meant to close with a 600-day summary. Your Notion, Sheets and Markdown stay yours. Deploy a newer ymzz-loop version to open the next 600-day chapter.</p></details>
+      <details><summary>Can I change the template?</summary><p>Yes — every field is defined in one file, scripts/schema.mjs.</p></details>
+      <details><summary>What do I need before setup?</summary><p>A GitHub account (fork the product branch), a Notion workspace you can connect an integration to, a Google account for Sheets and the reminder email, and about 10 minutes (see the start guide). No paid plan required on any of them.</p></details>
+      <details><summary>Is this website the product?</summary><p>No. This page is the showcase. The automation lives on the product-only GitHub branch — fork or download that branch so you do not copy the website into your repo.</p></details>
+      <details><summary>Why can I add to-dos on today’s page?</summary><p>It is a browser-only demo of slots 03–08 (up to 6 items). They stay in this browser via localStorage and a 60-hour cookie, then disappear. Nothing is sent to a server.</p></details>
+      <details><summary>How did you compare Day One, Zapier, and Obsidian?</summary><p>Qualitatively, from public product docs as of November 2026 — not from speed tests or invented user counts. See <a href="https://dayoneapp.com/pricing" rel="noopener noreferrer">Day One pricing</a>, <a href="https://zapier.com/pricing" rel="noopener noreferrer">Zapier pricing</a>, and <a href="https://obsidian.md/pricing" rel="noopener noreferrer">Obsidian pricing</a>. We compare ownership, cost model, and whether yesterday is ingested automatically.</p></details>
+    </div>
   </div>
 </section>
 <!-- SIGNUP -->
@@ -358,7 +525,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.1 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.2 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="start.html" data-i18n="nav.start">Start</a> · <a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
