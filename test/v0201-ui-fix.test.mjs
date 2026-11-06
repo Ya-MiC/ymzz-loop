@@ -12,10 +12,10 @@ const css = read("site/style.css");
 const html = read("site/index.html");
 
 describe("v0.20.1 showcase UI fixes", () => {
-  it("versions say 0.20.1", () => {
-    assert.equal(pkg.version, "0.20.1");
-    assert.match(read("site/config.js"), /VERSION:\s*"0.20.1"/);
-    assert.match(html, /v0\.20\.1/);
+  it("0.20.1 changelog remains; site version tracks package.json", () => {
+    assert.match(pkg.version, /^0\.20\.\d+$/);
+    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
+    assert.match(html, new RegExp(`v${pkg.version.replaceAll(".", "\\.")}`));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.1\]/);
   });
 

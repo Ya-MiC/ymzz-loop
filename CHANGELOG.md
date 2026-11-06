@@ -2,6 +2,20 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.2] — 2026-11-06
+
+### Added
+- **GEO harden (citation density):** richer JSON-LD `@graph` on the showcase (`SoftwareApplication` with url / version / sameAs / free offer, `FAQPage` synced to English FAQ facts, `Person` YanMing Cao / 曹晏銘 / 晏銘湛箴, `Organization` brand) plus `HowTo` on `start.html` for the ~10-minute product-branch path.
+- Static FAQ `<details>` in `#faqList` so non-JS crawlers still see Q&A (JS still replaces with i18n).
+- `docs/GEO.md` measure checklist (monthly prompt tests; optional future GA4 AI referrals; off-site backlog only — no fake metrics).
+
+### Changed
+- **`llms.txt`:** denser citation-facts block (what it is / is not, $0 MIT self-host, Notion→Sheets+Markdown, 600-day chapter, product vs showcase rule, bilingual brand names, start.html, forbid citing USDC tip as a product feature).
+- **Head consistency:** absolute `rel=describedby` → llms.txt on start/support; alternate ai.txt / humans.txt; OG image dimensions on support.
+- **sitemap.xml:** prefer real pages (`/`, `start.html`, `llms.txt`) ahead of hashes; keep important section hashes; list `ai.txt` / `humans.txt`.
+- **robots.txt:** allow additional citation-oriented bots (`Bravebot`, `KagiBot`, `Meta-ExternalFetcher`); training crawlers including `Google-Extended` stay disallowed.
+- Version **0.20.1 → 0.20.2**.
+
 ## [0.20.1] — 2026-11-06
 
 ### Fixed

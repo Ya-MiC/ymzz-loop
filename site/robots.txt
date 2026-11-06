@@ -58,6 +58,15 @@ Allow: /
 User-agent: Perplexity-User
 Allow: /
 
+User-agent: Bravebot
+Allow: /
+
+User-agent: KagiBot
+Allow: /
+
+User-agent: Meta-ExternalFetcher
+Allow: /
+
 # —— AI training / archive / bulk scrape — block ——
 User-agent: GPTBot
 Disallow: /
