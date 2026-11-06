@@ -1,0 +1,47 @@
+{
+  "name": "ymzz-loop",
+  "version": "0.20.4",
+  "description": "Zero-cost daily review & holdings journal: GitHub Actions creates your Notion page, emails a reminder, and syncs yesterday to Google Sheets + Markdown. One deploy = a 600-day chapter ending in a summary. Any time zone. 每日復盤，零成本自動化。",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "author": "YanMing Cao 曹晏銘 (晏銘湛箴) (https://github.com/Ya-MiC)",
+  "homepage": "https://ya-mic.github.io/ymzz-loop/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ya-MiC/ymzz-loop.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Ya-MiC/ymzz-loop/issues"
+  },
+  "keywords": [
+    "notion",
+    "github-actions",
+    "journal",
+    "daily-review",
+    "google-sheets",
+    "trading-journal",
+    "kpt",
+    "retrospective",
+    "productivity"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "setup": "node scripts/setup-notion.mjs",
+    "gate": "node scripts/gate.mjs",
+    "create-today": "node scripts/create-today.mjs",
+    "send-reminder": "node scripts/send-reminder.mjs",
+    "sync-yesterday": "node scripts/sync-yesterday.mjs",
+    "write-log": "node scripts/write-log.mjs",
+    "lint": "node scripts/lint.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@notionhq/client": "^2.2.15",
+    "notion-to-md": "^3.1.1",
+    "googleapis": "^144.0.0",
+    "nodemailer": "^6.9.15"
+  }
+}

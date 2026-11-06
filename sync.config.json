@@ -1,0 +1,14 @@
+{
+  "_comment": "setup.sh 會自動填入 / filled by setup.sh",
+  "timezone": "Etc/UTC",
+  "remind_time": "07:00",
+  "sinks": [
+    "markdown",
+    "sheets",
+    "feishu"
+  ],
+  "parent_page_id": "",
+  "review_db_id": "",
+  "holdings_db_id": "",
+  "notion_log_page_id": ""
+}
