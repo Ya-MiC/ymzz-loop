@@ -48,7 +48,7 @@ GitHub 무료 Actions 시간과 무료 Notion/Google API만 사용합니다. 실
 
 ## 설정 (모든 Fork 제품 사용자)
 
-아래 단계는 작성자만이 아니라 **Fork 이후의 당신**을 위한 것입니다. (한 번, 약 15분)
+아래 단계는 작성자만이 아니라 **Fork 이후의 당신**을 위한 것입니다. (한 번, 약 10분 — https://ya-mic.github.io/ymzz-loop/start.html)
 1. **Notion 통합** — https://www.notion.so/profile/integrations → New integration(Internal) `ymzz` → 토큰 복사 → 회고 페이지 `⋯` → Connections → `ymzz` 추가.
 2. **데이터베이스 생성**(Node.js 20+):
    ```bash
@@ -79,5 +79,5 @@ ymzz-loop는 **무료 MIT**입니다. 팁 환영.
 0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
 ```
 
-수신 전용: https://ya-mic.github.io/ymzz-loop/#donate
+수신 전용: https://ya-mic.github.io/ymzz-loop/support.html
 

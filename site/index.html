@@ -39,6 +39,7 @@
 
 <header class="nav">
   <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
+  <a class="nav-guide" href="start.html" data-i18n="nav.start">Start</a>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
       <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
@@ -71,7 +72,7 @@
     <p class="urgency reveal" data-i18n="hero.urgency"></p>
     <p class="pillars label reveal" data-i18n="hero.pillars"></p>
     <div class="cta reveal">
-      <a class="btn primary" href="#setup"><span data-i18n="hero.cta1">Start the 15-min setup</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
+      <a class="btn primary" href="start.html"><span data-i18n="hero.cta1">Start in about 10 minutes</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
       <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer" data-i18n-title="hero.cta2title" title="Product-only branch — no showcase site"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="hero.cta2">Get the automation</span></a>
     </div>
     <ul class="stats reveal">
@@ -341,34 +342,13 @@
   </div>
 </section>
 
-<!-- DONATE: receive-only USDC on Arbitrum One — no wallet connect / sign / approve -->
-<section id="donate" data-spy="Donate" class="sec">
-  <div class="panel donate">
-    <div class="prose">
-      <p class="label reveal">06 — <span data-i18n="donate.k">Donate</span></p>
-      <h2 class="reveal" data-i18n="donate.h">Donate / 贊助</h2>
-      <p class="reveal" data-i18n="donate.p">ymzz-loop stays free and MIT. If it helps you, you can send a tip.</p>
-      <p class="reveal warn" data-i18n="donate.warn">USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.</p>
-    </div>
-    <div class="donate-box reveal">
-      <figure class="donate-qr">
-        <img src="donate-usdc-arb.svg" width="264" height="264" alt="QR code for USDC receive address on Arbitrum One">
-        <figcaption class="label" data-i18n="donate.qr">Scan · Arbitrum One · USDC</figcaption>
-      </figure>
-      <div class="donate-addr">
-        <p class="label" data-i18n="donate.network">Network · Arbitrum One</p>
-        <p class="label" data-i18n="donate.token">Token · USDC only</p>
-        <div class="addrrow" dir="ltr">
-          <code id="donateAddr" class="addr">0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A</code>
-          <button type="button" class="btn ghost" id="donateCopy" data-addr="0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A">
-            <svg class="i" aria-hidden="true"><use href="icons.svg#i-copy"/></svg>
-            <span data-i18n="ui.copy">Copy</span>
-          </button>
-        </div>
-        <p class="sumsg" id="donateMsg" role="status" aria-live="polite"></p>
-        <p class="small"><a href="https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A" rel="noopener noreferrer" data-i18n="donate.explorer">View on ArbiScan</a> · <span data-i18n="donate.nosign">Receive-only address. This site never asks to connect a wallet, sign, or approve.</span></p>
-      </div>
-    </div>
+<!-- Optional support: crypto tip details live on support.html, not the landing surface -->
+<section id="donate" class="sec donate-gate">
+  <div class="panel donate-moved">
+    <p class="label reveal" data-i18n="donate.movedk">Optional</p>
+    <h2 class="reveal" data-i18n="donate.movedh">Tips are optional</h2>
+    <p class="reveal" data-i18n="donate.movedp">They are not part of setup or your first review. Details live on a separate page.</p>
+    <p class="reveal"><a class="btn ghost" href="support.html" data-i18n="donate.moved.link">Open optional support</a></p>
   </div>
 </section>
 </main>
@@ -378,8 +358,8 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.19.0 · MIT © 2026 YanMing Cao</bdi></p>
-  <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p class="label"><a href="start.html" data-i18n="nav.start">Start</a> · <a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
 </footer>

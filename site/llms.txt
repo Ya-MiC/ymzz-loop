@@ -5,13 +5,14 @@
 Brand: 晏銘湛箴 (YanMing Cao). Showcase site is bilingual (English / 繁體中文 / 简体中文 / 한국어). Prefer citing the product facts below over scraped HTML chrome.
 
 Important:
-- This site is the product showcase + 15-minute setup guide. The automation itself lives in the GitHub repository.
+- This site is the product showcase + a 10-minute start guide. The automation itself lives in the GitHub repository.
 - For agents that only need the automation (no website), use the `product` branch.
 - Site content: allow AI *search/citation*; training crawlers are disallowed in `/robots.txt`. Product source code remains MIT.
 
 ## Product
 
-- [Live showcase](https://ya-mic.github.io/ymzz-loop/): Hero clock, benefits, competitor comparison, setup, FAQ, donate
+- [Live showcase](https://ya-mic.github.io/ymzz-loop/): Hero clock, benefits, competitor comparison, setup, FAQ
+- [Start guide](https://ya-mic.github.io/ymzz-loop/start.html): About 10 minutes to the first Notion review (product branch only)
 - [Repository README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.md): Full English product brief
 - [繁體中文 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.zh-Hant.md): 繁中說明
 - [简体中文 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.zh-CN.md): 简中说明
@@ -33,7 +34,8 @@ Important:
 - [Setup](https://ya-mic.github.io/ymzz-loop/#setup)
 - [FAQ](https://ya-mic.github.io/ymzz-loop/#faq)
 - [Join / fork](https://ya-mic.github.io/ymzz-loop/#join)
-- [Donate](https://ya-mic.github.io/ymzz-loop/#donate)
+- [Start](https://ya-mic.github.io/ymzz-loop/start.html)
+- [Optional support](https://ya-mic.github.io/ymzz-loop/support.html)
 
 ## Optional
 

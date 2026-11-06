@@ -12,9 +12,10 @@ const html = readFileSync(join(root, "site/index.html"), "utf8");
 const cfg = readFileSync(join(root, "site/config.js"), "utf8");
 
 describe("v1.18.0 nav elastic + glass spy", () => {
-  it("versions say 1.18.0", () => {
-    assert.match(cfg, /VERSION:\s*"1.18.0"/);
-    assert.match(html, /v1.18.0/);
+  it("versions match package.json", () => {
+    const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+    assert.ok(cfg.includes(`VERSION: "${pkg.version}"`));
+    assert.ok(html.includes(`v${pkg.version}`));
   });
 
   it("clock tabular lining + mid dial (v1.18 skill polish)", () => {

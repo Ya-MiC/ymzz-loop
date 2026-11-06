@@ -7,7 +7,7 @@
 <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
 <img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
 <img src="https://img.shields.io/badge/node-%E2%89%A520-B9DDF1" alt="node 20+">
-<a href="https://ya-mic.github.io/ymzz-loop/"><img src="https://img.shields.io/badge/官网-guided%20setup-F4DDE7" alt="website"></a>
+<a href="https://ya-mic.github.io/ymzz-loop/start.html"><img src="https://img.shields.io/badge/官网-guided%20setup-F4DDE7" alt="website"></a>
 </p>
 
 <h1 align="center">ymzz-loop · 每日复盘</h1>
@@ -16,7 +16,7 @@
 <strong>一次部署＝一段 600 天篇章</strong>（倒数 600→0），然后产出 <strong>600 天总结</strong>、每日循环暂停——部署新版开启下一章。<br>
 $0 · 任意时区 · 无服务器 · 无 AI 配额 · MIT</p>
 
-<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官网与交互教学 Website & guided setup</a> · <a href="docs/architecture.md">🧩 架构 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/start.html">🌐 约 10 分钟开始页 Start guide</a> · <a href="https://ya-mic.github.io/ymzz-loop/">展示站 Showcase</a> · <a href="docs/architecture.md">🧩 架构 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
 ---
 
@@ -128,5 +128,5 @@ ymzz-loop **保持免费、MIT**。欢迎打赏。
 0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
 ```
 
-仅收款：https://ya-mic.github.io/ymzz-loop/#donate
+仅收款：https://ya-mic.github.io/ymzz-loop/support.html
 

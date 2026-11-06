@@ -1,0 +1,157 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT · © 2026 YanMing Cao (晏銘湛箴) -->
+<html lang="en" dir="ltr" data-theme="light" data-palette="cloud">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'none'">
+<title>ymzz-loop — Start: first Notion review in about 10 minutes</title>
+<meta name="description" content="Fork the product branch (not the showcase), add secrets, turn Actions on, and open today’s Notion page from the reminder email.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://ya-mic.github.io/ymzz-loop/start.html">
+<meta property="og:url" content="https://ya-mic.github.io/ymzz-loop/start.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ymzz-loop — Start: first Notion review in about 10 minutes">
+<meta property="og:description" content="Fork the product branch (not the showcase), add secrets, turn Actions on, and open today’s Notion page from the reminder email.">
+<meta property="og:image" content="https://ya-mic.github.io/ymzz-loop/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F8F6EF">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/jetbrains-mono.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+<link rel="describedby" href="llms.txt">
+</head>
+<body class="start-page" data-page="start">
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
+  <a class="nav-guide is-current" href="start.html" data-i18n="nav.start">Start</a>
+  <div class="tools">
+    <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
+      <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
+    <label class="chip sel"><span class="vh" data-i18n="ui.palette">Palette</span>
+      <select id="palette" aria-label="Palette"><option value="cloud">Cloud</option><option value="earth">Tea</option></select></label>
+    <button id="theme" class="chip" type="button"><svg class="i" aria-hidden="true"><use id="themeIc" href="icons.svg#i-moon"/></svg><span id="themeTx">Dark</span></button>
+  </div>
+</header>
+
+<main id="main">
+<section class="sec start-hero-sec">
+  <div class="panel start-hero">
+    <p class="label eyebrow" data-i18n="start.eyebrow">Guided start · 晏銘湛箴</p>
+    <h1><span class="l1" data-i18n="start.h1a">Your first review,</span> <span class="l2" data-i18n="start.h1b">in about 10 minutes.</span></h1>
+    <p class="op" data-i18n="start.lede">Fork the automation — the product branch only — add your secrets, turn GitHub Actions on, and open today’s blank Notion page from the reminder email.</p>
+    <p class="start-warn" data-i18n="start.warn">Do not fork or copy the showcase website (the <code>main</code> branch / <code>site/</code> folder). The <code>product</code> branch is the template.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="start.s1.cta">Open the product branch</span></a>
+      <a class="btn ghost" href="index.html"><span data-i18n="start.back">Back to the showcase</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="need">
+  <div class="panel">
+    <p class="label" data-i18n="start.need.k">Before you begin</p>
+    <h2 data-i18n="start.need.h">What you need</h2>
+    <ol class="start-needs">
+      <li data-i18n="start.need.1">A GitHub account (your fork runs the loop)</li>
+      <li data-i18n="start.need.2">A Notion workspace you can connect an integration to</li>
+      <li data-i18n="start.need.3">A Google account for Sheets, plus Gmail if you want the reminder email</li>
+      <li data-i18n="start.need.4">About 10 minutes for the first setup</li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="steps">
+  <ol class="start-track">
+    <li class="panel start-step">
+      <p class="label" data-i18n="start.s1.k">01 · about 2 min</p>
+      <h2 data-i18n="start.s1.t">Take the product branch, not the website</h2>
+      <p data-i18n="start.s1.p">Open the product branch, download or clone it, and push that tree to your own empty repository as main. GitHub’s “Use this template” or a fork of main copies the showcase site — skip those if you only want the automation.</p>
+      <pre class="start-pre" dir="ltr"><button class="copy" type="button"><svg class="i" aria-hidden="true"><use href="icons.svg#i-copy"/></svg><span data-i18n="ui.copy">Copy</span></button><code>git clone --depth 1 --branch product --single-branch https://github.com/Ya-MiC/ymzz-loop.git
+cd ymzz-loop
+# Push this tree to YOUR empty repository as main</code></pre>
+      <p><a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer"><span data-i18n="start.s1.cta">Open the product branch</span></a></p>
+    </li>
+    <li class="panel start-step">
+      <p class="label" data-i18n="start.s2.k">02 · about 3 min</p>
+      <h2 data-i18n="start.s2.t">Connect Notion and run setup once</h2>
+      <p data-i18n="start.s2.p">Create an internal Notion integration named ymzz, share your review page with it, then run setup to create the databases and commit <code>sync.config.json</code>.</p>
+      <pre class="start-pre" dir="ltr"><button class="copy" type="button"><svg class="i" aria-hidden="true"><use href="icons.svg#i-copy"/></svg><span data-i18n="ui.copy">Copy</span></button><code>NOTION_TOKEN=&lt;token&gt; ./setup.sh "https://www.notion.so/&lt;your-page&gt;"
+git add sync.config.json &amp;&amp; git commit -m "setup ids" &amp;&amp; git push</code></pre>
+    </li>
+    <li class="panel start-step">
+      <p class="label" data-i18n="start.s3.k">03 · about 3 min</p>
+      <h2 data-i18n="start.s3.t">Sheet + mailbox</h2>
+      <p data-i18n="start.s3.p">Create a Google Sheet, share it with your service-account email (Editor), and create a Gmail app password if you want email reminders.</p>
+    </li>
+    <li class="panel start-step" id="secrets">
+      <p class="label" data-i18n="start.s4.k">04 · about 1 min</p>
+      <h2 data-i18n="start.s4.t">Secrets, then turn Actions on</h2>
+      <p data-i18n="start.s4.p">Add the repository secrets below. Then open Actions and allow workflows on your fork. Without this step the schedule never runs.</p>
+      <p class="label" data-i18n="start.s4.req">Required secrets</p>
+      <table class="start-secrets">
+        <caption class="vh" data-i18n="start.s4.req">Required secrets</caption>
+        <thead><tr><th scope="col">Secret</th><th scope="col"> </th></tr></thead>
+        <tbody>
+          <tr><th scope="row"><code>NOTION_TOKEN</code></th><td data-i18n="start.secrets.notion">Notion integration token</td></tr>
+          <tr><th scope="row"><code>GOOGLE_SERVICE_ACCOUNT_JSON</code></th><td data-i18n="start.secrets.google">The whole service-account JSON file</td></tr>
+          <tr><th scope="row"><code>SHEET_ID</code></th><td data-i18n="start.secrets.sheet">Spreadsheet ID from /d/SHEET_ID/edit</td></tr>
+          <tr><th scope="row"><code>SMTP_USER</code></th><td data-i18n="start.secrets.smtpuser">Your Gmail address</td></tr>
+          <tr><th scope="row"><code>SMTP_PASS</code></th><td data-i18n="start.secrets.smtppass">16-character app password</td></tr>
+          <tr><th scope="row"><code>MAIL_TO</code></th><td data-i18n="start.secrets.mailto">Where reminders should arrive</td></tr>
+        </tbody>
+      </table>
+      <p class="small" data-i18n="start.secrets.smtpopt">Optional SMTP_HOST / SMTP_PORT — defaults: smtp.gmail.com / 465</p>
+      <p class="small" data-i18n="start.secrets.tz">Optional Variables (not secrets): YMZZ_TZ and YMZZ_REMIND_TIME</p>
+    </li>
+    <li class="panel start-step">
+      <p class="label" data-i18n="start.s5.k">05 · about 1 min</p>
+      <h2 data-i18n="start.s5.t">Run once, open the email, write</h2>
+      <p data-i18n="start.s5.p">Actions → daily-review → Run workflow. You should get today’s Notion link by email (if SMTP secrets are set), a new page in Notion, and two tabs in the Sheet. That page is your first review.</p>
+    </li>
+  </ol>
+</section>
+
+<section class="sec start-split" id="data">
+  <div class="panel">
+    <p class="label" data-i18n="start.retain.k">Where data stays</p>
+    <h2 data-i18n="start.retain.h">Your reviews stay in accounts you control</h2>
+    <p data-i18n="start.retain.p">Each successful run writes in your Notion, appends yesterday to your Google Sheet, and commits Markdown under notion/YYYY/ in your fork. This showcase site does not store your reviews. Demo to-dos on the homepage live only in this browser for 60 hours.</p>
+  </div>
+  <div class="panel">
+    <p class="label" data-i18n="start.email.k">Email reminder</p>
+    <h2 data-i18n="start.email.h">Mail is sent from your SMTP, not a hosted inbox</h2>
+    <p data-i18n="start.email.p">When SMTP_USER, SMTP_PASS and MAIL_TO are set, the workflow emails you today’s Notion link after the page is created. If those secrets are missing, the reminder step is skipped and the rest of the loop can still run. Failure and end-of-chapter notices use the same hook.</p>
+  </div>
+</section>
+
+<section class="sec" id="more">
+  <div class="panel">
+    <p class="label" data-i18n="start.more">More detail</p>
+    <p class="cta start-more-cta">
+      <a class="btn ghost" href="index.html#setup" data-i18n="start.more.setup">Interactive setup on the homepage</a>
+      <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="start.more.arch">Architecture</a>
+      <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/product-only.md" rel="noopener noreferrer" data-i18n="start.more.product">Product-only notes</a>
+    </p>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <p class="huge" aria-hidden="true">ymzz<span>·</span>loop</p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p class="label"><a href="index.html" data-i18n="start.back">Back to the showcase</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer" data-i18n="hero.cta2">Get the automation</a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
+  <p class="small" data-i18n="foot.priv"></p>
+  <p class="small" data-i18n="foot.tm"></p>
+</footer>
+<script src="config.js"></script>
+<script src="chrome.js" defer></script>
+</body>
+</html>

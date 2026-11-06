@@ -2,7 +2,21 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.0] — 2026-11-06
 
+Intentional early-version reset for the Alipay PAYATHON / vibe-coding track.
+Showcase iterations lived at 1.0–1.19; **0.20.0** marks the product as early hackathon software.
+The 1.x history below is preserved and is not rewritten.
+
+### Added
+- **Start guide** (`site/start.html`): about 10 minutes from product-branch copy to the first Notion review — fork/clone `product` only (never the showcase `site/`), Notion setup, Sheet + mailbox, secrets checklist, turn Actions on, first workflow + reminder email.
+- Shared chrome (`site/chrome.js`) for start/support pages (same language / palette / theme keys as the homepage).
+- `PRODUCT_NOTES.md`: what the daily-review email and retention hooks already do, what the operator must configure, and acceptance criteria that are not invented features.
+
+### Changed
+- Package and site version **1.19.0 → 0.20.0** (`package.json`, `site/config.js`, footers). Tests now assert the version from `package.json` instead of a hardcoded 1.18.0 string.
+- Hero primary CTA and a top-nav **Start** link point at `/start.html`. Homepage interactive setup remains as extra detail (~10 minute framing).
+- **USDC tip UI moved off the landing surface** to `site/support.html`. The homepage `#donate` section is a short optional note with no address, QR, or token details (old `#donate` hash still resolves). README donate links now point at `support.html`. This is a product-surface choice, not a legal conclusion.
 
 ## [1.19.0] — 2026-11-06
 

@@ -16,7 +16,7 @@
 <strong>一次部署＝一段 600 天篇章</strong>（倒數 600→0），然後產出 <strong>600 天總結</strong>、每日迴圈暫停——部署新版開啟下一章。<br>
 $0 · 任意時區 · 無伺服器 · 無 AI 配額 · MIT</p>
 
-<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">🌐 官網與互動教學 Website & guided setup</a> · <a href="CREDITS.md">致謝 Credits</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
+<p align="center"><a href="https://ya-mic.github.io/ymzz-loop/start.html">🌐 約 10 分鐘開始頁 Start guide</a> · <a href="https://ya-mic.github.io/ymzz-loop/">展示站 Showcase</a> · <a href="CREDITS.md">致謝 Credits</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
 ---
 
@@ -96,7 +96,7 @@ Cron is UTC-only, so it wakes hourly; a dependency-free gate exits in seconds un
 7. **第一次手動執行 First run**：Actions → daily-review → Run workflow。收到信、Notion 出現今天的頁、Sheet 出現兩個分頁就成功。
 
 
-## Donate / 贊助
+## 可選支持 / Optional support
 
 ymzz-loop **維持免費、MIT 開源**。若對你有幫助，歡迎打賞。
 
@@ -106,7 +106,7 @@ ymzz-loop **維持免費、MIT 開源**。若對你有幫助，歡迎打賞。
 0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
 ```
 
-僅收款地址（官網不會要求連接錢包）。QR 與複製按鈕：https://ya-mic.github.io/ymzz-loop/#donate · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
+僅收款地址（官網不會要求連接錢包）。可選（不是設定的一部分）：https://ya-mic.github.io/ymzz-loop/support.html · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
 
 ## 擴充 Extend
 新增同步目的地＝新增一個 sink 檔（`scripts/sinks/<name>.mjs`，實作 `{ name, enabled(env), write(ctx) }`）。詳見 [docs/architecture.md](docs/architecture.md)。
