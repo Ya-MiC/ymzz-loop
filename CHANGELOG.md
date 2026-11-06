@@ -2,6 +2,19 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.3] — 2026-11-06
+
+### Added
+- **Pricing surface (`#pricing`)** on the showcase: honest **$0 self-host forever** (free GitHub Actions minutes + free Notion/Google APIs). No Free→Max SaaS ladder. Qualitative contrast vs typical paid bot/journal tiers — no invented competitor dollar amounts. Optional tips on `support.html` called out as **not a plan**.
+- **4-step Quick start (`#quickstart`)** strip on the homepage linking into `start.html`; start hero repeats the same 4 steps and keeps the full secrets checklist visible.
+- **Use cases (`#usecases`)** strip: daily review discipline, holdings journal, $0-budget students/founders, bilingual Notion→Sheets+Markdown archive — grounded in the real product, no fake testimonials or user counts.
+- Nav + footer links for Quick start / Pricing / Use cases; sitemap + `llms.txt` section pointers; JSON-LD `Offer` densified with `UnitPriceSpecification` ($0) and `#pricing` URL.
+- `test/v0203-pricing-quickstart.test.mjs`.
+
+### Changed
+- Version **0.20.2 → 0.20.3**.
+- `v0202-geo` version assertion now tracks `package.json` (GEO structure checks unchanged).
+
 ## [0.20.2] — 2026-11-06
 
 ### Added
