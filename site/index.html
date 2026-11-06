@@ -39,10 +39,6 @@
 
 <header class="nav">
   <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
-  <button id="navToggle" class="chip nav-tog" type="button" aria-expanded="false" aria-controls="navLinks" data-i18n-aria="ui.menu"><span class="burger" aria-hidden="true"><i></i><i></i><i></i></span><span class="vh" data-i18n="ui.menu">Menu</span></button>
-  <nav class="links" id="navLinks" aria-label="Main">
-    <a href="#intro" data-i18n="nav.intro">Benefits</a><a href="#diff" data-i18n="diff.k">vs. others</a><a href="#setup" data-i18n="nav.setup">Setup</a><a href="#faq" data-i18n="nav.faq">FAQ</a><a href="#join" data-i18n="nav.join">Join</a><a href="#donate" data-i18n="nav.donate">Donate</a>
-  </nav>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
       <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
@@ -54,7 +50,7 @@
 
 <main id="main">
 <!-- HERO: today-page panel + headline panel -->
-<section class="hero hero-urgency" id="top" data-spy="Hero">
+<section class="hero hero-urgency" id="top">
   <!-- Screen 1: time urgency — live 24h dial + copy + today page (v1.2 dial restored) -->
   <div class="panel dialp reveal">
     <p class="label mono" data-i18n="dial.local">Your local time</p>
@@ -70,6 +66,7 @@
   <div class="panel headp">
     <p class="label eyebrow reveal" data-i18n="hero.eyebrow">Open source · by 晏銘湛箴</p>
     <h1><span class="l1" data-i18n="hero.h1a">Your daily review,</span> <span class="l2" data-i18n="hero.h1b">already waiting.</span></h1>
+    <p class="op reveal" data-i18n="hero.op">Every morning, a blank Notion review is waiting. Yesterday is already archived to Google Sheets and Markdown in your GitHub.</p>
     <p class="promise reveal" data-i18n="hero.promise"></p>
     <p class="urgency reveal" data-i18n="hero.urgency"></p>
     <p class="pillars label reveal" data-i18n="hero.pillars"></p>
@@ -126,6 +123,60 @@
   </div>
 </section>
 
+
+
+<!-- DATA FLOW: compact prerequisites / destinations (real path only, no fake metrics) -->
+<section id="flow" class="sec flow-sec">
+  <div class="panel flowp">
+    <div class="prose">
+      <p class="label reveal"><span data-i18n="flow.k">How it flows</span></p>
+      <h2 class="reveal" data-i18n="flow.h">Write in Notion. Keep the day in Sheets + GitHub.</h2>
+      <p class="reveal lede" data-i18n="flow.p"></p>
+    </div>
+    <ol class="flow-steps" data-i18n-aria="flow.aria" aria-label="Data flow">
+      <li class="flow-step">
+        <span class="flow-n" aria-hidden="true">01</span>
+        <strong class="flow-k" data-i18n="flow.1k">Notion</strong>
+        <span data-i18n="flow.1p">Today’s blank review is created. You write there.</span>
+      </li>
+      <li class="flow-step">
+        <span class="flow-n" aria-hidden="true">02</span>
+        <strong class="flow-k" data-i18n="flow.2k">Sheets</strong>
+        <span data-i18n="flow.2p">Yesterday lands as rows you can chart.</span>
+      </li>
+      <li class="flow-step">
+        <span class="flow-n" aria-hidden="true">03</span>
+        <strong class="flow-k" data-i18n="flow.3k">Git Markdown</strong>
+        <span data-i18n="flow.3p">A dated file in your own fork — permanent and diffable.</span>
+      </li>
+      <li class="flow-step">
+        <span class="flow-n" aria-hidden="true">04</span>
+        <strong class="flow-k" data-i18n="flow.4k">Feishu</strong>
+        <span data-i18n="flow.4p">Optional Bitable / Docx, off until you set secrets.</span>
+      </li>
+    </ol>
+    <aside class="flow-preview">
+      <p class="label" data-i18n="flow.prevk">What a successful run leaves behind</p>
+      <div class="flow-prev-grid">
+        <div class="flow-sample">
+          <p class="label" data-i18n="flow.git">Markdown in your fork</p>
+          <code class="fname" dir="ltr">1105_0700_utc.md</code>
+          <p class="small" data-i18n="mock.keepv">Shipped the setup guide</p>
+        </div>
+        <div class="flow-sample">
+          <p class="label" data-i18n="flow.sheet">Sheets · yesterday</p>
+          <table class="flow-sheet" id="sheetRows">
+            <caption class="vh" data-i18n="flow.sheet">Sheets · yesterday</caption>
+            <tbody>
+              <tr><th scope="row" class="rd" data-off="-1">11-05</th><td data-i18n="mock.keepv">Shipped the setup guide</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <p class="small flow-prevnote" data-i18n="flow.prevnote">Sample of the real archive shape — not live account data.</p>
+    </aside>
+  </div>
+</section>
 
 <!-- BENEFITS: outcome, not feature spec -->
 <section id="intro" data-spy="Benefits" class="sec">
@@ -262,7 +313,7 @@
   </div>
 </section>
 
-<!-- FAQ (minimal) -->
+<!-- FAQ -->
 <section id="faq" data-spy="FAQ" class="sec">
   <div class="panel">
     <p class="label">04 — <span data-i18n="nav.faq">FAQ</span></p>
@@ -327,7 +378,7 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.18.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v1.19.0 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>

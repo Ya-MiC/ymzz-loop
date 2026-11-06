@@ -4,6 +4,15 @@
 
 
 
+## [1.19.0] — 2026-11-06
+
+### Changed
+- **Showcase hero rebalance:** value proposition takes the wider center column; the live clock is a supporting widget (no empty full-height stretch). Operational one-liner sits next to the headline (Notion review today → yesterday to Sheets + GitHub); 600-day chapters stay secondary.
+- **Contrast and surfaces:** stronger text in light and dark; quieter grain and competing treatments; value-contrast scale still rules — no resting card borders (hover/focus only). Fonts unchanged: Fraunces display, Inter UI, JetBrains Mono.
+- **Density and nav:** top bar keeps brand + language/palette/theme only; section jumping lives in the frosted-glass dock (six sections, clickable, no numeric %). Footer padding clears the dock so footnotes stay readable. Cards still fold/expand; later sections stay aligned to the contracted nav width.
+- **Trust layer:** compact data-flow (Notion → Sheets + Git Markdown + optional Feishu) with a sample of the real archive shape (not live account data). FAQ expanded (free, data, failures, chapter, template, prerequisites, product-vs-showcase, demo to-dos, comparison sources). Privacy copy now mentions the 60-hour first-party to-do cookie. Comparison note cites Day One / Zapier / Obsidian public pricing pages. No invented stars or user counts.
+- **Continuous-curvature corners:** `corner-shape: squircle` inside `@supports`, with a slightly larger `border-radius` so squircles do not read smaller than round. Fallback remains plain `border-radius` on cards, panels, pills, buttons, and docks.
+
 ## [1.18.1] — 2026-11-06
 
 ### Added

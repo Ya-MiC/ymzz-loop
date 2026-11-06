@@ -4222,3 +4222,316 @@ html[data-theme=dark] .dial line.h{ opacity: 0.7; }
 #nextIn{
   font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
 }
+
+/* ===== v1.19.0 · showcase polish: hero rebalance · contrast · nav dedupe · trust · squircle =====
+ * Learn hierarchy/rhythm/trust from MausBot — do not copy colors or invent social proof.
+ */
+
+/* --- 1) Hero: value first, clock supporting --- */
+.hero.hero-urgency > .headp .op{
+  margin: 0 0 var(--s3);
+  max-inline-size: 44ch;
+  font: 500 clamp(1.08rem, 1.15rem + 0.45vw, 1.32rem) / 1.5 var(--f-body);
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+.hero.hero-urgency > .headp .promise{
+  margin: 0 0 var(--s3);
+  max-inline-size: 46ch;
+  font: 400 var(--t-base) / 1.55 var(--f-body);
+  color: var(--ink-2);
+  letter-spacing: 0;
+}
+.hero.hero-urgency > .headp .urgency{
+  margin: 0 0 var(--s2);
+  max-inline-size: 46ch;
+  padding-inline-start: 0.85rem;
+  border-inline-start: 0;
+  box-shadow: inset 0.15rem 0 0 0 color-mix(in srgb, var(--ink) 18%, transparent);
+  font: 400 var(--t-sm) / 1.55 var(--f-body);
+  color: var(--ink-2);
+}
+.hero.hero-urgency > .headp .pillars{
+  color: var(--ink-3);
+}
+
+@media screen and (min-width: 1089px){
+  .hero.hero-urgency{
+    grid-template-columns: minmax(13.5rem, 0.58fr) minmax(24rem, 1.52fr) minmax(20rem, 1.08fr) !important;
+    align-items: stretch !important;
+    min-block-size: 0 !important;
+  }
+  .hero.hero-urgency > .dialp{
+    align-self: start !important;
+    min-block-size: 0 !important;
+    height: auto !important;
+    justify-content: flex-start !important;
+    gap: var(--s3) !important;
+  }
+  .hero.hero-urgency > .headp{
+    justify-content: center !important;
+    min-block-size: 100% !important;
+    align-self: stretch !important;
+  }
+  .hero.hero-urgency > .headp h1{
+    max-inline-size: 16ch;
+    font-size: clamp(2.15rem, 1.55rem + 1.7vw, 3.4rem) !important;
+    line-height: 1.08 !important;
+    margin-block: 0.1rem 0.7rem !important;
+  }
+  .hero.hero-urgency > .dayp{
+    align-self: stretch !important;
+    min-block-size: 100% !important;
+  }
+  .hero.hero-urgency .stats,
+  .hero.hero-urgency .facts{
+    margin-block-start: auto;
+  }
+}
+
+/* Supporting dial: presence without swallowing the column */
+.dial{
+  inline-size: min(100%, 13.5rem) !important;
+  max-inline-size: 13.5rem !important;
+  margin-block: 0.15rem 0.35rem !important;
+}
+.clock{
+  font-size: clamp(1.55rem, 0.7rem + 1.8vw, 2.15rem) !important;
+}
+@media (max-width: 68rem){
+  .dial{
+    inline-size: min(100%, 13.25rem) !important;
+    max-inline-size: 13.25rem !important;
+  }
+}
+@media screen and (min-width: 1089px) and (max-height: 860px){
+  .dial{
+    inline-size: min(100%, 12.5rem) !important;
+    max-inline-size: 12.5rem !important;
+  }
+}
+
+/* --- 2) Contrast + quieter competing surfaces --- */
+.grain{ opacity: 0.028; }
+[data-theme=dark] .grain{ opacity: 0.02; }
+
+html[data-theme=dark],
+[data-theme=dark]{
+  --ink: #F0EBE0;
+  --ink-2: #D8D2C6;
+  --ink-3: #C9C2B6;
+}
+html[data-theme=dark] .op,
+html[data-theme=dark] h1,
+html[data-theme=dark] h2,
+html[data-theme=dark] h3{
+  color: #F0EBE0;
+}
+html[data-theme=dark] .promise,
+html[data-theme=dark] .urgency,
+html[data-theme=dark] .lede,
+html[data-theme=dark] .fact dd,
+html[data-theme=dark] details p{
+  color: #D8D2C6;
+}
+html[data-theme=dark] .chip,
+html[data-theme=dark] .btn.ghost,
+html[data-theme=dark] .nav .tools .chip,
+html[data-theme=dark] select{
+  color: #F0EBE0;
+}
+html[data-theme=dark] .chip select option{ color: var(--ink); background: var(--panel); }
+
+/* FAQ separators = value hairline, not a resting card border */
+#faqList details{
+  border-block-end: 0 !important;
+  box-shadow: inset 0 -1px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
+}
+html[data-theme=dark] #faqList details{
+  box-shadow: inset 0 -1px 0 0 color-mix(in srgb, #F0EBE0 28%, transparent);
+}
+#faqList details p a,
+.vs-note a{
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+/* Don't hide essential section headings while they enter the viewport */
+.js .sec > .panel > .label,
+.js .sec > .panel > h2,
+.js .sec .prose > .label,
+.js .sec .prose > h2{
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* --- 3) Nav dedupe + dock clearance --- */
+.nav .tools{ margin-inline-start: auto; }
+.nav-tog,
+.nav .links{ display: none !important; }
+
+.foot{
+  padding-block-end: calc(6.25rem + env(safe-area-inset-bottom, 0px)) !important;
+}
+#donate.sec,
+#join.sec{
+  scroll-margin-block-end: 5.5rem;
+}
+.sec-spy{
+  pointer-events: none;
+}
+.sec-spy .spy-list{
+  pointer-events: auto;
+}
+
+/* --- 4) Trust: compact data-flow + sample archive --- */
+.flow-sec{ margin-block-start: clamp(1rem, 2.2vw, 1.75rem); }
+.flowp{
+  display: grid;
+  gap: var(--s5);
+}
+.flowp > .prose{ max-inline-size: 62ch; }
+.flow-steps{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--s3);
+}
+.flow-step{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--s2);
+  padding: var(--s4);
+  background: var(--v-inset, color-mix(in srgb, #fff 28%, var(--ground)));
+  color: var(--ink-2);
+  font-size: var(--t-sm);
+  line-height: 1.55;
+}
+.flow-n{
+  font: 500 var(--t-xs) / 1 var(--f-body);
+  letter-spacing: 0.08em;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.flow-k{
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: var(--t-lg);
+  line-height: 1.2;
+  color: var(--ink);
+}
+.flow-preview{
+  display: grid;
+  gap: var(--s3);
+}
+.flow-prev-grid{
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s3);
+}
+.flow-sample{
+  display: grid;
+  gap: var(--s2);
+  padding: var(--s4);
+  background: var(--v-inset, color-mix(in srgb, #fff 28%, var(--ground)));
+}
+.flow-sample .fname,
+.flow-sheet{
+  font-family: var(--f-code);
+  font-size: var(--t-sm);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+.flow-sheet{ width: 100%; border-collapse: collapse; }
+.flow-sheet th,
+.flow-sheet td{
+  padding: 0.2rem 0;
+  text-align: start;
+  font-weight: 500;
+}
+.flow-prevnote{ margin: 0; color: var(--ink-3); }
+
+@media (max-width: 68rem){
+  .flow-steps{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 40rem){
+  .flow-steps,
+  .flow-prev-grid{ grid-template-columns: 1fr; }
+}
+
+html[data-theme=dark] .flow-step,
+html[data-theme=dark] .flow-sample{
+  background: var(--v-inset);
+  color: #D8D2C6;
+}
+html[data-theme=dark] .flow-k,
+html[data-theme=dark] .flow-sample .fname,
+html[data-theme=dark] .flow-sheet{
+  color: #F0EBE0;
+}
+
+/* --- 5) Continuous-curvature squircle (Chrome 139+) ---
+ * Same px reads smaller than round; boost radius inside @supports.
+ * Circles (week dots, swatches, glow orbs) stay round — not listed here.
+ */
+@supports (corner-shape: squircle){
+  :root{
+    --R: clamp(1.6rem, 2.55vw, 2.25rem);
+    --Ri: max(0.9rem, calc(var(--R) - var(--pad-card) + 0.22rem));
+  }
+  @media (max-width: 48rem){
+    :root{ --R: 1.45rem; }
+  }
+
+  .panel,
+  .tile,
+  .fact,
+  .daycard,
+  .paper,
+  .fc,
+  .donate-box,
+  .join,
+  .donate,
+  .diffp,
+  .intro,
+  .tut,
+  .flowp,
+  .hold-card,
+  .foot,
+  .tpanel,
+  .tpanel pre,
+  .addr,
+  .bezel,
+  .bezel > div,
+  .code,
+  .story li,
+  .lp,
+  .donate-qr img,
+  .donate .warn,
+  .chip-mock,
+  .progress,
+  .todo-add input,
+  .fld input,
+  .row select,
+  .row input,
+  .tag span,
+  .fold-tog,
+  .hold-edit-tog,
+  .hold-reset,
+  .btn,
+  .chip,
+  .nav,
+  .spy-list,
+  .spy-list a,
+  .flow-step,
+  .flow-sample,
+  .skip:focus,
+  .copy,
+  .trouble,
+  .acts button{
+    corner-shape: squircle;
+  }
+}
