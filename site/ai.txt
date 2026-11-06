@@ -1,0 +1,15 @@
+# ai.txt — AI training / licensing preference for ymzz-loop showcase
+# Path: https://ya-mic.github.io/ymzz-loop/ai.txt
+# This file is a voluntary signal. Access control is in robots.txt.
+
+User-Agent: *
+Disallow-Ai-Training: /
+Allow-Ai-Search: /
+Allow-Ai-Citation: /
+
+# Product source code (separate from this marketing site):
+# License-Code: MIT — https://github.com/Ya-MiC/ymzz-loop/blob/main/LICENSE
+# Repository: https://github.com/Ya-MiC/ymzz-loop
+
+Contact: https://github.com/Ya-MiC/ymzz-loop/issues
+Owner: YanMing Cao (曹晏銘 / 晏銘湛箴)

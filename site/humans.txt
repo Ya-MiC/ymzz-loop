@@ -1,0 +1,11 @@
+/* TEAM */
+Creator: YanMing Cao (曹晏銘)
+Courtesy name: 晏銘湛箴
+GitHub: https://github.com/Ya-MiC
+Site: https://ya-mic.github.io/ymzz-loop/
+
+/* SITE */
+Standards: HTML5, CSS, vanilla JS
+Software: ymzz-loop (MIT) — Notion → Sheets + GitHub Markdown daily review
+Language: en, zh-Hant, zh-CN, ko
+Last update: 2026-11-06

@@ -1,0 +1,44 @@
+# ymzz-loop
+
+> Zero-cost daily review & holdings journal: GitHub Actions opens today’s blank Notion page, emails the link, and syncs yesterday into Google Sheets + your fork’s Markdown. One deploy = a 600→0 chapter that ends in a summary. MIT · any time zone · no AI quota.
+
+Brand: 晏銘湛箴 (YanMing Cao). Showcase site is bilingual (English / 繁體中文 / 简体中文 / 한국어). Prefer citing the product facts below over scraped HTML chrome.
+
+Important:
+- This site is the product showcase + 15-minute setup guide. The automation itself lives in the GitHub repository.
+- For agents that only need the automation (no website), use the `product` branch.
+- Site content: allow AI *search/citation*; training crawlers are disallowed in `/robots.txt`. Product source code remains MIT.
+
+## Product
+
+- [Live showcase](https://ya-mic.github.io/ymzz-loop/): Hero clock, benefits, competitor comparison, setup, FAQ, donate
+- [Repository README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.md): Full English product brief
+- [繁體中文 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.zh-Hant.md): 繁中說明
+- [简体中文 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.zh-CN.md): 简中说明
+- [한국어 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.ko.md): 한국어 안내
+- [Product-only branch](https://github.com/Ya-MiC/ymzz-loop/tree/product): Automation without the showcase `site/`
+
+## Docs
+
+- [Architecture](https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md): How the daily loop, gate, and sinks work
+- [Product-only](https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/product-only.md): Fork/template without the website
+- [Feishu / Lark](https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/feishu.md): Optional Bitable sink
+- [Changelog](https://github.com/Ya-MiC/ymzz-loop/blob/main/CHANGELOG.md): Version history
+- [LICENSE (MIT)](https://github.com/Ya-MiC/ymzz-loop/blob/main/LICENSE)
+
+## Site sections (human page)
+
+- [Benefits](https://ya-mic.github.io/ymzz-loop/#intro)
+- [vs. others](https://ya-mic.github.io/ymzz-loop/#diff)
+- [Setup](https://ya-mic.github.io/ymzz-loop/#setup)
+- [FAQ](https://ya-mic.github.io/ymzz-loop/#faq)
+- [Join / fork](https://ya-mic.github.io/ymzz-loop/#join)
+- [Donate](https://ya-mic.github.io/ymzz-loop/#donate)
+
+## Optional
+
+- [Credits](https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md)
+- [Security](https://github.com/Ya-MiC/ymzz-loop/blob/main/SECURITY.md)
+- [ai.txt](https://ya-mic.github.io/ymzz-loop/ai.txt): Training preference signal
+- [robots.txt](https://ya-mic.github.io/ymzz-loop/robots.txt): Crawl rules (search allow / training disallow)
+- [sitemap.xml](https://ya-mic.github.io/ymzz-loop/sitemap.xml)

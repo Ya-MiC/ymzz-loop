@@ -4,6 +4,15 @@
 
 
 
+## [1.18.1] — 2026-11-06
+
+### Added
+- **GEO / SEO discovery stack on Pages:** `site/llms.txt` (Answer.AI map), `site/robots.txt` (allow search + AI citation; disallow training/scrape bots), `site/ai.txt` (training preference), `site/sitemap.xml`, `site/humans.txt`.
+- **Head discovery links:** canonical, og:url, `rel=describedby` → llms.txt, alternate ai.txt / humans.txt.
+
+
+
+
 
 
 
