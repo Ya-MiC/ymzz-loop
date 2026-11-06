@@ -10,13 +10,14 @@ const read = rel => readFileSync(join(root, rel), "utf8");
 const pkg = JSON.parse(read("package.json"));
 const ADDR = "0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A";
 
-describe("v0.20.0 hackathon start surface", () => {
-  it("package version is 0.20.0 and config/footer agree", () => {
-    assert.equal(pkg.version, "0.20.0");
-    assert.match(read("site/config.js"), /VERSION:\s*"0.20.0"/);
-    assert.match(read("site/index.html"), /v0\.20\.0/);
-    assert.match(read("site/start.html"), /v0\.20\.0/);
+describe("v0.20 hackathon start surface", () => {
+  it("package version is 0.20.x and config/footer/CHANGELOG agree", () => {
+    assert.match(pkg.version, /^0\.20\.\d+$/);
+    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
+    assert.ok(read("site/index.html").includes(`v${pkg.version}`));
+    assert.ok(read("site/start.html").includes(`v${pkg.version}`));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.0\]/);
+    assert.match(read("CHANGELOG.md"), new RegExp(`## \\[${pkg.version.replaceAll(".", "\\.")}\\]`));
   });
 
   it("start guide exists, points at product branch, and never the USDC address", () => {

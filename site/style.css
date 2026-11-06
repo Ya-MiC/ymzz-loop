@@ -1413,8 +1413,8 @@ body,button,input,select,textarea,.stats b,.dnum,.cities b,.count,.sheet td,.wee
   .tile:hover,.lp:hover,.fact:hover,.fc:hover,.daycard:hover,.btn:hover{transform:none!important}
 }
 
-/* v1.11.1 · flow / How-it-works section removed — hide any leftover selectors */
-.stage,.paper-stage,.stage-glow,.story,.bign,.sprog,#flow,#flowList,#bigN,#sprog{display:none!important}
+/* v1.11.1 · old How-it-works scaffolding removed — hide leftovers (not #flow; restored in 1.19 / 0.20.1) */
+.stage,.paper-stage,.stage-glow,.story,.bign,.sprog,#flowList,#bigN,#sprog{display:none!important} /* v0.20.1: #flow restored as trust-layer data-flow — do not hide */
 
 /* v1.12.0 · differentiation */
 .diffp .lede{max-inline-size:62ch;color:var(--ink-2)}
@@ -4682,4 +4682,25 @@ html[data-theme=dark] .start-warn{
   .nav-guide{
     corner-shape: squircle;
   }
+}
+
+/* ===== v0.20.1 · sticky-nav scroll clearance + visible data-flow ===== */
+:root{
+  /* sticky .nav sits at inset-block-start:var(--frame); pill ~3.5–4.5rem when contracted */
+  --scroll-clear: calc(var(--frame) + 4.75rem);
+}
+html{
+  scroll-padding-block-start: var(--scroll-clear);
+}
+main > .sec[id],
+.sec[id]{
+  scroll-margin-block-start: var(--scroll-clear);
+}
+/* Ensure restored #flow participates in normal flow (overrides any stale hide) */
+#flow.flow-sec,
+#flow.sec{
+  display: block !important;
+}
+#flow .flowp{
+  display: grid;
 }

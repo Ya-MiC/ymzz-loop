@@ -2,6 +2,12 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.1] — 2026-11-06
+
+### Fixed
+- **Sticky nav covering section titles** on hash / spy jumps (`#intro`, Benefits, etc.): `scroll-padding-block-start` on `html` and `scroll-margin-block-start` on `.sec[id]` clear the contracted glass nav (`--scroll-clear`).
+- **“How it flows” invisible** between hero and Benefits: a leftover v1.11.1 rule hid `#flow` with `display:none !important` after the trust-layer section was restored. `#flow` is visible again in normal document order; obsolete `.stage` / `#flowList` leftovers stay hidden.
+
 ## [0.20.0] — 2026-11-06
 
 Intentional early-version reset for the Alipay PAYATHON / vibe-coding track.
