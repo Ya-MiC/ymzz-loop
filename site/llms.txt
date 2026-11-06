@@ -10,6 +10,8 @@ What it **is**:
 - Open-source **self-host** automation (MIT) that runs in **your** GitHub Actions fork.
 - Daily loop: create today’s blank **Notion** review → email you the Notion link (operator SMTP) → sync **yesterday** into **Google Sheets** + dated **Markdown** under `notion/YYYY/` in the fork; optional Feishu / Lark Bitable.
 - **$0** to self-host on free GitHub Actions minutes + free Notion/Google APIs — **no paid tier**.
+- **Pricing:** one plan only — **$0 self-host forever**. No Free→Max ladder. Optional tips on `support.html` are **not** a plan.
+- **Quick start:** four steps on the homepage (`#quickstart`) map to the ~10-minute `start.html` guide (product branch + secrets checklist).
 - Lifespan is a **600-day chapter** (countdown 600→0); at 0 the daily loop pauses for a chapter summary; deploy a newer version to open the next chapter.
 - Any time zone via Variables `YMZZ_TZ` / `YMZZ_REMIND_TIME`.
 
@@ -37,7 +39,7 @@ Important crawl stance:
 
 ## Product
 
-- [Live showcase](https://ya-mic.github.io/ymzz-loop/): Hero clock, benefits, competitor comparison, setup, FAQ
+- [Live showcase](https://ya-mic.github.io/ymzz-loop/): Hero, 4-step quick start, $0 pricing, use cases, benefits, competitor comparison, setup, FAQ
 - [Start guide](https://ya-mic.github.io/ymzz-loop/start.html): About 10 minutes to the first Notion review (product branch only)
 - [Repository README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.md): Full English product brief
 - [繁體中文 README](https://github.com/Ya-MiC/ymzz-loop/blob/main/README.zh-Hant.md): 繁中說明
@@ -56,7 +58,10 @@ Important crawl stance:
 
 ## Site sections (human page)
 
+- [Quick start (4 steps)](https://ya-mic.github.io/ymzz-loop/#quickstart)
+- [Pricing ($0 self-host)](https://ya-mic.github.io/ymzz-loop/#pricing)
 - [How it flows](https://ya-mic.github.io/ymzz-loop/#flow)
+- [Use cases](https://ya-mic.github.io/ymzz-loop/#usecases)
 - [Benefits](https://ya-mic.github.io/ymzz-loop/#intro)
 - [vs. others](https://ya-mic.github.io/ymzz-loop/#diff)
 - [Setup](https://ya-mic.github.io/ymzz-loop/#setup)

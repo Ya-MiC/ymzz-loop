@@ -33,14 +33,15 @@ function collectTypes(node, into = new Set()) {
 }
 
 describe("v0.20.2 GEO harden", () => {
-  it("versions say 0.20.2", () => {
-    assert.equal(pkg.version, "0.20.2");
-    assert.match(read("site/config.js"), /VERSION:\s*"0\.20\.2"/);
-    assert.match(read("site/index.html"), /v0\.20\.2/);
-    assert.match(read("site/start.html"), /v0\.20\.2/);
-    assert.match(read("site/support.html"), /v0\.20\.2/);
-    assert.match(read("site/humans.txt"), /0\.20\.2/);
+  it("versions track package.json (0.20.x) and keep 0.20.2 changelog", () => {
+    assert.match(pkg.version, /^0\.20\.\d+$/);
+    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
+    assert.match(read("site/index.html"), new RegExp(`v${pkg.version.replaceAll(".", "\\.")}`));
+    assert.match(read("site/start.html"), new RegExp(`v${pkg.version.replaceAll(".", "\\.")}`));
+    assert.match(read("site/support.html"), new RegExp(`v${pkg.version.replaceAll(".", "\\.")}`));
+    assert.match(read("site/humans.txt"), new RegExp(pkg.version.replaceAll(".", "\\.")));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.2\]/);
+    assert.match(read("CHANGELOG.md"), new RegExp(`## \\[${pkg.version.replaceAll(".", "\\.")}\\]`));
   });
 
   it("index JSON-LD includes SoftwareApplication, FAQPage, Person", () => {
@@ -51,7 +52,7 @@ describe("v0.20.2 GEO harden", () => {
       assert.ok(types.has(need), `missing @type ${need}; have ${[...types]}`);
     }
     const flat = JSON.stringify(blocks);
-    assert.match(flat, /"softwareVersion"\s*:\s*"0\.20\.2"/);
+    assert.match(flat, new RegExp(`"softwareVersion"\\s*:\\s*"${pkg.version.replaceAll(".", "\\.")}"`));
     assert.match(flat, /"isAccessibleForFree"\s*:\s*true/);
     assert.match(flat, /github\.com\/Ya-MiC\/ymzz-loop/);
     assert.match(flat, /晏銘湛箴|YanMing Cao|曹晏銘/);

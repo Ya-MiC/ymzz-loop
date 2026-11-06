@@ -45,13 +45,28 @@
       "description": "Zero-cost daily review and holdings journal: GitHub Actions creates today's blank Notion page, emails a reminder, and syncs yesterday to Google Sheets plus Markdown in your fork. One deploy opens a 600-day chapter that ends in a summary. MIT, any time zone, no AI quota.",
       "applicationCategory": "ProductivityApplication",
       "operatingSystem": "GitHub Actions; Node.js >=20",
-      "softwareVersion": "0.20.2",
+      "softwareVersion": "0.20.3",
       "license": "https://opensource.org/licenses/MIT",
       "isAccessibleForFree": true,
       "offers": {
         "@type": "Offer",
+        "name": "Self-host forever",
         "price": "0",
-        "priceCurrency": "USD"
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": "https://ya-mic.github.io/ymzz-loop/#pricing",
+        "description": "ymzz-loop is $0 to self-host forever on free GitHub Actions minutes and free Notion/Google APIs. There is no paid Free→Max ladder. Optional tips on support.html are not a plan.",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Self-host forever",
+          "referenceQuantity": {
+            "@type": "QuantitativeValue",
+            "value": "1",
+            "unitText": "self-hosted deploy"
+          }
+        }
       },
       "programmingLanguage": [
         "JavaScript",
@@ -197,6 +212,8 @@
 <header class="nav">
   <a class="brand" href="#top"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
   <a class="nav-guide" href="start.html" data-i18n="nav.start">Start</a>
+  <a class="nav-guide" href="#quickstart" data-i18n="nav.quickstart">Quick start</a>
+  <a class="nav-guide" href="#pricing" data-i18n="nav.pricing">Pricing</a>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
       <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
@@ -283,6 +300,44 @@
 
 
 
+
+<!-- QUICK START: 4 steps → start.html (secrets checklist stays on start) -->
+<section id="quickstart" data-spy="Start" class="sec">
+  <div class="panel qsp">
+    <div class="prose">
+      <p class="label reveal"><span data-i18n="qs.k">Quick start</span></p>
+      <h2 class="reveal" data-i18n="qs.h">Four steps to your first review</h2>
+      <p class="reveal lede" data-i18n="qs.p">About 10 minutes. Product branch only — this strip is the map; the start guide keeps the secrets checklist.</p>
+    </div>
+    <ol class="qs-steps" data-i18n-aria="qs.aria" aria-label="Four-step quick start">
+      <li class="qs-step">
+        <span class="qs-n" aria-hidden="true">01</span>
+        <strong class="qs-k" data-i18n="qs.1k">Product branch</strong>
+        <span data-i18n="qs.1p">Clone or download <code>product</code> — never the showcase <code>site/</code>.</span>
+      </li>
+      <li class="qs-step">
+        <span class="qs-n" aria-hidden="true">02</span>
+        <strong class="qs-k" data-i18n="qs.2k">Notion setup</strong>
+        <span data-i18n="qs.2p">Connect an integration and run setup once to write <code>sync.config.json</code>.</span>
+      </li>
+      <li class="qs-step">
+        <span class="qs-n" aria-hidden="true">03</span>
+        <strong class="qs-k" data-i18n="qs.3k">Sheet + mailbox</strong>
+        <span data-i18n="qs.3p">Share a Google Sheet with your service account; optional Gmail app password for reminders.</span>
+      </li>
+      <li class="qs-step">
+        <span class="qs-n" aria-hidden="true">04</span>
+        <strong class="qs-k" data-i18n="qs.4k">Secrets + Actions</strong>
+        <span data-i18n="qs.4p">Add required secrets, allow workflows, run once — open today’s Notion link from email.</span>
+      </li>
+    </ol>
+    <p class="qs-cta reveal">
+      <a class="btn primary" href="start.html"><span data-i18n="qs.cta">Open the start guide</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a>
+      <a class="btn ghost" href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer" data-i18n-title="hero.cta2title" title="Product-only branch — no showcase site"><span data-i18n="hero.cta2">Get the automation</span></a>
+    </p>
+  </div>
+</section>
+
 <!-- DATA FLOW: compact prerequisites / destinations (real path only, no fake metrics) -->
 <section id="flow" class="sec flow-sec">
   <div class="panel flowp">
@@ -365,6 +420,40 @@
   </div>
 </section>
 
+
+
+<!-- USE CASES: grounded in real product — no fake testimonials -->
+<section id="usecases" data-spy="Uses" class="sec">
+  <div class="panel usesp">
+    <div class="prose">
+      <p class="label reveal"><span data-i18n="uses.k">Use cases</span></p>
+      <h2 class="reveal" data-i18n="uses.h">Who the loop is for</h2>
+      <p class="reveal lede" data-i18n="uses.p">Real jobs the product already does — not invented user counts or quotes.</p>
+    </div>
+    <ul class="uses-grid" data-i18n-aria="uses.aria" aria-label="Use cases">
+      <li class="use-card reveal">
+        <p class="label" data-i18n="uses.1k">Daily review discipline</p>
+        <h3 data-i18n="uses.1h">Blank page already waiting</h3>
+        <p data-i18n="uses.1p">Each morning a Notion review is created and emailed to you — less blank-page friction, more days you actually keep.</p>
+      </li>
+      <li class="use-card reveal">
+        <p class="label" data-i18n="uses.2k">Holdings journal</p>
+        <h3 data-i18n="uses.2h">Broker-agnostic positions</h3>
+        <p data-i18n="uses.2p">Track holdings beside the review in Notion — tickers you choose, no broker lock-in required.</p>
+      </li>
+      <li class="use-card reveal">
+        <p class="label" data-i18n="uses.3k">$0 budget builders</p>
+        <h3 data-i18n="uses.3h">Students &amp; founders</h3>
+        <p data-i18n="uses.3p">Self-host on free Actions minutes and free Notion/Google APIs. No SaaS rent to start a 600-day chapter.</p>
+      </li>
+      <li class="use-card reveal">
+        <p class="label" data-i18n="uses.4k">Bilingual archive</p>
+        <h3 data-i18n="uses.4h">Notion → Sheets + Markdown</h3>
+        <p data-i18n="uses.4p">Yesterday lands as Sheet rows you can chart and dated Markdown in your fork — portable across languages and tools.</p>
+      </li>
+    </ul>
+  </div>
+</section>
 
 <!-- HOLDINGS 彩蛋: compact mock · zh-CN + UTC+8 → 600519.SH, else 2330.TW · no IBKR -->
 <section id="holdings" class="sec hold-sec" aria-label="Holdings mock">
@@ -460,6 +549,65 @@
   </div>
 </section>
 
+
+<!-- PRICING: honest $0 self-host — not a Free→Max SaaS ladder -->
+<section id="pricing" data-spy="Pricing" class="sec">
+  <div class="panel pricep">
+    <div class="prose">
+      <p class="label reveal"><span data-i18n="price.k">Pricing</span></p>
+      <h2 class="reveal" data-i18n="price.h">$0 self-host forever</h2>
+      <p class="reveal lede" data-i18n="price.p">There is no paid Free → Max ladder. One plan: run ymzz-loop in your fork on free GitHub Actions minutes and free Notion/Google APIs.</p>
+    </div>
+    <div class="price-grid">
+      <article class="price-card is-us reveal">
+        <p class="label" data-i18n="price.plan.k">The only plan</p>
+        <p class="price-amt" dir="ltr"><span data-i18n="price.plan.amt">$0</span></p>
+        <h3 data-i18n="price.plan.h">Self-host forever</h3>
+        <ul class="price-list">
+          <li data-i18n="price.plan.1">MIT code in your fork — read, change, keep</li>
+          <li data-i18n="price.plan.2">Daily Notion → Sheets + Git Markdown loop</li>
+          <li data-i18n="price.plan.3">600-day chapter → summary, then redeploy</li>
+          <li data-i18n="price.plan.4">No AI quota, no metered Zap steps</li>
+        </ul>
+        <p class="cta"><a class="btn primary" href="start.html"><span data-i18n="price.plan.cta">Start free</span><svg class="i flip" aria-hidden="true"><use href="icons.svg#i-arrow-right"/></svg></a></p>
+      </article>
+      <aside class="price-contrast reveal">
+        <p class="label" data-i18n="price.vs.k">Versus paid tiers elsewhere</p>
+        <h3 data-i18n="price.vs.h">What we are not selling</h3>
+        <p data-i18n="price.vs.p">Desktop AI bots and hosted journals often publish Free → Starter → Pro → Max monthly ladders. ymzz-loop has none of those. You pay cloud vendors only if you leave their free tiers — that is your account, not our plan.</p>
+        <table class="price-vs">
+          <caption class="vh" data-i18n="price.vs.caption">Honest contrast — no invented dollar amounts for competitors</caption>
+          <thead>
+            <tr>
+              <th scope="col" data-i18n="price.vs.h.what">What</th>
+              <th scope="col" class="is-us">ymzz-loop</th>
+              <th scope="col" data-i18n="price.vs.h.them">Typical paid bot / journal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row" data-i18n="price.vs.tier.k">Product tiers</th>
+              <td class="is-us" data-i18n="price.vs.tier.us">One: $0 self-host</td>
+              <td data-i18n="price.vs.tier.them">Often Free → Max monthly ladders</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="price.vs.host.k">Where it runs</th>
+              <td class="is-us" data-i18n="price.vs.host.us">Your GitHub Actions fork</td>
+              <td data-i18n="price.vs.host.them">Vendor cloud / desktop app store</td>
+            </tr>
+            <tr>
+              <th scope="row" data-i18n="price.vs.data.k">Who holds the days</th>
+              <td class="is-us" data-i18n="price.vs.data.us">Your Notion, Sheet, Markdown</td>
+              <td data-i18n="price.vs.data.them">Vendor journal or chat history</td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="small price-tip" data-i18n="price.tip">Optional tips on <a href="support.html">support.html</a> are gratitude only — not a plan, not required for setup, and not a product feature.</p>
+      </aside>
+    </div>
+  </div>
+</section>
+
 <!-- SETUP -->
 <section id="setup" data-spy="Setup" class="sec">
   <div class="panel tut">
@@ -525,8 +673,8 @@
   <div class="swatches" role="img" aria-label="Palette: #B9DDF1 #F4DDE7 #F8F6EF #CDBFE0 #B7C8A8 #E8E3CC #CBBF9E #A38E7A">
     <span style="--c:#B9DDF1"></span><span style="--c:#F4DDE7"></span><span style="--c:#F8F6EF"></span><span style="--c:#CDBFE0"></span><span style="--c:#B7C8A8"></span><span style="--c:#E8E3CC"></span><span style="--c:#CBBF9E"></span><span style="--c:#A38E7A"></span>
   </div>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.2 · MIT © 2026 YanMing Cao</bdi></p>
-  <p class="label"><a href="start.html" data-i18n="nav.start">Start</a> · <a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.3 · MIT © 2026 YanMing Cao</bdi></p>
+  <p class="label"><a href="start.html" data-i18n="nav.start">Start</a> · <a href="#quickstart" data-i18n="nav.quickstart">Quick start</a> · <a href="#pricing" data-i18n="nav.pricing">Pricing</a> · <a href="#usecases" data-i18n="nav.usecases">Use cases</a> · <a href="https://github.com/Ya-MiC/ymzz-loop" rel="noopener noreferrer">GitHub</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/docs/architecture.md" rel="noopener noreferrer" data-i18n="foot.arch"></a> · <a href="https://github.com/Ya-MiC/ymzz-loop/blob/main/CREDITS.md" rel="noopener noreferrer" data-i18n="foot.credits">Credits</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/issues" rel="noopener noreferrer" data-i18n="foot.fb"></a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
 </footer>

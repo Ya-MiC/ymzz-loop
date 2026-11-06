@@ -19,10 +19,28 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://ya-mic.github.io/ymzz-loop/#quickstart</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ya-mic.github.io/ymzz-loop/#pricing</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.88</priority>
+  </url>
+  <url>
     <loc>https://ya-mic.github.io/ymzz-loop/#flow</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://ya-mic.github.io/ymzz-loop/#usecases</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.72</priority>
   </url>
   <url>
     <loc>https://ya-mic.github.io/ymzz-loop/#intro</loc>

@@ -95,9 +95,22 @@
       "@id": "https://ya-mic.github.io/ymzz-loop/#software",
       "name": "ymzz-loop",
       "url": "https://ya-mic.github.io/ymzz-loop/",
-      "softwareVersion": "0.20.2",
+      "softwareVersion": "0.20.3",
       "isAccessibleForFree": true,
       "license": "https://opensource.org/licenses/MIT",
+      "offers": {
+        "@type": "Offer",
+        "name": "Self-host forever",
+        "price": "0",
+        "priceCurrency": "USD",
+        "url": "https://ya-mic.github.io/ymzz-loop/#pricing",
+        "priceSpecification": {
+          "@type": "UnitPriceSpecification",
+          "price": "0",
+          "priceCurrency": "USD",
+          "name": "Self-host forever"
+        }
+      },
       "sameAs": [
         "https://github.com/Ya-MiC/ymzz-loop"
       ]
@@ -113,6 +126,7 @@
 <header class="nav">
   <a class="brand" href="index.html"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
   <a class="nav-guide is-current" href="start.html" data-i18n="nav.start">Start</a>
+  <a class="nav-guide" href="index.html#pricing" data-i18n="nav.pricing">Pricing</a>
   <div class="tools">
     <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
       <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
@@ -133,6 +147,13 @@
       <a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer"><svg class="i" aria-hidden="true"><use href="icons.svg#i-brand-github"/></svg><span data-i18n="start.s1.cta">Open the product branch</span></a>
       <a class="btn ghost" href="index.html"><span data-i18n="start.back">Back to the showcase</span></a>
     </div>
+    <ol class="qs-steps start-qs" data-i18n-aria="qs.aria" aria-label="Four-step quick start">
+      <li class="qs-step"><span class="qs-n" aria-hidden="true">01</span><strong class="qs-k" data-i18n="qs.1k">Product branch</strong><span data-i18n="qs.1p">Clone or download <code>product</code> — never the showcase <code>site/</code>.</span></li>
+      <li class="qs-step"><span class="qs-n" aria-hidden="true">02</span><strong class="qs-k" data-i18n="qs.2k">Notion setup</strong><span data-i18n="qs.2p">Connect an integration and run setup once to write <code>sync.config.json</code>.</span></li>
+      <li class="qs-step"><span class="qs-n" aria-hidden="true">03</span><strong class="qs-k" data-i18n="qs.3k">Sheet + mailbox</strong><span data-i18n="qs.3p">Share a Google Sheet with your service account; optional Gmail app password for reminders.</span></li>
+      <li class="qs-step"><span class="qs-n" aria-hidden="true">04</span><strong class="qs-k" data-i18n="qs.4k">Secrets + Actions</strong><span data-i18n="qs.4p">Add required secrets, allow workflows, run once — open today’s Notion link from email.</span></li>
+    </ol>
+    <p class="small start-qs-note" data-i18n="qs.detail">Details and the secrets checklist are below — nothing is hidden.</p>
   </div>
 </section>
 
@@ -227,7 +248,7 @@ git add sync.config.json &amp;&amp; git commit -m "setup ids" &amp;&amp; git pus
 
 <footer class="foot">
   <p class="huge" aria-hidden="true">ymzz<span>·</span>loop</p>
-  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.2 · MIT © 2026 YanMing Cao</bdi></p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.3 · MIT © 2026 YanMing Cao</bdi></p>
   <p class="label"><a href="index.html" data-i18n="start.back">Back to the showcase</a> · <a href="https://github.com/Ya-MiC/ymzz-loop/tree/product" rel="noopener noreferrer" data-i18n="hero.cta2">Get the automation</a> · <a href="support.html" data-i18n="nav.support">Support</a></p>
   <p class="small" data-i18n="foot.priv"></p>
   <p class="small" data-i18n="foot.tm"></p>
