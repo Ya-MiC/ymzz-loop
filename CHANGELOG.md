@@ -2,6 +2,16 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.5] — 2026-11-07
+
+### Fixed
+- **Showcase / unconfigured repos**: hourly `daily-review` no longer GO's when `NOTION_TOKEN` is empty (was painting Actions red and failing `create-today` every day after remind time).
+- **Failure email step**: skips cleanly when SMTP secrets are unset (`continue-on-error` + credential guard) so missing mail config does not double-fail the job.
+
+### Changed
+- Version **0.20.4 → 0.20.5**.
+- `test/gate-lifespan.test.mjs` covers the missing-token skip.
+
 ## [0.20.4] — 2026-11-06
 
 ### Fixed
