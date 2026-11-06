@@ -7,7 +7,7 @@
 One deploy = one **600-day chapter** of daily review, counting **600→0** — a gentle clock, then a **600-day summary** and the loop pauses.  
 GitHub Actions in **your** fork opens today’s blank page in Notion, emails the link, and **auto-ingests yesterday** into Google Sheets + your GitHub Markdown (optional Feishu).  
 **$0 · MIT · multi-end · no AI quota · any time zone** — Notion write → Sheets + Git (+ Feishu).  
-**[Open the site & 15-min setup →](https://ya-mic.github.io/ymzz-loop/)** · **[Get automation only (no website) →](https://github.com/Ya-MiC/ymzz-loop/tree/product)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
+**[Open the 10-min start guide →](https://ya-mic.github.io/ymzz-loop/start.html)** · **[Showcase →](https://ya-mic.github.io/ymzz-loop/)** · **[Get automation only (no website) →](https://github.com/Ya-MiC/ymzz-loop/tree/product)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
 
 <p align="center">
 <a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
@@ -53,7 +53,8 @@ It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Ch
 
 Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in seconds unless local time ≥ your reminder time and today hasn't run (`.ymzz/last-run`). Late or skipped schedules catch up the next hour. Public repos: free; private: ≈720 min/month, under the 2,000 free minutes.
 
-## Setup (once, ~15 min)
+## Setup (once, ~10 min)
+Prefer the guided page: https://ya-mic.github.io/ymzz-loop/start.html
 1. **Notion integration** — https://www.notion.so/profile/integrations → New integration (Internal) named `ymzz` → copy the token. Open your review page → `⋯` → Connections → add `ymzz`.
 2. **Create databases** (Node.js 20+):
    ```bash
@@ -79,9 +80,9 @@ Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in 
 7. **First run** — Actions → daily-review → Run workflow. You should get an email, today's page in Notion, and two tabs in the Sheet.
 
 
-## Donate / 贊助
+## Optional support / 贊助
 
-ymzz-loop stays **free and MIT**. If it helps you, tips are welcome.
+ymzz-loop stays **free and MIT**. Tips are optional and are not part of setup. If it helps you, details are on the support page.
 
 **USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
 
@@ -89,7 +90,7 @@ ymzz-loop stays **free and MIT**. If it helps you, tips are welcome.
 0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
 ```
 
-Receive-only address (no wallet connect on the site). QR and copy button: https://ya-mic.github.io/ymzz-loop/#donate · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
+Receive-only address (no wallet connect on the site). Optional (not part of setup): https://ya-mic.github.io/ymzz-loop/support.html · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
 
 ## Extend
 Optional Feishu secrets: `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_BITABLE_APP_TOKEN`, `FEISHU_BITABLE_TABLE_ID` (off when unset). Credits / font licenses: [CREDITS.md](CREDITS.md).

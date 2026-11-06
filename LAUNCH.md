@@ -82,7 +82,7 @@ Why not Day One / Notion+Zapier / Obsidian DIY?
 MIT code. No AI quota. Any time zone. $0/month.
 
 Repo: https://github.com/Ya-MiC/ymzz-loop
-Site + 15-min guided setup: https://ya-mic.github.io/ymzz-loop/
+Site + 10-min start guide: https://ya-mic.github.io/ymzz-loop/start.html
 
 Happy to answer setup questions. I would love feedback on whether the 600-day chapter helps you start today instead of “someday”.
 
@@ -106,7 +106,7 @@ vs alternatives:
 - Notion + Zapier: powerful, metered glue — we are MIT + $0 Actions in your fork.
 - Obsidian DIY: possible, not a packaged daily-review product with auto previous-day ingest.
 
-Would love your fork + honest issue. Setup is ~15 minutes.
+Would love your fork + honest issue. Setup is about 10 minutes: https://ya-mic.github.io/ymzz-loop/start.html
 
 ---
 
@@ -134,7 +134,7 @@ Would love your fork + honest issue. Setup is ~15 minutes.
 - Obsidian DIY：能拼，不是开箱即用的每日复盘产品
 
 仓库：https://github.com/Ya-MiC/ymzz-loop  
-官网（15 分钟设置）：https://ya-mic.github.io/ymzz-loop/
+官网开始页（约 10 分钟）：https://ya-mic.github.io/ymzz-loop/start.html
 
 欢迎 Fork、提 Issue，也欢迎吐槽「600 天一章」到底有没有用。
 

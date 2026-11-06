@@ -1,0 +1,82 @@
+<!doctype html>
+<!-- SPDX-License-Identifier: MIT · © 2026 YanMing Cao (晏銘湛箴) -->
+<html lang="en" dir="ltr" data-theme="light" data-palette="cloud">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'; connect-src 'self' https:; base-uri 'self'; form-action 'none'">
+<title>ymzz-loop — Optional support</title>
+<meta name="description" content="Optional tip details. Not required to use ymzz-loop or finish the start guide.">
+<meta name="robots" content="index,follow,max-image-preview:large">
+<link rel="canonical" href="https://ya-mic.github.io/ymzz-loop/support.html">
+<meta property="og:url" content="https://ya-mic.github.io/ymzz-loop/support.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ymzz-loop — Optional support">
+<meta property="og:description" content="Optional tip details. Not required to use ymzz-loop or finish the start guide.">
+<meta property="og:image" content="https://ya-mic.github.io/ymzz-loop/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F8F6EF">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/inter.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="support-page" data-page="support">
+<a class="skip" href="#main" data-i18n="skip">Skip to content</a>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav">
+  <a class="brand" href="index.html"><img src="favicon.svg" alt="" width="28" height="28"><span>ymzz<b>·</b>loop</span></a>
+  <a class="nav-guide" href="start.html" data-i18n="nav.start">Start</a>
+  <div class="tools">
+    <label class="chip sel"><svg class="i" aria-hidden="true"><use href="icons.svg#i-language"/></svg><span class="vh" data-i18n="ui.lang">Language</span>
+      <select id="lang"><option value="en">English</option><option value="zh-Hant">繁體中文</option><option value="zh-CN">简体中文</option><option value="ko">한국어</option><option value="ar">العربية (beta)</option></select></label>
+    <label class="chip sel"><span class="vh" data-i18n="ui.palette">Palette</span>
+      <select id="palette" aria-label="Palette"><option value="cloud">Cloud</option><option value="earth">Tea</option></select></label>
+    <button id="theme" class="chip" type="button"><svg class="i" aria-hidden="true"><use id="themeIc" href="icons.svg#i-moon"/></svg><span id="themeTx">Dark</span></button>
+  </div>
+</header>
+
+<main id="main">
+<section class="sec" id="support">
+  <div class="panel donate">
+    <div class="prose">
+      <p class="label" data-i18n="support.k">Optional support</p>
+      <h1 data-i18n="donate.h">Donate / 贊助</h1>
+      <p data-i18n="support.lede">This page is optional. You do not need it to run ymzz-loop or finish the start guide.</p>
+      <p data-i18n="donate.p">ymzz-loop stays free and MIT. If it helps you, you can send a tip.</p>
+      <p class="warn" data-i18n="donate.warn">USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.</p>
+    </div>
+    <div class="donate-box">
+      <figure class="donate-qr">
+        <img src="donate-usdc-arb.svg" width="264" height="264" alt="QR code for USDC receive address on Arbitrum One">
+        <figcaption class="label" data-i18n="donate.qr">Scan · Arbitrum One · USDC</figcaption>
+      </figure>
+      <div class="donate-addr">
+        <p class="label" data-i18n="donate.network">Network · Arbitrum One</p>
+        <p class="label" data-i18n="donate.token">Token · USDC only</p>
+        <div class="addrrow" dir="ltr">
+          <code id="donateAddr" class="addr">0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A</code>
+          <button type="button" class="btn ghost" id="donateCopy" data-addr="0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A">
+            <svg class="i" aria-hidden="true"><use href="icons.svg#i-copy"/></svg>
+            <span data-i18n="ui.copy">Copy</span>
+          </button>
+        </div>
+        <p class="sumsg" id="donateMsg" role="status" aria-live="polite"></p>
+        <p class="small"><a href="https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A" rel="noopener noreferrer" data-i18n="donate.explorer">View on ArbiScan</a> · <span data-i18n="donate.nosign">Receive-only address. This site never asks to connect a wallet, sign, or approve.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <p class="huge" aria-hidden="true">ymzz<span>·</span>loop</p>
+  <p><b>晏銘湛箴</b> · <span data-i18n="foot.tag"></span> · <bdi dir="ltr">v0.20.0 · MIT © 2026 YanMing Cao</bdi></p>
+  <p class="label"><a href="start.html" data-i18n="nav.start">Start</a> · <a href="index.html" data-i18n="start.back">Back to the showcase</a></p>
+  <p class="small" data-i18n="foot.priv"></p>
+</footer>
+<script src="config.js"></script>
+<script src="chrome.js" defer></script>
+</body>
+</html>

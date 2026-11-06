@@ -37,10 +37,16 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ya-mic.github.io/ymzz-loop/#donate</loc>
+    <loc>https://ya-mic.github.io/ymzz-loop/start.html</loc>
+    <lastmod>2026-11-06</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+  <url>
+    <loc>https://ya-mic.github.io/ymzz-loop/support.html</loc>
     <lastmod>2026-11-06</lastmod>
     <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
+    <priority>0.2</priority>
   </url>
   <url>
     <loc>https://ya-mic.github.io/ymzz-loop/llms.txt</loc>
