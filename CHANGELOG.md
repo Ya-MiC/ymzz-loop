@@ -2,6 +2,19 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.20.4] — 2026-11-06
+
+### Fixed
+- **Section spy stayed English** after language switch: spy labels now read `data-spy-i18n` and refresh inside `apply()`.
+- **Arabic UI English fallthrough**: filled **101** missing `site/i18n/ar.json` keys (FAQ / setup / features / donate / footer / mock / tz) so surfaces no longer fall back to English.
+- **Korean comparison table** still English under `ko`: translated `vs.*` (and related mock/donate) strings.
+
+### Changed
+- Version **0.20.3 → 0.20.4**.
+- `start.html` nav adds Quick start → `index.html#quickstart`.
+- Confirmed v0.20.3 pricing / quickstart / usecases keys already present in zh-Hant / zh-CN / ko / ar; `data-i18n` wiring intact.
+- `test/v0204-i18n.test.mjs`.
+
 ## [0.20.3] — 2026-11-06
 
 ### Added
