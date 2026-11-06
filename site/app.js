@@ -16,7 +16,7 @@
 
   // faq built from keys
   const renderStatic = () => {
-    $("#faqList").innerHTML = [1, 2, 4].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
+    $("#faqList").innerHTML = [1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => `<details><summary>${t("q" + i)}</summary><p>${t("a" + i)}</p></details>`).join("");
   };
 
   // world-clock tile (feature demo only; no hero clock)
@@ -191,9 +191,9 @@
     $$(".count", e.target).forEach(c => { const to = +c.dataset.to, t0 = performance.now(), dur = reduce ? 0 : 900;
       const tick = n => { const p = dur ? Math.min(1, (n - t0) / dur) : 1; c.textContent = Math.round(to * (1 - Math.pow(1 - p, 4))); if (p < 1) requestAnimationFrame(tick); else c.textContent = String(to); };
       requestAnimationFrame(tick); });
-  }), { threshold: .05, rootMargin: "0px 0px -5% 0px" });
+  }), { threshold: .01, rootMargin: "12% 0px 25% 0px" });
   $$(".reveal, .tile, .lp, .fact, .fc").forEach((el, i) => { el.style.setProperty("--i", i % 6); io.observe(el); });
-  const secIo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("sec-in"); secIo.unobserve(e.target); } }), { threshold: 0.12, rootMargin: "0px 0px -8% 0px" });
+  const secIo = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("sec-in"); secIo.unobserve(e.target); } }), { threshold: 0.04, rootMargin: "8% 0px 20% 0px" });
   $$(".sec, .hero, .marquee, .foot").forEach(el => secIo.observe(el));
 
   // guided setup
