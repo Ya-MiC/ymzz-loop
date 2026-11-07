@@ -17,6 +17,7 @@ function runGate(cwd, env = {}) {
       YMZZ_REMIND_TIME: "00:00",
       GITHUB_EVENT_NAME: "schedule",
       YMZZ_MAX_DAYS: "600",
+      NOTION_TOKEN: "test-token",
       ...env,
     },
   }).toString();
@@ -58,7 +59,7 @@ test("gate --mark writes started once", () => {
   const dir = scratch();
   execFileSync("node", [gate, "--mark"], {
     cwd: dir,
-    env: { ...process.env, YMZZ_TZ: "UTC", YMZZ_REMIND_TIME: "00:00", GITHUB_EVENT_NAME: "workflow_dispatch" },
+    env: { ...process.env, YMZZ_TZ: "UTC", YMZZ_REMIND_TIME: "00:00", GITHUB_EVENT_NAME: "workflow_dispatch", NOTION_TOKEN: "test-token" },
   });
   const started = fs.readFileSync(path.join(dir, ".ymzz/started"), "utf8").trim();
   assert.match(started, /^\d{4}-\d{2}-\d{2}$/);
@@ -67,7 +68,14 @@ test("gate --mark writes started once", () => {
   // second mark must not change started
   execFileSync("node", [gate, "--mark"], {
     cwd: dir,
-    env: { ...process.env, YMZZ_TZ: "UTC", YMZZ_REMIND_TIME: "00:00", GITHUB_EVENT_NAME: "workflow_dispatch" },
+    env: { ...process.env, YMZZ_TZ: "UTC", YMZZ_REMIND_TIME: "00:00", GITHUB_EVENT_NAME: "workflow_dispatch", NOTION_TOKEN: "test-token" },
   });
   assert.equal(fs.readFileSync(path.join(dir, ".ymzz/started"), "utf8").trim(), started);
+});
+
+test("gate skips schedule when NOTION_TOKEN missing", () => {
+  const dir = scratch();
+  const out = runGate(dir, { NOTION_TOKEN: "" });
+  assert.match(out, /missing NOTION_TOKEN/);
+  assert.match(out, /skip/);
 });

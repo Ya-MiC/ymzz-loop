@@ -26,10 +26,16 @@ function dayIndex(from, to) {
 const day = started ? dayIndex(started, today) : 0;
 const expired = Boolean(started && day > MAX_DAYS);
 
+const hasNotion = Boolean(String(process.env.NOTION_TOKEN || "").trim());
+
 let go, why;
 if (expired) {
   go = false;
   why = `chapter complete: day ${day} > ${MAX_DAYS} (started ${started}) — pause for summary`;
+} else if (!hasNotion) {
+  // Showcase / unfinished setup: do not GO without secrets (avoids red hourly runs + false failure mail).
+  go = false;
+  why = "missing NOTION_TOKEN — configure secrets (or disable this workflow on a showcase-only repo)";
 } else if (manual) {
   go = true;
   why = "manual run";

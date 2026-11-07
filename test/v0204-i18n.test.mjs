@@ -17,13 +17,14 @@ const FOCUS = [
 ];
 
 describe("v0.20.4 i18n polish", () => {
-  it("versions say 0.20.4", () => {
-    assert.equal(pkg.version, "0.20.4");
-    assert.match(read("site/config.js"), /VERSION:\s*"0\.20\.4"/);
-    assert.match(read("site/index.html"), /v0\.20\.4/);
-    assert.match(read("site/start.html"), /v0\.20\.4/);
-    assert.match(read("site/support.html"), /v0\.20\.4/);
-    assert.match(read("site/humans.txt"), /0\.20\.4/);
+  it("versions track package.json (0.20.x) and keep 0.20.4 changelog", () => {
+    assert.match(pkg.version, /^0\.20\.\d+$/);
+    const v = pkg.version.replace(/\./g, "\\.");
+    assert.match(read("site/config.js"), new RegExp(`VERSION:\\s*"${v}"`));
+    assert.match(read("site/index.html"), new RegExp(`v${v}`));
+    assert.match(read("site/start.html"), new RegExp(`v${v}`));
+    assert.match(read("site/support.html"), new RegExp(`v${v}`));
+    assert.match(read("site/humans.txt"), new RegExp(v));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.4\]/);
   });
 
