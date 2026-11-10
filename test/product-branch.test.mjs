@@ -2,8 +2,10 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { execSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
+import { skipShowcase } from './product-only-gate.mjs';
 
 const sh = (c) => execSync(c, { encoding: 'utf8' }).trim();
+const siteSkip = skipShowcase() ? 'showcase lives on main; this checkout is product-only' : false;
 
 describe('product branch excludes showcase site', () => {
   it('local product branch exists', () => {
@@ -23,7 +25,7 @@ describe('product branch excludes showcase site', () => {
     assert.match(files, /scripts\/gate\.mjs/);
     assert.match(files, /\.github\/workflows\/daily-review\.yml/);
   });
-  it('hero CTA points at product branch not /generate', () => {
+  it('hero CTA points at product branch not /generate', { skip: siteSkip }, () => {
     const html = readFileSync('site/index.html', 'utf8');
     assert.match(html, /ymzz-loop\/tree\/product/);
     assert.equal(html.includes('/generate'), false);
@@ -36,13 +38,13 @@ describe('product branch excludes showcase site', () => {
 });
 
 describe('spy has no numeric progress', () => {
-  it('index has no spy-meter or spyPct', () => {
+  it('index has no spy-meter or spyPct', { skip: siteSkip }, () => {
     const html = readFileSync('site/index.html', 'utf8');
     assert.equal(html.includes('spy-meter'), false);
     assert.equal(html.includes('spyPct'), false);
     assert.equal(html.includes('id="spyFill"'), false);
   });
-  it('app.js drives glass vars not percent text', () => {
+  it('app.js drives glass vars not percent text', { skip: siteSkip }, () => {
     const js = readFileSync('site/app.js', 'utf8');
     assert.match(js, /--spy-glass/);
     assert.equal(js.includes('spyPct'), false);

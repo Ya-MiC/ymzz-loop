@@ -1,5 +1,8 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { skipShowcase } from './product-only-gate.mjs';
+
+const siteSkip = skipShowcase() ? 'showcase lives on main; this checkout is product-only' : false;
 
 /** Must stay in sync with site/app.js todo TTL + max slots */
 const TTL_MS = 60 * 60 * 1000 * 60; // 60 hours
@@ -64,7 +67,7 @@ describe('todo max 6 slots (03–08)', () => {
     const items = Array.from({ length: 9 }, (_, i) => ({ id: String(i), text: 'x', created: t0 }));
     assert.equal(purgeItems(items, t0).length, 6);
   });
-  it('zh-Hant limit copy is exact', async () => {
+  it('zh-Hant limit copy is exact', { skip: siteSkip }, async () => {
     const { readFileSync } = await import('node:fs');
     const d = JSON.parse(readFileSync(new URL('../site/i18n/zh-Hant.json', import.meta.url), 'utf8'));
     assert.equal(d['todo.limit'], '如果 6 個代辦不能滿足您的期待，那您剛才一定輸入了一個偽需求。');

@@ -1,0 +1,14 @@
+name: v021
+on: [push, pull_request]
+permissions: { contents: read }
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.83.0
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: cargo test --manifest-path app/Cargo.toml
+      - run: node --test test/v021-tokens.test.mjs test/v021-t3-reuse.test.mjs

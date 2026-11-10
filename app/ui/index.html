@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ymzz-loop 0.21 · 本機復盤</title>
+  <link rel="stylesheet" href="/tokens.css">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <p class="brand">ymzz-loop</p>
+      <p class="quiet">0.21 本機核心 · 支付寶黑客松示範</p>
+      <p class="quiet" id="fontNote"></p>
+      <nav class="nav" aria-label="主選單">
+        <button type="button" data-panel="files" aria-current="page">1 檔案星雲</button>
+        <button type="button" data-panel="links">2 我的連接</button>
+        <button type="button" data-panel="device">3 這台電腦</button>
+        <button type="button" data-panel="talk">對話紀錄</button>
+        <button type="button" data-panel="ocr">文件辨識</button>
+        <button type="button" data-panel="report">彙報</button>
+        <button type="button" data-panel="pay">沙箱收款</button>
+      </nav>
+      <label class="quiet" for="surface">同一個表面只使用一套色</label>
+      <select id="surface">
+        <option value="cloud">雲箋 · 鎖定淺色</option>
+        <option value="earth">陶土 · 鎖定淺色</option>
+        <option value="dusk">暮靄 · 衍生待驗證</option>
+        <option value="wood">暮林 · 衍生待驗證</option>
+      </select>
+    </aside>
+    <main class="main">
+      <ol class="steps longform">
+        <li>選資料夾</li>
+        <li>按查詢</li>
+        <li>看預覽</li>
+        <li>確認才搬動</li>
+        <li>沙箱收款與本機檔案分開</li>
+      </ol>
+      <section id="files" class="panel active">
+        <h1>檔案星雲</h1>
+        <p class="quiet longform">暖紙白表面。預設只有兩個篩選：日期，以及磁碟 × 檔案類型。改條件不會搜尋，要按「查詢」。</p>
+        <p class="banner" id="sampleBanner" hidden>合成樣本，不是這台電腦的檔案。</p>
+        <div class="row">
+          <input id="rootPath" class="input-warm grow" placeholder="資料夾路徑，例如 /home/you/notes" aria-label="資料夾">
+          <button type="button" id="useRoot">使用這個資料夾</button>
+          <button type="button" id="scanRoot">掃描中繼資料</button>
+          <button type="button" id="loadSample">載入合成樣本</button>
+        </div>
+        <div class="row" id="presets">
+          <button type="button" data-preset="3">3 日</button>
+          <button type="button" data-preset="7">7 日</button>
+          <button type="button" data-preset="30">30 日</button>
+          <button type="button" data-preset="90">90 日</button>
+          <button type="button" data-preset="365">365 日</button>
+        </div>
+        <div class="row">
+          <input id="start" class="input-warm" aria-label="開始日期" placeholder="開始 YYYY-MM-DD">
+          <input id="end" class="input-warm" aria-label="結束日期" placeholder="結束 YYYY-MM-DD">
+          <input id="drive" class="input-warm" aria-label="磁碟" placeholder="磁碟，Linux 用掛載點">
+          <input id="ext" class="input-warm" aria-label="副檔名" placeholder="類型，例如 .md">
+          <button type="button" class="primary" id="runQuery">查詢</button>
+        </div>
+        <p class="quiet" id="draftState">尚未查詢。</p>
+        <div class="split">
+          <div>
+            <div class="canvas" id="graph" role="img" aria-label="檔案關係"></div>
+            <div class="card">
+              <p id="heatLabel">日期計數。這不是語義等高線。</p>
+              <div id="heat"></div>
+              <p class="grey" id="semantic"></p>
+              <svg id="compare" width="100%" height="120" aria-label="上次查詢灰線"></svg>
+            </div>
+          </div>
+          <aside class="card">
+            <h2>Markdown</h2>
+            <p class="quiet" id="mdHint">先選資料夾，才能寫入。</p>
+            <textarea id="mdBody" class="input-warm" disabled placeholder="寫一段筆記"></textarea>
+            <div class="row">
+              <input id="mdPath" class="input-warm" placeholder="notes/today.md" disabled>
+              <button type="button" id="mdSave" disabled>儲存新檔</button>
+            </div>
+            <p id="selection"></p>
+            <button type="button" id="selectAll">全選本次結果</button>
+            <h2>整理</h2>
+            <p class="quiet">先預覽。輸入 CONFIRM 才搬動，而且不覆蓋已有檔案。可以撤銷。</p>
+            <input id="moveFrom" class="input-warm" placeholder="來源，例如 a.md" aria-label="來源">
+            <input id="moveTo" class="input-warm" placeholder="目的，例如 sorted/a.md" aria-label="目的">
+            <div class="row">
+              <button type="button" id="planMove">預覽搬動</button>
+              <button type="button" id="confirmMove">確認搬動</button>
+              <button type="button" id="undoMove">撤銷</button>
+            </div>
+            <p id="moveOut"></p>
+          </aside>
+        </div>
+      </section>
+      <section id="links" class="panel">
+        <h1>我的連接</h1>
+        <p class="quiet longform">這裡接的是你自己的 Notion、Sheets、Docs、GitHub、飛書或 Lark。預設不打外網。Oomol 只記錄金鑰參考與團隊名，不是 Login with Oomol。</p>
+        <div class="card">
+          <div class="row">
+            <select id="kind" aria-label="連接種類">
+              <option value="notion">Notion</option>
+              <option value="google_sheets">Google Sheets</option>
+              <option value="google_docs">Google Docs</option>
+              <option value="github">GitHub</option>
+              <option value="feishu">飛書</option>
+              <option value="lark">Lark</option>
+              <option value="oomol_hosted">Oomol 託管</option>
+            </select>
+            <input id="resource" class="input-warm grow" placeholder="資源 ID，不要貼權杖">
+            <input id="secretRef" class="input-warm grow" placeholder="secret_ref，例如 env:NOTION_TOKEN">
+            <button type="button" class="primary" id="saveLink">儲存連接</button>
+          </div>
+          <button type="button" id="syncLink">用合成紀錄同步一次（本機）</button>
+          <button type="button" id="dropLink">中斷連接</button>
+          <pre class="mono" id="linkOut"></pre>
+        </div>
+      </section>
+      <section id="device" class="panel">
+        <h1>這台電腦</h1>
+        <p class="quiet">數值來自這台機器。沒有的項目寫未知或沒有，不補一個型號。</p>
+        <pre class="mono" id="deviceOut">讀取中。</pre>
+      </section>
+      <section id="talk" class="panel">
+        <h1>對話紀錄</h1>
+        <p class="quiet longform">對話留在這台電腦。搜尋使用併入的 T3 文字模組。沒有預設上傳。</p>
+        <div class="row">
+          <input id="threadTitle" class="input-warm grow" placeholder="標題">
+          <button type="button" id="newThread">新對話</button>
+        </div>
+        <textarea id="utterance" class="input-warm" placeholder="寫一句合成內容"></textarea>
+        <div class="row">
+          <button type="button" id="sendUtterance">送出</button>
+          <input id="findText" class="input-warm grow" placeholder="搜尋至少兩個字">
+          <button type="button" id="findBtn">搜尋</button>
+          <button type="button" id="checkPoint">留下檢查點</button>
+          <button type="button" id="exportThread">匯出這段</button>
+          <button type="button" id="archiveThread">封存</button>
+        </div>
+        <p class="quiet">搜尋與訊息清理走已執行的 T3 模組，不是只做匯入畫面。沒有模型供應商驅動時，畫面會寫明缺口。</p>
+        <pre class="mono" id="talkOut"></pre>
+      </section>
+      <section id="ocr" class="panel">
+        <h1>文件辨識</h1>
+        <p class="quiet longform">數位 PDF 先抽文字層。掃描檔要 PaddleOCR。這個程式不擅自下載模型：校驗碼沒有釘住就拒絕。也可以只登記一個你自己的 API，而且這一步不會發請求。</p>
+        <div class="card">
+          <p id="ocrRuntime">讀取執行環境。</p>
+          <pre class="mono" id="ocrCatalog"></pre>
+          <div class="row">
+            <button type="button" id="ocrRefresh">重新讀取目錄</button>
+            <button type="button" id="ocrDownload">下載模型</button>
+            <button type="button" id="ocrSample">抽出合成數位 PDF</button>
+            <button type="button" id="ocrRemove">清除本機快取與 API 設定</button>
+          </div>
+          <p id="ocrResult"></p>
+        </div>
+        <div class="card">
+          <h2>選用的 API</h2>
+          <p class="quiet">只在你勾選之後才記住。金鑰只留遮罩。迴圈位址或 https 都可以，這裡仍然不呼叫。</p>
+          <input id="ocrEndpoint" class="input-warm" placeholder="https:// 或 http://127.0.0.1:…" aria-label="API 位址">
+          <input id="ocrRef" class="input-warm" placeholder="secret_ref，例如 env:OCR_KEY" aria-label="金鑰參考">
+          <label class="quiet"><input id="ocrOpt" type="checkbox"> 我要登記這個 API，了解它還不會被呼叫</label>
+          <div class="row"><button type="button" id="ocrSaveApi">登記</button></div>
+        </div>
+      </section>
+      <section id="report" class="panel">
+        <h1>給主人的彙報</h1>
+        <p class="quiet longform">把本機檔案、600 日復盤進度、對話和沙箱訂單放在同一張紙上。不是會計軟體，不是雲端信箱，也不會把檔案上傳走。</p>
+        <div class="card" id="reportCard"></div>
+        <div class="card">
+          <h2>有依據的判斷</h2>
+          <p class="quiet">判斷只引用你貼上的證據。低信心與文件辨識都要人看過。不會自動刪檔，也不會對外轉帳。</p>
+          <textarea id="evidence" class="input-warm" placeholder="貼上一條證據"></textarea>
+          <button type="button" id="decideBtn">根據這條證據判斷</button>
+          <p id="decideOut"></p>
+        </div>
+        <pre class="mono" id="reportOut"></pre>
+      </section>
+      <section id="pay" class="panel">
+        <h1>沙箱收款</h1>
+        <p class="banner">這是參賽示範的訂單流程，不是正式支付寶扣款。沒有商戶號，不會真的收款。本機檔案不因未付款而鎖住。</p>
+        <div class="row">
+          <button type="button" class="primary" id="newOrder">建立沙箱訂單</button>
+          <button type="button" id="settleOrder">模擬付款驗證</button>
+          <button type="button" id="deliverOrder">交付權益</button>
+          <button type="button" id="refundOrder">部分退款 40 分</button>
+        </div>
+        <pre class="mono" id="payOut"></pre>
+      </section>
+    </main>
+  </div>
+  <nav class="dock" aria-label="手機選單">
+    <button type="button" data-panel="files">檔案</button>
+    <button type="button" data-panel="links">連接</button>
+    <button type="button" data-panel="talk">對話</button>
+    <button type="button" data-panel="report">彙報</button>
+  </nav>
+  <script src="/app.js"></script>
+</body>
+</html>

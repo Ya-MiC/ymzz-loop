@@ -18,3 +18,5 @@ Checked 2026-11-05.
 The website loads no fonts, scripts or styles from third parties; Latin fonts are self-hosted (≈150 KB total); CJK/Arabic use system fonts (Noto if installed). No React Bits, GSAP or award-site code is included; effects are re-implemented.
 
 | Feishu / Lark Open API | — | proprietary API ToS (no SDK vendored) | https://open.feishu.cn/ | optional sink `scripts/sinks/feishu.mjs` |
+| T3 Code | v0.1.8 (`bf469bb`) | MIT | https://github.com/pingdotgg/t3code | pure modules under `third_party/t3code/`; see `NOTICE.md`. Not the whole monorepo. |
+| PaddleOCR | not bundled | Apache-2.0 | https://github.com/PaddlePaddle/PaddleOCR | probe only, `app/ocr/paddle_worker.py`. Weights are not downloaded. |

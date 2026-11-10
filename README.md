@@ -2,6 +2,8 @@
 
 > **This branch has no showcase website** (`site/` and Pages deploy are excluded).
 > It is the **automation product** only: Notion daily review → Sheets + Markdown (+ optional Feishu).
+>
+> v0.21 adds a local Rust app in `app/` (`ymzz-vibe`). It does not replace the Node review. See [docs/v021-run.md](docs/v021-run.md). The repository `LICENSE` is still MIT; ownership notes are in [docs/LICENSE-BOUNDARY.md](docs/LICENSE-BOUNDARY.md).
 
 ## Get this into your own repo (no website)
 

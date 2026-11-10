@@ -2,25 +2,30 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
+import { skipShowcase } from "./product-only-gate.mjs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = rel => readFileSync(join(root, rel), "utf8");
 const pkg = JSON.parse(read("package.json"));
+const siteSkip = skipShowcase(root) ? "showcase lives on main; this checkout is product-only" : false;
 const ADDR = "0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A";
 
 describe("v0.20 hackathon start surface", () => {
-  it("package version is 0.20.x and config/footer/CHANGELOG agree", () => {
+  it("package version is 0.20.x and CHANGELOG agrees", () => {
     assert.match(pkg.version, /^0\.20\.\d+$/);
-    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
-    assert.ok(read("site/index.html").includes(`v${pkg.version}`));
-    assert.ok(read("site/start.html").includes(`v${pkg.version}`));
     assert.match(read("CHANGELOG.md"), /## \[0\.20\.0\]/);
     assert.match(read("CHANGELOG.md"), new RegExp(`## \\[${pkg.version.replaceAll(".", "\\.")}\\]`));
   });
 
-  it("start guide exists, points at product branch, and never the USDC address", () => {
+  it("site config and pages carry the same version", { skip: siteSkip }, () => {
+    assert.ok(read("site/config.js").includes(`VERSION: "${pkg.version}"`));
+    assert.ok(read("site/index.html").includes(`v${pkg.version}`));
+    assert.ok(read("site/start.html").includes(`v${pkg.version}`));
+  });
+
+  it("start guide exists, points at product branch, and never the USDC address", { skip: siteSkip }, () => {
     assert.equal(existsSync(join(root, "site/start.html")), true);
     const start = read("site/start.html");
     assert.match(start, /tree\/product|branch product|--branch product/);
@@ -30,7 +35,7 @@ describe("v0.20 hackathon start surface", () => {
     assert.match(read("site/index.html"), /href="start\.html"/);
   });
 
-  it("landing page does not put USDC donation front and center", () => {
+  it("landing page does not put USDC donation front and center", { skip: siteSkip }, () => {
     const html = read("site/index.html");
     assert.doesNotMatch(html, new RegExp(ADDR));
     assert.doesNotMatch(html, /donate-usdc-arb\.svg/);
