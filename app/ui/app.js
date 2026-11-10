@@ -229,6 +229,8 @@ async function boot() {
   $("fontNote").textContent = "正文字體指定 Noto Sans SC Variable，此包未嵌入字檔。代碼用 JetBrains Mono。深藤紫仍是提案，沒有當成預設。";
   const session = await api("/api/session");
   state.csrf = session.csrf;
+  const root = await api("/api/root");
+  if (root.root) $("rootPath").value = root.root;
   text("deviceOut", JSON.stringify(await api("/api/inventory"), null, 2));
   await loadReport();
   text("semantic", "尚未查詢。");
@@ -291,6 +293,7 @@ $("saveLink").addEventListener("click", async () => {
       resource_id: $("resource").value || "synthetic-resource",
       secret_ref: secretRef || "env:NOT_SET",
       consent: $("linkConsent").checked,
+      approve_target: $("linkApprove").checked,
       base_url: $("baseUrl").value,
       mapping: { mapping: [
         { logical_field: "title", source_type: "title", required: true },
@@ -394,9 +397,14 @@ $("ocrSample").addEventListener("click", async () => {
 });
 $("ocrRuntime").addEventListener("click", async () => {
   try {
-    text("ocrResult", "正在準備獨立 Python 環境。這一步會下載套件，權重仍分開。");
-    const data = await api("/api/ocr/runtime", { method: "POST", body: {} });
-    text("ocrResult", `環境在 ${data.installed_into}。尚未把套件算進 git。`);
+    text("ocrResult", "正在背景準備獨立 Python 環境。套件有校驗碼，權重仍分開。");
+    await api("/api/ocr/runtime", { method: "POST", body: {} });
+    for (let i = 0; i < 120; i += 1) {
+      const status = await api("/api/ocr/runtime");
+      text("ocrResult", `辨識環境：${status.state || ""} ${status.detail || ""}`);
+      if (status.state && status.state !== "running") break;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    }
   } catch (err) { text("ocrResult", err.message); }
 });
 $("ocrSaveApi").addEventListener("click", async () => {
@@ -418,6 +426,13 @@ $("ocrInvoke").addEventListener("click", async () => {
       text: $("ocrText").value,
     } });
     text("ocrResult", data.called ? "已送到本機位址。" : "沒有呼叫。");
+  } catch (err) { text("ocrResult", err.message); }
+});
+$("ocrCancel").addEventListener("click", async () => {
+  try {
+    await api("/api/ocr/cancel", { method: "POST", body: {} });
+    const runtime = await api("/api/ocr/runtime/cancel", { method: "POST", body: {} });
+    text("ocrResult", `已要求取消。環境狀態 ${runtime.state || ""}`);
   } catch (err) { text("ocrResult", err.message); }
 });
 $("ocrRemove").addEventListener("click", async () => {
@@ -459,8 +474,12 @@ $("modelSend").addEventListener("click", async () => {
   try {
     const data = await api("/api/provider", { method: "POST", body: {
       opt_in: $("modelOpt").checked,
+      protocol: $("modelProtocol").value,
       base_url: $("modelBase").value,
+      model: $("modelName").value,
       prompt: $("utterance").value || "hello",
+      include_document: $("modelDoc").checked,
+      content_consent: $("modelDoc").checked,
     } });
     text("talkOut", JSON.stringify(data, null, 2));
   } catch (err) { text("talkOut", err.message); }

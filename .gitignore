@@ -2,3 +2,4 @@ node_modules/
 app/target/
 app/ocr/runtime/
 app/ocr/models/
+*.deb

@@ -15,7 +15,6 @@ use serde_json::{json, Value};
 use std::collections::BTreeMap;
 use std::fs;
 use std::io::Write;
-use std::os::unix::fs::OpenOptionsExt;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::sync::Mutex;
@@ -882,6 +881,9 @@ impl App {
         let loopback =
             base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:");
         if !loopback {
+            if connector.get("approve_target").and_then(|v| v.as_bool()) == Some(true) {
+                return self.sync_https(id, kind, connector, mapping, records);
+            }
             let sample = records.first().cloned().unwrap_or(json!({}));
             let checked = if records.is_empty() {
                 json!({})
@@ -987,12 +989,7 @@ impl App {
         let dir = self.cfg.lock().expect("cfg").data_dir.join("secrets");
         fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
         let path = dir.join(&id);
-        let mut file = fs::OpenOptions::new()
-            .create_new(true)
-            .write(true)
-            .mode(0o600)
-            .open(&path)
-            .map_err(|e| e.to_string())?;
+        let mut file = open_private(&path, true)?;
         file.write_all(value.as_bytes())
             .map_err(|e| e.to_string())?;
         Ok(json!({"secret_ref": format!("local:{id}"), "stored": true}))
@@ -1016,9 +1013,12 @@ impl App {
         if meta.file_type().is_symlink() {
             return Err("secret symlink rejected".into());
         }
-        use std::os::unix::fs::PermissionsExt;
-        if meta.permissions().mode() & 0o077 != 0 {
-            return Err("secret file is not mode 0600".into());
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            if meta.permissions().mode() & 0o077 != 0 {
+                return Err("secret file is not mode 0600".into());
+            }
         }
         let text = fs::read_to_string(&path).map_err(|e| e.to_string())?;
         Ok(text.trim().to_string())
@@ -1240,7 +1240,17 @@ impl App {
 
     pub fn ocr_runtime(&self) -> Result<Value, String> {
         let data = self.cfg.lock().expect("cfg").data_dir.clone();
-        crate::ocrflow::install_runtime(&data)
+        crate::ocrflow::start_runtime(&data)
+    }
+
+    pub fn ocr_runtime_status(&self) -> Result<Value, String> {
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::runtime_status(&data)
+    }
+
+    pub fn ocr_runtime_cancel(&self) -> Result<Value, String> {
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::cancel_runtime(&data)
     }
 
     pub fn ocr_api(&self, body: &Value) -> Result<Value, String> {
@@ -1295,7 +1305,41 @@ impl App {
             );
         }
         if !loopback {
-            return Err("this build invokes only an explicit loopback OCR endpoint".into());
+            let bearer = if secret_ref.starts_with("local:") {
+                self.load_local_secret(&secret_ref)?
+            } else if !key.is_empty() {
+                key.to_string()
+            } else {
+                return Err("invoke needs a local secret".into());
+            };
+            let text = body.get("text").and_then(|v| v.as_str()).unwrap_or("");
+            if text.is_empty() {
+                return Err("nothing to send".into());
+            }
+            let resp = crate::https::send(crate::https::Request {
+                method: "POST".into(),
+                url: endpoint.to_string(),
+                headers: vec![
+                    ("Authorization".into(), format!("Bearer {bearer}")),
+                    ("Content-Type".into(), "application/json".into()),
+                ],
+                body: json!({"text": text}).to_string().into_bytes(),
+                policy: crate::https::Policy::Remote,
+                timeout: Duration::from_secs(20),
+                max_bytes: 1_048_576,
+                cancel: None,
+            })
+            .map_err(|e| redact(&e, &[bearer.as_str()]))?;
+            return Ok(json!({
+                "opt_in": true,
+                "key": masked,
+                "called": true,
+                "inference": "remote_https",
+                "auth": "not_live_authenticated",
+                "status": resp.status,
+                "file_operation": "none",
+                "response": redact(&resp.body, &[bearer.as_str()]),
+            }));
         }
         let text = body.get("text").and_then(|v| v.as_str()).unwrap_or("");
         if text.is_empty() {
@@ -1346,25 +1390,110 @@ impl App {
         if blocked_provider_host(base) {
             return Err("nvidia nim is not called".into());
         }
-        if !(base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:")) {
-            return Err(
-                "this build only calls an explicit loopback OpenAI-compatible server".into(),
-            );
-        }
         let prompt = body.get("prompt").and_then(|v| v.as_str()).unwrap_or("");
         if prompt.is_empty() {
             return Err("prompt required".into());
         }
-        let mut content = prompt.to_string();
-        if body
+        let include_document = body
             .get("include_document")
             .and_then(|v| v.as_bool())
-            .unwrap_or(false)
-        {
+            .unwrap_or(false);
+        if include_document && body.get("content_consent").and_then(|v| v.as_bool()) != Some(true) {
+            return Err("document text is not sent without content_consent".into());
+        }
+        let mut content = prompt.to_string();
+        if include_document {
             if let Some(doc) = body.get("document_text").and_then(|v| v.as_str()) {
                 content.push('\n');
                 content.push_str(doc);
             }
+        }
+        let protocol = body
+            .get("protocol")
+            .and_then(|v| v.as_str())
+            .unwrap_or("openai");
+        let loopback =
+            base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:");
+        if protocol == "ollama" {
+            if !loopback {
+                return Err("ollama mode only dials an explicit loopback port".into());
+            }
+            let model = body
+                .get("model")
+                .and_then(|v| v.as_str())
+                .unwrap_or("local");
+            let req = BuiltRequest {
+                method: "POST".into(),
+                url: format!("{}/api/chat", base.trim_end_matches('/')),
+                headers: vec![("Content-Type".into(), "application/json".into())],
+                body: json!({
+                    "model": model,
+                    "messages": [{"role": "user", "content": content}],
+                    "stream": false
+                })
+                .to_string(),
+            };
+            let raw = connectors::exchange_with(
+                &req,
+                connectors::ExchangePolicy {
+                    allow_loopback: true,
+                    allow_public: false,
+                },
+                1,
+            )?;
+            let reply = raw.split("\r\n\r\n").nth(1).unwrap_or("").to_string();
+            return Ok(json!({
+                "called": true,
+                "file_operation": "none",
+                "auto_apply": false,
+                "host": "ollama_loopback",
+                "auth": "local_not_a_cloud_account",
+                "reply": reply
+            }));
+        }
+        if base.starts_with("https://") {
+            let secret_ref = body
+                .get("secret_ref")
+                .and_then(|v| v.as_str())
+                .unwrap_or("");
+            let bearer = self.load_local_secret(secret_ref)?;
+            let url = chat_completions_url(base);
+            let model = body
+                .get("model")
+                .and_then(|v| v.as_str())
+                .filter(|s| !s.is_empty())
+                .ok_or("model required")?;
+            let resp = crate::https::send(crate::https::Request {
+                method: "POST".into(),
+                url,
+                headers: vec![
+                    ("Authorization".into(), format!("Bearer {bearer}")),
+                    ("Content-Type".into(), "application/json".into()),
+                ],
+                body: json!({"model": model, "messages": [{"role": "user", "content": content}]})
+                    .to_string()
+                    .into_bytes(),
+                policy: crate::https::Policy::Remote,
+                timeout: Duration::from_secs(20),
+                max_bytes: 1_048_576,
+                cancel: None,
+            })
+            .map_err(|e| redact(&e, &[bearer.as_str()]))?;
+            return Ok(json!({
+                "called": true,
+                "file_operation": "none",
+                "auto_apply": false,
+                "host": "remote_https",
+                "auth": "not_live_authenticated",
+                "status": resp.status,
+                "reply": redact(&resp.body, &[bearer.as_str()]),
+            }));
+        }
+        if !loopback {
+            return Err(
+                "use http://127.0.0.1 or http://localhost for a local server, or https for an approved remote provider"
+                    .into(),
+            );
         }
         let req = BuiltRequest {
             method: "POST".into(),
@@ -1391,10 +1520,64 @@ impl App {
     }
 
     pub fn ocr_remove(&self) -> Result<Value, String> {
-        let dir = self.cfg.lock().expect("cfg").data_dir.join("ocr-cache");
-        let _ = fs::remove_dir_all(&dir);
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        let _ = crate::ocrflow::cancel_runtime(&data);
+        let _ = fs::remove_dir_all(data.join("ocr-cache"));
+        let _ = fs::remove_dir_all(data.join("ocr-runtime"));
         store::kv_put(&self.db.lock().expect("db"), "ocr_api", "{}")?;
         Ok(json!({"removed": true}))
+    }
+
+    fn sync_https(
+        &self,
+        id: &str,
+        kind: &str,
+        connector: &Value,
+        mapping: &Value,
+        records: &[Value],
+    ) -> Result<Value, String> {
+        if connector.get("consent").and_then(|v| v.as_bool()) != Some(true) {
+            return Err("consent required before an official host is contacted".into());
+        }
+        let secret = self.load_local_secret(
+            connector
+                .get("secret_ref")
+                .and_then(|v| v.as_str())
+                .unwrap_or(""),
+        )?;
+        let sample = records.first().cloned().ok_or("nothing to send")?;
+        let checked = connectors::validate_record(mapping, &sample)?;
+        let mut built = preview_request(kind, connector, &checked)?;
+        for header in &mut built.headers {
+            if header.0.eq_ignore_ascii_case("authorization") {
+                header.1 = format!("Bearer {secret}");
+            }
+        }
+        let resp = crate::https::send(crate::https::Request {
+            method: built.method,
+            url: built.url,
+            headers: built.headers,
+            body: built.body.into_bytes(),
+            policy: crate::https::Policy::Remote,
+            timeout: Duration::from_secs(20),
+            max_bytes: 1_048_576,
+            cancel: None,
+        })
+        .map_err(|e| redact(&e, &[secret.as_str()]))?;
+        let detail = redact(
+            &format!("https {} {}", resp.status, resp.body),
+            &[secret.as_str()],
+        );
+        self.log_sync(id, resp.status < 400, &detail)?;
+        Ok(json!({
+            "applied": 0,
+            "duplicates": 0,
+            "transport": "https",
+            "live_called": true,
+            "auth": "remote_https_not_live_authenticated",
+            "status": resp.status,
+            "official_host": true,
+        }))
     }
 
     pub fn decide(&self, body: &Value) -> Result<Value, String> {
@@ -1908,6 +2091,31 @@ fn draft_json(spec: &QuerySpec) -> Value {
     })
 }
 
+fn open_private(path: &Path, create_new: bool) -> Result<fs::File, String> {
+    let mut opts = fs::OpenOptions::new();
+    opts.write(true);
+    if create_new {
+        opts.create_new(true);
+    } else {
+        opts.create(true).truncate(true);
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        opts.mode(0o600);
+    }
+    opts.open(path).map_err(|e| e.to_string())
+}
+
+fn chat_completions_url(base: &str) -> String {
+    let trimmed = base.trim_end_matches('/');
+    if trimmed.ends_with("/chat/completions") {
+        trimmed.to_string()
+    } else {
+        format!("{trimmed}/chat/completions")
+    }
+}
+
 fn empty_to_none(v: Option<&str>) -> Option<String> {
     v.filter(|s| !s.is_empty()).map(|s| s.to_string())
 }
@@ -1920,13 +2128,7 @@ fn load_or_create(path: &Path) -> Result<String, String> {
         }
     }
     let value = random_id("tok");
-    let mut file = fs::OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .mode(0o600)
-        .open(path)
-        .map_err(|e| e.to_string())?;
+    let mut file = open_private(path, false)?;
     file.write_all(value.as_bytes())
         .map_err(|e| e.to_string())?;
     Ok(value)
@@ -2077,6 +2279,7 @@ fn run_argv(argv: &[String], cwd: &Path, timeout: Duration) -> Result<Value, Str
 mod tests {
     use super::*;
     use crate::dates::{parse_ymd, preset_days};
+    #[cfg(unix)]
     use std::os::unix::fs::symlink;
 
     fn app() -> (App, PathBuf) {
@@ -2147,6 +2350,7 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         fs::write(root.join("note.md"), b"hello synthetic").unwrap();
         fs::write(root.join(".env"), b"SUPER_SECRET_VALUE").unwrap();
+        #[cfg(unix)]
         symlink("/etc/passwd", root.join("leak")).unwrap();
         app.set_root(&root.to_string_lossy()).unwrap();
         app.scan("Asia/Seoul").unwrap();
@@ -2157,13 +2361,16 @@ mod tests {
             env.skip_reason.as_deref(),
             Some("secret_name_content_not_read")
         );
-        let link = recs.iter().find(|r| r.path.ends_with("leak")).unwrap();
-        assert!(
-            link.escapes
-                || link.skip_reason.as_deref() == Some("symlink_not_followed")
-                || link.skip_reason.as_deref() == Some("symlink_escapes_root")
-        );
-        assert!(!link.readable);
+        #[cfg(unix)]
+        {
+            let link = recs.iter().find(|r| r.path.ends_with("leak")).unwrap();
+            assert!(
+                link.escapes
+                    || link.skip_reason.as_deref() == Some("symlink_not_followed")
+                    || link.skip_reason.as_deref() == Some("symlink_escapes_root")
+            );
+            assert!(!link.readable);
+        }
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -2278,6 +2485,7 @@ mod tests {
         let _ = fs::remove_dir_all(&dir);
     }
 
+    #[cfg(unix)]
     #[test]
     fn provider_fixture_runs() {
         let (app, dir) = app();
@@ -2538,6 +2746,26 @@ mod tests {
                 || err.contains("blocked")
                 || err.contains("public")
         );
+        let held = app
+            .connector_save(&json!({
+                "kind": "notion",
+                "consent": false,
+                "approve_target": true,
+                "secret_ref": secret["secret_ref"],
+                "resource_id": "db",
+                "mapping": mapping
+            }))
+            .unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        let refused = app
+            .connector_sync(
+                &held,
+                &json!({"transport":"live","records":[{"title":"合成","date":"2026-11-07","record_id":"SYN-HOLD","version":"1"}]}),
+            )
+            .unwrap_err();
+        assert!(refused.contains("consent"), "{refused}");
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -2574,6 +2802,51 @@ mod tests {
         let saved = app.ocr_api(&json!({"opt_in": true, "endpoint": "https://ocr.example/v1", "key": "super-secret-ocr"})).unwrap();
         assert_eq!(saved["called"], false);
         assert!(!saved.to_string().contains("super-secret-ocr"));
+        assert!(app
+            .provider_chat(&json!({"opt_in": true, "base_url": "http://127.0.0.1:9", "prompt": "hi", "include_document": true}))
+            .unwrap_err()
+            .contains("content_consent"));
+        let secret = app.secret_put("not-a-real-key").unwrap();
+        let err = app
+            .provider_chat(&json!({
+                "opt_in": true,
+                "base_url": "https://10.1.2.3/v1",
+                "prompt": "hi",
+                "model": "fixture-model",
+                "secret_ref": secret["secret_ref"]
+            }))
+            .unwrap_err();
+        assert!(err.contains("not a public"), "{err}");
+        assert!(!err.contains("not-a-real-key"));
+        let ollama = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let oport = ollama.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            use std::io::{Read, Write};
+            let (mut sock, _) = ollama.accept().unwrap();
+            let mut buf = [0u8; 4096];
+            let _ = sock.read(&mut buf);
+            let got = String::from_utf8_lossy(&buf);
+            assert!(got.contains("POST /api/chat"));
+            assert!(got.contains("\"stream\":false"));
+            let body = b"{\"message\":{\"content\":\"ollama-reply\"}}";
+            let resp = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            sock.write_all(resp.as_bytes()).unwrap();
+            sock.write_all(body).unwrap();
+        });
+        let local = app
+            .provider_chat(&json!({
+                "opt_in": true,
+                "protocol": "ollama",
+                "base_url": format!("http://127.0.0.1:{oport}"),
+                "prompt": "hello",
+                "model": "fixture"
+            }))
+            .unwrap();
+        assert_eq!(local["host"], "ollama_loopback");
+        assert!(local["reply"].as_str().unwrap().contains("ollama-reply"));
         let _ = fs::remove_dir_all(&dir);
     }
 

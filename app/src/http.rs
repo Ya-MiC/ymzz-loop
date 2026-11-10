@@ -193,6 +193,8 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("POST", "/api/ocr/recognize") => app.ocr_recognize_sample(),
         ("POST", "/api/ocr/cancel") => app.ocr_cancel(),
         ("POST", "/api/ocr/runtime") => app.ocr_runtime(),
+        ("GET", "/api/ocr/runtime") => app.ocr_runtime_status(),
+        ("POST", "/api/ocr/runtime/cancel") => app.ocr_runtime_cancel(),
         ("POST", "/api/ocr/sample") => app.ocr_sample(),
         ("POST", "/api/ocr/api") => app.ocr_api(body),
         ("POST", "/api/provider") => app.provider_chat(body),

@@ -108,21 +108,20 @@ fn desktop(args: &[String]) {
             std::process::exit(1);
         }
     };
-    let url = format!("http://127.0.0.1:{port}/");
+    let server = Arc::clone(&app);
     std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_millis(400));
-        let opened = std::process::Command::new("xdg-open").arg(&url).status();
-        if opened.map(|s| s.success()).unwrap_or(false) {
-            return;
+        if let Err(err) = ymzz_vibe::http::bind_and_serve(server, port) {
+            eprintln!("{err}");
         }
-        eprintln!(
-            "open {url} in a browser. Choose a folder from the page; no shell command is required."
-        );
     });
-    if let Err(err) = ymzz_vibe::http::bind_and_serve(app, port) {
-        eprintln!("{err}");
-        std::process::exit(1);
+    for _ in 0..50 {
+        if std::net::TcpStream::connect(("127.0.0.1", port)).is_ok() {
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
     }
+    ymzz_vibe::shell::open(app, port);
+    std::process::exit(0);
 }
 
 fn mcp_stdio() {

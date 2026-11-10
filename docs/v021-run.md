@@ -17,7 +17,7 @@ Port `413` is decimal. If the operating system refuses it, the program stops and
 
 Open `http://127.0.0.1:1413/`. The session cookie is set by that page. The token file in the data directory is mode `0600`.
 
-`ymzz-vibe desktop` is the installable loopback shell. It uses port 1413 on purpose, because 413 is privileged, and it opens the page with `xdg-open` when that command exists. The page lists folders; it does not ask for a Cargo command. Tauri was not compiled in this environment because the WebKit development files are absent. `packaging/ymzz-loop.desktop` is a user launcher for a binary you have already built. It is not an AppImage, deb, or notarized package.
+`ymzz-vibe desktop` opens a GTK 3 window with the system WebKit and listens on 127.0.0.1:1413. Port 413 is privileged, so the program does not try it and does not use sudo. The header button is a GTK folder chooser. Tauri is not used. `scripts/package-deb.sh` builds a Linux amd64 .deb that depends on the distro WebKit and GTK packages. Windows and macOS shells are not built. OCR wheels are not in the package; the window installs the hash-pinned set into its data directory.
 
 PaddleOCR weights are not in git. `app/ocr/pins.json` records sha256 values computed here from the downloaded bytes. The app downloads those HTTPS URLs with curl, checks the pin, and extracts only if the archive listing has no symlink, absolute path, or `..`. The isolated interpreter is `python3 -m venv` under the data directory plus `app/ocr/requirements-ocr.txt`. Until that interpreter exists, the catalog says the runtime is not bundled. A saved API address is not a call. A call happens only after opt-in, and this build places that call on an explicit loopback URL.
 

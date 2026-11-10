@@ -4,6 +4,8 @@ use std::fs;
 use std::io::Read;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
 use std::time::Duration;
 
 pub static OCR_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
@@ -37,7 +39,55 @@ pub fn python_for(data_dir: &Path) -> PathBuf {
     PathBuf::from("python3")
 }
 
-pub fn install_runtime(data_dir: &Path) -> Result<Value, String> {
+static RUNTIME_RUNNING: AtomicBool = AtomicBool::new(false);
+
+pub fn start_runtime(data_dir: &Path) -> Result<Value, String> {
+    if RUNTIME_RUNNING.swap(true, Ordering::AcqRel) {
+        return runtime_status(data_dir);
+    }
+    let data = data_dir.to_path_buf();
+    write_runtime_status(&data, "running", "preparing the isolated runtime");
+    thread::spawn(move || {
+        let result = install_blocking(&data);
+        match result {
+            Ok(()) => write_runtime_status(&data, "ready", "hashed wheels installed"),
+            Err(err) if err == "cancelled" => write_runtime_status(&data, "cancelled", "cancelled"),
+            Err(err) => write_runtime_status(&data, "failed", &err),
+        }
+        let _ = fs::remove_file(data.join("ocr-runtime.pid"));
+        RUNTIME_RUNNING.store(false, Ordering::Release);
+    });
+    Ok(json!({"state": "running", "background": true, "bundled": false}))
+}
+
+pub fn runtime_status(data_dir: &Path) -> Result<Value, String> {
+    let path = data_dir.join("ocr-runtime.status");
+    if let Ok(text) = fs::read_to_string(&path) {
+        if let Ok(v) = serde_json::from_str::<Value>(&text) {
+            return Ok(v);
+        }
+    }
+    let python = data_dir.join("ocr-runtime/bin/python");
+    Ok(json!({"state": if python.is_file() { "ready" } else { "absent" }, "background": false}))
+}
+
+pub fn cancel_runtime(data_dir: &Path) -> Result<Value, String> {
+    let _ = fs::write(data_dir.join("ocr-runtime.cancel"), "1");
+    if let Ok(pid) = fs::read_to_string(data_dir.join("ocr-runtime.pid")) {
+        let pid = pid.trim();
+        if !pid.is_empty() && pid.chars().all(|c| c.is_ascii_digit()) {
+            #[cfg(unix)]
+            {
+                let _ = Command::new("kill").args(["-TERM", pid]).status();
+            }
+        }
+    }
+    write_runtime_status(data_dir, "cancelled", "cancel requested");
+    Ok(json!({"state": "cancelled"}))
+}
+
+fn install_blocking(data_dir: &Path) -> Result<(), String> {
+    let _ = fs::remove_file(data_dir.join("ocr-runtime.cancel"));
     let dest = data_dir.join("ocr-runtime");
     let python = dest.join("bin/python");
     if !python.is_file() {
@@ -50,16 +100,41 @@ pub fn install_runtime(data_dir: &Path) -> Result<Value, String> {
             return Err("could not create the OCR virtualenv; python3-venv is required".into());
         }
     }
-    let req = util::repo_root().join("app/ocr/requirements-ocr.txt");
-    let status = Command::new(&python)
-        .args(["-m", "pip", "install", "-r"])
-        .arg(&req)
-        .status()
-        .map_err(|e| e.to_string())?;
-    if !status.success() {
-        return Err("pip install of the pinned OCR runtime failed".into());
+    if data_dir.join("ocr-runtime.cancel").is_file() {
+        return Err("cancelled".into());
     }
-    Ok(json!({"python": python, "bundled": false, "installed_into": dest}))
+    let req = util::repo_root().join("app/ocr/requirements-ocr-hashed.txt");
+    if !req.is_file() {
+        return Err("hashed requirements file is missing".into());
+    }
+    let mut child = Command::new(&python)
+        .args([
+            "-m",
+            "pip",
+            "install",
+            "--require-hashes",
+            "--only-binary=:all:",
+            "-r",
+        ])
+        .arg(&req)
+        .spawn()
+        .map_err(|e| e.to_string())?;
+    let _ = fs::write(data_dir.join("ocr-runtime.pid"), child.id().to_string());
+    let status = child.wait().map_err(|e| e.to_string())?;
+    if data_dir.join("ocr-runtime.cancel").is_file() {
+        return Err("cancelled".into());
+    }
+    if !status.success() {
+        return Err("pip install of the hash-pinned OCR runtime failed".into());
+    }
+    Ok(())
+}
+
+fn write_runtime_status(data_dir: &Path, state: &str, detail: &str) {
+    let _ = fs::write(
+        data_dir.join("ocr-runtime.status"),
+        json!({"state": state, "detail": detail, "bundled": false}).to_string(),
+    );
 }
 
 pub fn ensure(data_dir: &Path) -> Result<Value, String> {
@@ -342,6 +417,7 @@ fn write_status(cache: &Path, text: &str) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(unix)]
     use std::os::unix::fs::symlink;
 
     #[test]
@@ -353,6 +429,7 @@ mod tests {
         ));
     }
 
+    #[cfg(unix)]
     #[test]
     fn extract_refuses_a_symlink_member() {
         let dir = std::env::temp_dir().join(format!("ymzz-tar-{}", std::process::id()));

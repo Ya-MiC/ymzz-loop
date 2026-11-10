@@ -115,8 +115,9 @@
             <input id="resource" class="input-warm grow" placeholder="資源 ID，不要貼權杖">
             <input id="secretRef" class="input-warm grow" placeholder="已存的 secret_ref，或留空改用下面的金鑰" aria-label="金鑰參考">
             <input id="secretValue" class="input-warm grow" type="password" placeholder="金鑰只寫進本機 0600 檔" aria-label="本機金鑰" autocomplete="off">
-            <label class="quiet"><input id="linkConsent" type="checkbox"> 同意對我填的位址送出</label>
-            <input id="baseUrl" class="input-warm grow" placeholder="本機測試位址 http://127.0.0.1:…" aria-label="測試位址">
+            <label class="quiet"><input id="linkConsent" type="checkbox"> 同意送出</label>
+            <label class="quiet"><input id="linkApprove" type="checkbox"> 核准打官方 HTTPS 主機</label>
+            <input id="baseUrl" class="input-warm grow" placeholder="本機測試位址 http://127.0.0.1:…，留空才用官方主機" aria-label="測試位址">
             <button type="button" class="primary" id="saveLink">儲存連接</button>
           </div>
           <button type="button" id="syncLink">用合成紀錄同步一次（本機）</button>
@@ -145,17 +146,25 @@
           <button type="button" id="exportThread">匯出這段</button>
           <button type="button" id="archiveThread">封存</button>
         </div>
-        <p class="quiet">搜尋、匯入清理與模型短名走已執行的 T3 模組。下面的模型只打你同意的本機位址，不打 NVIDIA。</p>
+        <p class="quiet">搜尋、匯入清理、串流收集與行程群組保護走已執行的 T3 模組。本機 Ollama 與遠端 HTTPS 是兩條路。NVIDIA 不打。文件內容要另外勾同意。</p>
         <div class="row">
-          <input id="modelBase" class="input-warm grow" placeholder="http://127.0.0.1:… 本機相容位址" aria-label="模型位址">
-          <label class="quiet"><input id="modelOpt" type="checkbox"> 同意打這次本機模型</label>
+          <select id="modelProtocol" aria-label="模型通道">
+            <option value="ollama">本機 Ollama</option>
+            <option value="openai">本機相容或遠端 HTTPS</option>
+          </select>
+          <input id="modelBase" class="input-warm grow" placeholder="http://127.0.0.1:11434 或 https:// 你核准的位址" aria-label="模型位址">
+          <input id="modelName" class="input-warm" placeholder="模型名稱" aria-label="模型名稱" value="">
+        </div>
+        <div class="row">
+          <label class="quiet"><input id="modelOpt" type="checkbox"> 同意打這一次</label>
+          <label class="quiet"><input id="modelDoc" type="checkbox"> 連文件內容一起送</label>
           <button type="button" id="modelSend">送出一句</button>
         </div>
         <pre class="mono" id="talkOut"></pre>
       </section>
       <section id="ocr" class="panel">
         <h1>文件辨識</h1>
-        <p class="quiet longform">數位 PDF 先抽文字層。掃描圖用釘好校驗碼的 PaddleOCR 2.7。下載會核對本機算出的 sha256，不會把未釘住的網址當模型。登記 API 不會發請求；勾選並按下送出，才打到你填的本機位址。</p>
+        <p class="quiet longform">數位 PDF 先抽文字層。掃描圖用釘好校驗碼的 PaddleOCR 2.7。下載會核對本機算出的 sha256。準備環境由這個視窗在背景安裝有校驗碼的套件，不必自己下指令。登記 API 不會發請求。</p>
         <div class="card">
           <p id="ocrStatus">讀取執行環境。</p>
           <p id="ocrResult"></p>
@@ -166,13 +175,14 @@
             <button type="button" id="ocrRecognize">辨識合成掃描圖</button>
             <button type="button" id="ocrSample">抽出合成數位 PDF</button>
             <button type="button" id="ocrRuntime">準備辨識環境</button>
-            <button type="button" id="ocrRemove">清除本機快取與 API 設定</button>
+            <button type="button" id="ocrCancel">取消</button>
+            <button type="button" id="ocrRemove">清除快取、環境與 API 設定</button>
           </div>
         </div>
         <div class="card">
           <h2>選用的 API</h2>
-          <p class="quiet">登記只留遮罩。送出才會打到本機位址，而且只送你貼上的文字。</p>
-          <input id="ocrEndpoint" class="input-warm" placeholder="http://127.0.0.1:…" aria-label="API 位址">
+          <p class="quiet">登記只留遮罩。送出才會打到你填的位址：本機用 http://127.0.0.1，遠端必須是 https。只送你貼上的文字。</p>
+          <input id="ocrEndpoint" class="input-warm" placeholder="http://127.0.0.1:… 或 https://…" aria-label="API 位址">
           <input id="ocrText" class="input-warm" placeholder="要送出的文字" aria-label="辨識文字">
           <label class="quiet"><input id="ocrOpt" type="checkbox"> 我同意這一次打到上面的本機位址</label>
           <div class="row">

@@ -195,7 +195,6 @@ pub fn undo_move(root: &Path, plan: &PlannedMove) -> Result<(), String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::os::unix::fs::symlink;
 
     fn tmp() -> PathBuf {
         let p = std::env::temp_dir().join(format!("ymzz-paths-{}", std::process::id()));
@@ -212,9 +211,13 @@ mod tests {
         assert!(resolve_inside(&root, "CON.md").is_err());
         assert!(resolve_inside(&root, "nested/\u{202e}md").is_err());
         fs::write(root.join("note.md"), b"synthetic").unwrap();
-        symlink("/etc/passwd", root.join("leak")).unwrap();
-        let err = resolve_inside(&root, "leak").unwrap_err();
-        assert!(err.contains("symlink"), "{err}");
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::symlink;
+            symlink("/etc/passwd", root.join("leak")).unwrap();
+            let err = resolve_inside(&root, "leak").unwrap_err();
+            assert!(err.contains("symlink"), "{err}");
+        }
         let _ = fs::remove_dir_all(&root);
     }
 

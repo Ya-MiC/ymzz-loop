@@ -23,6 +23,13 @@ Files (unchanged source, relative to this directory):
 | src/hostClassification.ts | packages/shared/src/hostClassification.ts |
 | src/cliArgs.ts | packages/shared/src/cliArgs.ts |
 | src/mergeMessage.ts | packages/source-control-core/src/server/mergeMessage.ts |
+| upstream/processGroup.ts | packages/provider-core/src/server/processGroup.ts |
+| upstream/collectStreamText.ts | packages/provider-core/src/server/collectStreamText.ts |
+
+`bridge.mjs` executes those files. `collectStreamText.ts` is run with the
+`effect` package installed beside this directory (the same major version the
+v0.1.8 lockfile uses). That is the provider stream collector and the process
+group guard. It is not the OpenCode, Codex, or other provider application.
 
 The rest of T3 Code (Effect provider drivers, Electron/iOS/Android shells,
 Tailscale/SSH serving, 1Password, ACP registry, voice, load balancing) is

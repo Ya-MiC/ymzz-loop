@@ -10,5 +10,20 @@ jobs:
       - uses: dtolnay/rust-toolchain@1.83.0
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
+      - run: npm install --prefix third_party/t3code --omit=dev
       - run: cargo test --manifest-path app/Cargo.toml
       - run: node --test test/v021-tokens.test.mjs test/v021-t3-reuse.test.mjs
+  core-other-os:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.83.0
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install --prefix third_party/t3code --omit=dev
+      - run: cargo test --manifest-path app/Cargo.toml

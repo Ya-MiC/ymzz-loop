@@ -10,9 +10,9 @@ struct Row {
 
 const ROWS: &[Row] = &[
     Row { id: "T01", implemented: true, tested: "http::tests::pages_and_auth", unverified: "", gap: "No hosted app.t3.codes client." },
-    Row { id: "T02", implemented: false, tested: "", unverified: "ymzz-vibe desktop opens the loopback UI and the page has a folder browser. Tauri was not compiled here.", gap: "Electron is not bundled. Tauri was not compiled: webkit2gtk is absent and this build will not sudo to install it. The shipping shell is the Rust binary plus a browser, not a packaged WebView." },
+    Row { id: "T02", implemented: true, tested: "the Linux GTK window compiles in this tree", unverified: "Windows and macOS windows were not compiled or opened.", gap: "The Linux shell is GTK 3 plus system WebKitGTK. Electron is not bundled. Tauri was not used. Windows and macOS shells were not built." },
     Row { id: "T03", implemented: false, tested: "", unverified: "", gap: "No iOS or Android store client." },
-    Row { id: "T04", implemented: true, tested: "main help text", unverified: "", gap: "No winget, Homebrew, deb, or AUR package is produced here." },
+    Row { id: "T04", implemented: true, tested: "main help text", unverified: "A Linux amd64 deb is produced by scripts/package-deb.sh when that script is run. This row does not mean Windows or macOS packages were built.", gap: "Windows and macOS installers were not built. winget, Homebrew, and AUR are not produced." },
     Row { id: "T05", implemented: true, tested: "net::tests::port_413_is_decimal_and_non_loopback_is_refused", unverified: "", gap: "systemd unit is printed only. It is not installed." },
     Row { id: "T06", implemented: true, tested: "inventory::tests::inventory_does_not_invent_gpu_or_tpu", unverified: "macOS and Windows were not executed.", gap: "Only this Linux host was sampled." },
     Row { id: "T10", implemented: true, tested: "engine::tests::provider_fixture_runs", unverified: "Live Claude, Codex, Cursor, Grok, OpenCode, fx, Kiro, Pi, Muse were not invoked.", gap: "Upstream Effect provider packages are not vendored." },
@@ -148,10 +148,14 @@ mod tests {
                 "missing S{n:02}"
             );
         }
-        for must_gap in ["T02", "T03", "T23", "T34", "T37", "T40", "T41", "T44"] {
+        for must_gap in ["T03", "T23", "T34", "T37", "T40", "T41", "T44"] {
             let row = rows.iter().find(|r| r["id"] == must_gap).unwrap();
             assert!(!row["gap"].as_str().unwrap().is_empty(), "{must_gap}");
             assert_eq!(row["implemented"], false);
         }
+        let t02 = rows.iter().find(|r| r["id"] == "T02").unwrap();
+        assert_eq!(t02["implemented"], true);
+        assert!(t02["gap"].as_str().unwrap().contains("Windows"));
+        assert_eq!(t02["parity"], false);
     }
 }
