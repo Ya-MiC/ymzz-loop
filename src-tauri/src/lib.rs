@@ -113,9 +113,9 @@ fn start_core(resource_dir: Option<&Path>) -> Result<(), String> {
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
-            let resources = app.path().resource_dir().ok();
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
             {
+                let resources = app.path().resource_dir().ok();
                 start_core(resources.as_deref())?;
                 if let Some(window) = app.get_webview_window("main") {
                     let _ = window.navigate(Url::parse("http://127.0.0.1:1413/").expect("url"));
@@ -123,7 +123,7 @@ pub fn run() {
             }
             #[cfg(any(target_os = "android", target_os = "ios"))]
             {
-                let _ = resources;
+                let _ = app;
             }
             Ok(())
         })
