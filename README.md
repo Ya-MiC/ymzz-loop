@@ -173,8 +173,8 @@ Adversarial notes: `docs/v021-adversarial.md`.
 ## This run
 
 - 檢查（`ci`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344250)
-- 核心測試（`v021`）：Windows 與 macOS 已通過 [42791344057](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344057)。Linux 有一次迴圈連線被拒絕，已修好後重跑。
-- 安裝檔工作流程：[42791344089](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344089)。完成後，`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` 在該次的 artifacts，並進草稿預發行 `v0.21.0-preview`。
+- 核心測試（`v021`）：Windows 與 macOS 已通過。Linux 的迴圈測試曾在標頭到齊、內文還沒到時就把連線關掉，已改成讀完整個請求再回答。
+- 安裝檔工作流程：[42792034835](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42792034835)。完成後，`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` 在該次的 artifacts，並進草稿預發行 `v0.21.0-preview`。
 - 這台機器已打出並打開過 Linux 套件 `ymzz-bingce_0.21.0_amd64.deb`（12.7 MB）。裡面有視窗程式和本機核心，頁面是「怎麼稱呼你」。
 
 Android 的上一輪停在 `setup-android@v3`。這一輪改用 v4。iOS 與手機安裝檔還沒有能打開彙報的成品。沒有上架。

@@ -336,16 +336,32 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
         thread::spawn(move || {
-            let (mut sock, _) = listener.accept().unwrap();
+            let Ok((mut sock, _)) = listener.accept() else {
+                return;
+            };
+            let _ = sock.set_read_timeout(Some(std::time::Duration::from_secs(2)));
             let mut buf = Vec::new();
             let mut tmp = [0u8; 1024];
             loop {
-                let n = sock.read(&mut tmp).unwrap_or(0);
-                if n == 0 {
-                    break;
+                match sock.read(&mut tmp) {
+                    Ok(0) => break,
+                    Ok(n) => {
+                        buf.extend_from_slice(&tmp[..n]);
+                        if let Some(pos) = buf.windows(4).position(|w| w == b"\r\n\r\n") {
+                            let header = String::from_utf8_lossy(&buf[..pos]).to_ascii_lowercase();
+                            let len = header
+                                .lines()
+                                .find_map(|line| line.strip_prefix("content-length:"))
+                                .and_then(|v| v.trim().parse::<usize>().ok())
+                                .unwrap_or(0);
+                            if buf.len() >= pos + 4 + len {
+                                break;
+                            }
+                        }
+                    }
+                    Err(_) => break,
                 }
-                buf.extend_from_slice(&tmp[..n]);
-                if buf.windows(4).any(|w| w == b"\r\n\r\n") {
+                if buf.len() > 65_536 {
                     break;
                 }
             }
@@ -354,8 +370,8 @@ mod tests {
                 "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
                 body.len()
             );
-            sock.write_all(resp.as_bytes()).unwrap();
-            sock.write_all(body).unwrap();
+            let _ = sock.write_all(resp.as_bytes());
+            let _ = sock.write_all(body);
         });
         std::env::set_var("YMZZ_CONNECTOR_NET", "1");
         let req = BuiltRequest {
