@@ -12,13 +12,15 @@
 
 | 系統 | 你要下載的檔 | 現況 |
 | --- | --- | --- |
-| Windows | `.msi` 與 `.exe` | 等工作流程跑完，從上面的草稿或 artifacts 下載 |
-| macOS | `.dmg`（未簽名） | 同上 |
-| Linux | `.deb` 與 `.AppImage` | 同上。這台開發機也會先打出一份 `.deb` 做驗證 |
-| Android | `.apk` 可側載；上架要用 `.aab` | 工作流程會試。手機裡還沒有能用的本機核心，不要把它當成已經能用的安裝檔。沒有上架 Google Play |
-| iOS | 模擬器建置 | 工作流程會試。沒有簽過名的 `.ipa`，也沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號 |
+| Windows | [`.msi`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64_en-US.msi) 與 [`.exe`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64-setup.exe) | 已在草稿裡 |
+| macOS | [`.dmg`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_aarch64.dmg)（未簽名，Apple 晶片） | 已在草稿裡 |
+| Linux | [`.deb`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.deb) 與 [`.AppImage`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.AppImage) | 已在草稿裡 |
+| Android | `.apk` 可側載；上架要用 `.aab` | 還沒有檔。手機裡沒有本機核心，就算之後做出殼，也不能打開彙報。沒有上架 Google Play |
+| iOS | 模擬器建置 | 還沒有檔。沒有簽過名的 `.ipa`，也沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號 |
 
-這次執行的精確網址，會在工作流程啟動後補到這份說明的最下方。
+草稿頁（要登入）：https://github.com/Ya-MiC/ymzz-loop/releases/tag/untagged-4bf6ff0326917ba02f0e
+
+同一批檔也在這次成功的工作流程裡：https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344089
 
 ### macOS 被系統擋住時
 
@@ -116,8 +118,8 @@ cargo tauri build --bundles deb,appimage
 | 本機核心、彙報、檔案整理、沙箱收款 | 有測試，在這台電腦上跑過 |
 | 第一次開啟的六個畫面 | Linux 上點過，截圖在上面 |
 | Tauri 2 視窗 | 原始碼在 `src-tauri`。核心是旁邊的程式，因為核心還用 Rust 1.83，Tauri 2.12 需要更新的套件，不能編成同一個程式 |
-| Linux / Windows / macOS 安裝檔 | 工作流程會做。以那次 artifacts 和草稿發行裡真正有的檔為準 |
-| Android、iOS | 工作流程會試。還沒有能打開彙報的手機安裝檔。沒有上架 |
+| Linux / Windows / macOS 安裝檔 | 草稿裡已有 `.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` |
+| Android、iOS | 還沒有能打開彙報的手機安裝檔。沒有上架 |
 | 辨識模型 | 要另外準備。有文字的 PDF 不需要它 |
 | 連接 Notion、試算表、文件、GitHub、飛書、Lark | 可以預覽和保存金鑰。沒有用你的帳號真的呼叫 |
 | 對話和 Claude / Codex 帳號 | 沒有把句子送出去。不能說已經和那些產品對等 |
@@ -140,9 +142,9 @@ The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/i
 
 | System | File | Status |
 | --- | --- | --- |
-| Windows | `.msi` and `.exe` | Download from the draft or the artifacts after the workflow succeeds |
-| macOS | unsigned `.dmg` | Same |
-| Linux | `.deb` and `.AppImage` | Same |
+| Windows | `.msi` and `.exe` | On the draft now |
+| macOS | unsigned Apple silicon `.dmg` | On the draft now |
+| Linux | `.deb` and `.AppImage` | On the draft now |
 | Android | sideload `.apk`; Play needs an `.aab` | The job is allowed to try. There is no mobile build that opens the briefing. Nothing was uploaded to Google Play |
 | iOS | simulator build | No signed `.ipa`, no TestFlight, no App Store. Those need your Apple developer account |
 
@@ -166,7 +168,7 @@ To publish: set the Actions secret `NPM_TOKEN`, configure PyPI trusted publishin
 
 ## Status
 
-The local core, the six-step first run on Linux, and the Tauri 2 window source are in this branch. Desktop installers exist when the workflow artifacts exist. Android and iOS do not yet open the briefing, because the core still builds on Rust 1.83 and Tauri 2.12 cannot be linked into that same crate graph. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT.
+The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. The draft pre-release has the Windows, macOS, and Linux installers. Android and iOS do not open the briefing, because the core still builds on Rust 1.83 and Tauri 2.12 cannot be linked into that same crate graph. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT.
 
 Adversarial notes: `docs/v021-adversarial.md`.
 
@@ -174,7 +176,7 @@ Adversarial notes: `docs/v021-adversarial.md`.
 
 - 檢查（`ci`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344250)
 - 核心測試（`v021`）：Windows 與 macOS 已通過。Linux 的迴圈測試曾在標頭到齊、內文還沒到時就把連線關掉，已改成讀完整個請求再回答。
-- 安裝檔工作流程：[42792034835](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42792034835)。完成後，`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` 在該次的 artifacts，並進草稿預發行 `v0.21.0-preview`。
-- 這台機器已打出並打開過 Linux 套件 `ymzz-bingce_0.21.0_amd64.deb`（12.7 MB）。裡面有視窗程式和本機核心，頁面是「怎麼稱呼你」。
+- 安裝檔：[42791344089](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344089) 成功。草稿裡有 `.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg`。
+- 這台機器已打開過 Linux 套件。頁面是「怎麼稱呼你」。
 
-Android 的上一輪停在 `setup-android@v3`。這一輪改用 v4。iOS 與手機安裝檔還沒有能打開彙報的成品。沒有上架。
+Android 的 SDK 步驟已通過，建置停在「這個視窗套件沒有 library」。iOS 停在找不到 `binaries/core`，而且沒有簽章憑證。兩支都還做不出能打開彙報的手機安裝檔。沒有上架。

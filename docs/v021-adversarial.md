@@ -31,4 +31,4 @@
 
 視窗程式 `ymzz-bingce` 會啟動旁邊的 `ymzz-vibe`。核心檔不在時，視窗會停在「找不到本機核心」。頁面本身只向 `127.0.0.1` 要資料。沒有網路時，稱呼、資料夾和彙報仍可做；辨識模型若還沒準備，掃描圖片那一步會失敗，有文字的 PDF 不依賴那個下載。
 
-Linux 以外的安裝檔要等 GitHub Actions。手機版還沒有能裝來用的核心，原因寫在 README 的狀態表。
+草稿預發行裡已有 Windows `.msi` / `.exe`、macOS `.dmg`、Linux `.deb` / `.AppImage`。這些檔要登入 GitHub 才能從草稿下載。手機版還沒有能裝來用的核心：Android 建置停在視窗套件沒有 library，iOS 停在找不到 `binaries/core` 且沒有簽章憑證。原因也寫在 README 的狀態表。
