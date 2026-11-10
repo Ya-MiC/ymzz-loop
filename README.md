@@ -1,8 +1,10 @@
 # 稟冊
 
-稟冊是晏銘湛箴（ymzz）的本機私人事務稟報。它留在你這台電腦上，把檔案、對話和復盤收成一份給你看的彙報。稱呼、電話和金鑰不送走。
+稟冊是晏銘湛箴（ymzz）的本機私人事務稟報，也是 Alipay PAYATHON 2026 **Vibe Pay 賽道**的作品。設計 Skill 那一份是另一個儲存庫的 Skill 賽道，不在這裡。這份作品留在你這台電腦上，把檔案、對話、復盤和沙箱收款收成一份給你看的彙報。稱呼、電話和金鑰不送走。
 
 「稟」是呈給擁有者的報告，「冊」是留在本機的那一本。產品要交的是這份彙報，不是一個搜尋框，也不是放在別處的共享資料庫。
+
+沙箱收款是 Vibe Pay 沙箱：建立訂單、簽名通知、簽名查單、交付和退一部分。頁面跳回來不算付款。不會真的扣款，也沒有放正式商店的帳號。這不是得獎聲明，也沒有付費用戶。
 
 安裝檔名是 `ymzz-bingce`。視窗標題是「稟冊」。
 
@@ -47,7 +49,7 @@ Google Play 要你自己的開發者帳號，這份儲存庫沒有代為註冊�
 共 6 步。每一步有進度、返回，以及可以跳過的地方。主按鈕只有一個。
 
 1. 怎麼稱呼你。不填電話時預設是「用戶」。有電話時是「用戶」加電話最後四碼。電話只留在這台電腦。字母或不足 8 個數字會停下來說明。
-2. 選一個資料夾。沒有子資料夾時寫「這裡沒有子資料夾。」
+2. 點一個位置。桌面、文件、下載，以及這台電腦上找得到的 Codex、Claude、Cursor、ChatGPT 資料夾，都會列出來。不用自己打路徑。沒有子資料夾時寫「這裡沒有子資料夾。」
 3. 東西留在這台電腦。
 4. 文件辨識可以以後再裝。主按鈕是「開始準備」，「先跳過」不下載。
 5. 連接可以以後再設。
@@ -73,6 +75,20 @@ Google Play 要你自己的開發者帳號，這份儲存庫沒有代為註冊�
 
 ![進入彙報](docs/onboarding/07-dashboard.png)
 
+跳過資料夾時，彙報會先放進合成樣本和一則對話，所以數字不是空的。點數字就到那一頁。側欄、底部（窄螢幕）和「跳到」都能換頁。窄螢幕的側欄收成抽屜，不會蓋住彙報。
+
+下面是 Linux 上用核心和瀏覽器點過的畫面。1100 寬是桌面，390 寬是手機寬度。還沒在裝好的 Windows `.exe`、Linux AppImage，或手機殼裡點過。
+
+![彙報，數字可以點](docs/clickthrough/03-home.png)
+
+![對話](docs/clickthrough/06-talk.png)
+
+![沙箱收款](docs/clickthrough/page-pay.png)
+
+![390 寬，側欄收起](docs/clickthrough/07-mobile-home.png)
+
+![390 寬，選單抽屜](docs/clickthrough/08-mobile-drawer.png)
+
 ## 開始用
 
 從安裝檔打開「稟冊」。視窗會連到這台電腦上的 `127.0.0.1`，不需要先裝別的執行環境。
@@ -94,7 +110,7 @@ cargo tauri build --bundles deb,appimage
 - 600 日復盤：彙報上可以跑每日檢查。檢查在這台電腦上，不連你的帳號。
 - 彙報：檔案數、對話數、沙箱訂單、時區。這台機器沒有自己的時區時，顯示首爾。
 - 文件：有文字的 PDF 會收進可搜尋的紀錄。沒有文字層的 PDF 會請你改選圖片。掃描圖片要另外準備辨識。
-- 沙箱收款：頁面跳回來不算付款。不會真的扣款。正式商店的帳號沒有放在這裡。
+- 沙箱收款：Vibe Pay 沙箱。頁面跳回來不算付款。不會真的扣款。正式商店的帳號沒有放在這裡。
 
 ## 套件
 
@@ -117,6 +133,7 @@ cargo tauri build --bundles deb,appimage
 | --- | --- |
 | 本機核心、彙報、檔案整理、沙箱收款 | 有測試，在這台電腦上跑過 |
 | 第一次開啟的六個畫面 | Linux 上點過，截圖在上面 |
+| 頁面跳轉、不用打路徑、窄螢幕選單 | Linux 上用核心點過 88 個控制項，含 390 寬的抽屜。截圖在上面。裝好的 Windows `.exe`、AppImage、手機殼還沒這樣點過 |
 | Tauri 2 視窗 | 原始碼在 `src-tauri`。核心是旁邊的程式，因為核心還用 Rust 1.83，Tauri 2.12 需要更新的套件，不能編成同一個程式 |
 | Linux / Windows / macOS 安裝檔 | 草稿裡已有 `.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` |
 | Android、iOS | 有未簽名的殼，沒有本機核心，不能打開彙報。沒有上架 |
@@ -132,7 +149,7 @@ cargo tauri build --bundles deb,appimage
 
 # Bingce
 
-Bingce (稟冊) is the local steward under the ymzz brand, 晏銘湛箴. It stays on your computer and brings you a briefing of files, conversations, and the daily review. The nickname, phone number, and keys stay on that computer.
+Bingce (稟冊) is the local steward under the ymzz brand, 晏銘湛箴, and the Alipay PAYATHON 2026 Vibe Pay track entry. The design Skill lives in a separate repository and is the Skill-track entry. Bingce stays on your computer and brings you a briefing of files, conversations, the daily review, and a sandbox payment. The nickname, phone number, and keys stay on that computer.
 
 The product is the briefing brought to its owner, and the local record that briefing comes from.
 
@@ -158,7 +175,7 @@ Six screens, in Traditional Chinese: nickname, folder, local-only explanation, o
 
 ## What is included
 
-File organization from v0.20, local conversation records, a 600-day review, the briefing, document reading, and the Vibe Pay sandbox. The sandbox does not charge. A page redirect is not a payment. No merchant account is stored here.
+File organization from v0.20, local conversation records, a 600-day review, the briefing, document reading, and the Vibe Pay sandbox. Suggested places replace typed paths. Cards, the sidebar, the narrow-screen drawer, and the jump palette all open a real page. The sandbox does not charge. A page redirect is not a payment. No merchant account is stored here. This is not a claim that the contest is won, and there is no paid-user result.
 
 ## Packages
 
@@ -168,7 +185,7 @@ To publish: set the Actions secret `NPM_TOKEN`, configure PyPI trusted publishin
 
 ## Status
 
-The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. The draft pre-release has the Windows, macOS, and Linux installers. Android and iOS artifacts are shells without the local core, so they do not open the briefing. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT.
+The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. A Linux click-through drove 88 controls, including the 390px drawer, against the core in a browser. The installed Windows `.exe`, the AppImage, and the phone shells were not click-tested that way. The draft pre-release still has the previous Windows, macOS, and Linux installers until the next installer run replaces them. Android and iOS artifacts are shells without the local core, so they do not open the briefing. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT. The approved palette is unchanged.
 
 Adversarial notes: `docs/v021-adversarial.md`.
 

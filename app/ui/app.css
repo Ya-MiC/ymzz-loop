@@ -3,7 +3,7 @@
 
 html, body { margin: 0; min-height: 100%; }
 [hidden] { display: none !important; }
-.onboard { min-height: 100vh; max-width: 640px; margin: 0 auto; padding: var(--sp-6) var(--sp-4) var(--sp-8); background: var(--paper); }
+.onboard { min-height: 100vh; max-width: 640px; margin: 0 auto; padding: var(--sp-6) var(--sp-4) var(--sp-8); background: var(--bg-0); }
 .onboard-card h1 { font-size: var(--fs-h2); font-weight: 500; margin: 0 0 var(--sp-2); }
 .dots { display: flex; gap: 8px; padding: 0; margin: 0 0 var(--sp-3); list-style: none; }
 .dots li { width: 28px; height: 6px; border-radius: 999px; background: var(--bg-3); }
@@ -65,20 +65,69 @@ pre.mono, .mono { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 22
 .steps { display: flex; gap: var(--sp-2); flex-wrap: wrap; padding: 0; margin: var(--sp-3) 0; list-style: none; }
 .steps li { background: var(--bg-1); border-radius: 999px; padding: 6px 12px; }
 .dock { display: none; }
+.menu-btn { display: none; }
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scrim);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  min-height: 100%;
+  background: var(--scrim);
+  cursor: pointer;
+}
 .kv { display: grid; grid-template-columns: 8rem 1fr; gap: var(--sp-2) var(--sp-3); margin: 0; }
+.top { display: flex; gap: var(--sp-2); align-items: center; margin: 0 0 var(--sp-3); }
+.crumbs { display: flex; flex-wrap: wrap; gap: var(--sp-2); align-items: center; flex: 1; }
+.crumbs button, .nav button { background: transparent; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); gap: var(--sp-3); }
+.stat { display: flex; flex-direction: column; align-items: flex-start; gap: var(--sp-2); text-align: left; background: var(--bg-1); border-radius: 16px; padding: var(--pad-card); min-height: 108px; }
+.stat strong { font-size: var(--fs-h2); font-weight: 500; }
+.places, .thread-list { display: flex; flex-direction: column; gap: var(--sp-2); }
+.place[aria-pressed="true"], .thread-list button[aria-current="true"] { background: var(--accent-soft); }
+.drop { min-height: 72px; border-radius: 16px; background: var(--bg-1); display: flex; align-items: center; justify-content: center; text-align: center; padding: var(--sp-3); }
+.drop[data-hot="1"] { background: var(--accent-soft); }
+.talk-layout { display: grid; grid-template-columns: minmax(180px, 240px) minmax(0, 1fr); gap: var(--sp-3); }
+.bubble { background: var(--bg-0); border-radius: 12px; padding: var(--sp-3); margin: var(--sp-2) 0; }
+.bubble[data-role="user"] { background: var(--accent-soft); }
+.palette { position: fixed; z-index: var(--z-overlay); left: 18vw; right: 18vw; top: 12vh; background: var(--bg-1); border-radius: 16px; padding: var(--pad-card); }
+.palette button { display: block; width: 100%; text-align: left; background: transparent; }
 .kv dt { color: var(--ink-2); }
 .kv dd { margin: 0; }
 @media (max-width: 860px) {
-  .app { grid-template-columns: 1fr; }
-  .split { grid-template-columns: 1fr; }
+  .app { display: block; min-height: 100vh; }
+  .split, .talk-layout { grid-template-columns: 1fr; }
+  .palette { left: var(--sp-3); right: var(--sp-3); }
   .longform { font-size: var(--fs-body-mobile); }
-  .side .nav { display: none; }
-  .dock {
-    display: flex; position: sticky; bottom: 0; gap: var(--sp-2);
-    padding: var(--sp-2); background: var(--bg-1);
+  .menu-btn { display: inline-flex; align-items: center; }
+  .side {
+    position: fixed;
+    z-index: var(--z-drawer);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    width: min(84vw, 280px);
+    background: var(--bg-0);
+    transform: translateX(-110%);
+    box-shadow: var(--shadow-float);
   }
-  .dock button { flex: 1; min-height: var(--hit); }
-  .main { padding-bottom: var(--sp-6); }
+  body[data-drawer="open"] .side { transform: none; }
+  body[data-app="on"] .dock {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: var(--z-sticky);
+    gap: var(--sp-2);
+    padding: var(--sp-2) var(--sp-2) calc(var(--sp-2) + var(--safe-bottom));
+    background: var(--bg-1);
+  }
+  .dock button { flex: 1 1 0; min-width: 0; min-height: var(--hit); padding: 0 var(--sp-1); }
+  .main { padding-bottom: calc(var(--hit) + var(--sp-8) + var(--safe-bottom)); }
 }
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }

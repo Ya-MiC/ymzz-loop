@@ -33,5 +33,8 @@ describe("v0.21 wenrun surface", () => {
     assert.match(html, /稟冊/);
     assert.match(html, /怎麼稱呼你/);
     assert.match(html, /先跳過/);
+    assert.doesNotMatch(css, /var\(--paper\)/);
+    assert.match(html, /id="menuBtn"/);
+    assert.match(css, /data-drawer/);
   });
 });

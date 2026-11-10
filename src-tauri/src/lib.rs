@@ -112,13 +112,17 @@ fn start_core(resource_dir: Option<&Path>) -> Result<(), String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_opener::init())
         .setup(|app| {
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
             {
                 let resources = app.path().resource_dir().ok();
-                start_core(resources.as_deref())?;
+                let started = start_core(resources.as_deref());
                 if let Some(window) = app.get_webview_window("main") {
-                    let _ = window.navigate(Url::parse("http://127.0.0.1:1413/").expect("url"));
+                    if started.is_ok() {
+                        let _ = window.navigate(Url::parse("http://127.0.0.1:1413/").expect("url"));
+                    }
                 }
             }
             #[cfg(any(target_os = "android", target_os = "ios"))]

@@ -7,12 +7,12 @@
     "frontendDist": "../app/ui"
   },
   "app": {
-    "withGlobalTauri": false,
+    "withGlobalTauri": true,
     "windows": [
       {
         "label": "main",
         "title": "稟冊",
-        "url": "http://127.0.0.1:1413/",
+        "url": "recovery.html",
         "width": 1100,
         "height": 780,
         "resizable": true

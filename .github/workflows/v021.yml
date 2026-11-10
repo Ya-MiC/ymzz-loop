@@ -4,7 +4,7 @@ permissions: { contents: read }
 jobs:
   rust:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@1.83.0
@@ -16,6 +16,10 @@ jobs:
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
       - run: npm install --prefix third_party/t3code --omit=dev
       - run: cargo test --manifest-path app/Cargo.toml
+      - run: cargo build --manifest-path app/Cargo.toml
+      - run: npm install --no-save --no-audit --no-fund playwright
+      - run: npx playwright install --with-deps chromium
+      - run: node test/clickthrough.mjs
       - run: node --test test/v021-tokens.test.mjs test/v021-t3-reuse.test.mjs packages/ymzz/test.test.mjs
   core-other-os:
     strategy:

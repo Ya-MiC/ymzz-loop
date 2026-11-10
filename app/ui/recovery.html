@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>稟冊</title>
+  <link rel="stylesheet" href="tokens.css">
+  <link rel="stylesheet" href="fonts.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body>
+  <section class="onboard">
+    <h1>本機核心沒有連上</h1>
+    <p>稟冊要先啟動這台電腦上的核心，彙報和沙箱收款才會動。沒有核心時，不會給你一排沒有反應的按鈕。</p>
+    <p class="quiet" id="recoveryReason">正在再試一次。</p>
+    <button type="button" class="primary" id="retryCore">再試一次</button>
+  </section>
+  <script>
+    const core = "http://127.0.0.1:1413/";
+    async function retry() {
+      const note = document.getElementById("recoveryReason");
+      note.textContent = "正在連這台電腦上的核心。";
+      try {
+        const res = await fetch(core + "api/health");
+        if (res.ok) {
+          location.href = core;
+          return;
+        }
+      } catch (err) {
+        note.textContent = "還沒連上。請再按一次。";
+      }
+    }
+    document.getElementById("retryCore").addEventListener("click", retry);
+    retry();
+  </script>
+</body>
+</html>

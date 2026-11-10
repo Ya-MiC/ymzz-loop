@@ -9,6 +9,14 @@
   <link rel="stylesheet" href="/app.css">
 </head>
 <body>
+  <button type="button" class="scrim" id="scrim" hidden aria-label="關閉選單"></button>
+  <p class="quiet" id="booting">正在打開。</p>
+  <section id="recovery" class="onboard" hidden>
+    <h1>本機核心沒有連上</h1>
+    <p>稟冊要先連上這台電腦上的核心。沒有核心時，按鈕不會空轉。</p>
+    <p class="warn" id="recoveryReason"></p>
+    <button type="button" class="primary" id="retryCore">再試一次</button>
+  </section>
   <section id="onboard" class="onboard" hidden>
     <p class="quiet" id="onboardProgress">第 1 步，共 6 步</p>
     <ol class="dots" id="onboardDots" aria-hidden="true"></ol>
@@ -27,23 +35,19 @@
       </div>
     </div>
     <div class="card onboard-card" data-step="2" hidden>
-      <h1>選一個資料夾</h1>
-      <p class="quiet">稟冊只整理這個資料夾裡的檔案。還沒選的話，下面是空的。</p>
-      <div class="row">
-        <input id="onboardPath" class="input-warm grow" placeholder="資料夾路徑" aria-label="資料夾路徑">
-        <button type="button" id="onboardBrowse">瀏覽</button>
-      </div>
-      <div class="card" id="onboardBrowser"></div>
+      <h1>選一個位置</h1>
+      <p class="quiet">點一個位置就好。還沒選的話，下面是空的。</p>
+      <div class="places" id="onboardPlaces"></div>
       <p class="warn" id="folderError"></p>
       <div class="row">
         <button type="button" id="folderBack">返回</button>
         <button type="button" id="folderSkip">先跳過</button>
-        <button type="button" class="primary" id="folderNext">用這個資料夾</button>
+        <button type="button" class="primary" id="folderNext">用這個位置</button>
       </div>
     </div>
     <div class="card onboard-card" data-step="3" hidden>
       <h1>東西留在這台電腦</h1>
-      <p>檔案、對話和復盤都在這台電腦。沒有你的同意，不會把內容送出去。</p>
+      <p>檔案、對話、復盤和沙箱訂單都在這台電腦。沒有你的同意，不會把內容送出去。</p>
       <p class="quiet">沙箱收款不會真的扣款。正式商店的帳號沒有放在這裡。</p>
       <div class="row">
         <button type="button" id="privacyBack">返回</button>
@@ -79,18 +83,20 @@
       </div>
     </div>
   </section>
-  <div class="app" id="workspace">
+  <div class="app" id="workspace" hidden>
     <aside class="side">
       <p class="brand">稟冊</p>
       <p class="quiet" id="brandNick">晏銘湛箴</p>
-      <nav class="nav" aria-label="主選單">
-        <button type="button" data-panel="files" aria-current="page">檔案</button>
-        <button type="button" data-panel="links">連接</button>
-        <button type="button" data-panel="device">這台電腦</button>
+      <nav class="nav" id="sideNav" aria-label="主選單">
+        <button type="button" data-panel="home">彙報</button>
+        <button type="button" data-panel="files">檔案</button>
         <button type="button" data-panel="talk">對話</button>
         <button type="button" data-panel="ocr">文件</button>
-        <button type="button" data-panel="report">彙報</button>
+        <button type="button" data-panel="review">復盤</button>
+        <button type="button" data-panel="links">連接</button>
         <button type="button" data-panel="pay">沙箱收款</button>
+        <button type="button" data-panel="device">這台電腦</button>
+        <button type="button" data-panel="settings">設定</button>
       </nav>
       <label class="quiet" for="surface">配色</label>
       <select id="surface">
@@ -101,18 +107,43 @@
       </select>
     </aside>
     <main class="main">
-      <p class="quiet steps-line">選資料夾，查詢，看過再搬。收款和檔案是分開的。</p>
-      <section id="files" class="panel active">
+      <header class="top">
+        <button type="button" id="menuBtn" class="menu-btn" aria-expanded="false" aria-controls="sideNav">選單</button>
+        <button type="button" id="goBack">返回</button>
+        <nav class="crumbs" id="crumbs" aria-label="現在的位置"></nav>
+        <button type="button" id="paletteBtn">跳到</button>
+      </header>
+      <div id="palette" class="palette" hidden>
+        <label class="quiet" for="paletteQuery">要去哪一頁</label>
+        <input id="paletteQuery" class="input-warm" aria-label="搜尋頁面" placeholder="輸入頁面">
+        <div id="paletteList"></div>
+      </div>
+      <p class="quiet" id="navStatus"></p>
+      <section id="home" class="panel active">
+        <h1>彙報</h1>
+        <p class="quiet">檔案、對話、復盤和沙箱收款，收成一份給你。點下面的數字就到那一頁。</p>
+        <div class="stats" id="stats">
+          <button type="button" class="stat" data-go="files"><span class="quiet">檔案</span><strong id="statFilesN">…</strong><span class="quiet" id="statFilesHint">還沒掃描</span></button>
+          <button type="button" class="stat" data-go="talk"><span class="quiet">對話</span><strong id="statTalkN">…</strong><span class="quiet">留在這台電腦</span></button>
+          <button type="button" class="stat" data-go="review"><span class="quiet">600 日復盤</span><strong id="statReviewN">…</strong><span class="quiet">這一章</span></button>
+          <button type="button" class="stat" data-go="ocr"><span class="quiet">文件</span><strong id="statOcrN">…</strong><span class="quiet">辨識</span></button>
+          <button type="button" class="stat" data-go="pay"><span class="quiet">沙箱訂單</span><strong id="statOrderN">…</strong><span class="quiet">不會扣款</span></button>
+        </div>
+        <p class="quiet" id="homeMeta"></p>
+      </section>
+      <section id="files" class="panel">
         <h1>檔案</h1>
-        <p class="quiet">先選日期和類型，再按查詢。改條件不會自己搜。</p>
+        <p class="quiet">點一個位置，或把資料夾拖進來。先選日期和類型，再按查詢。改條件不會自己搜。</p>
         <p class="banner" id="sampleBanner" hidden>這是合成樣本，不是這台電腦裡的檔案。</p>
+        <div class="drop" id="dropZone">把資料夾拖到這裡</div>
+        <div class="places" id="placeList"></div>
+        <p id="placeStatus"></p>
         <div class="row">
-          <input id="rootPath" class="input-warm grow" placeholder="資料夾" aria-label="資料夾">
-          <button type="button" id="browseRoot">瀏覽</button>
-          <button type="button" id="useRoot">用這個資料夾</button>
+          <button type="button" id="browseRoot">選擇其他資料夾</button>
           <button type="button" id="scanRoot">掃描</button>
           <button type="button" id="loadSample">載入樣本</button>
         </div>
+        <div class="card" id="browser" hidden></div>
         <div class="row" id="presets">
           <button type="button" data-preset="3">3 日</button>
           <button type="button" data-preset="7">7 日</button>
@@ -127,11 +158,11 @@
           <button type="button" class="primary" id="runQuery">查詢</button>
         </div>
         <p class="quiet" id="draftState">尚未查詢。</p>
+        <div class="card" id="fileDetail" hidden></div>
         <div class="split">
           <div class="stack">
             <div class="canvas" id="graph" role="img" aria-label="檔案關係"></div>
             <div class="card" id="drawer" aria-label="這一組的檔案"></div>
-            <div class="card" id="browser" hidden></div>
             <div class="card">
               <p id="heatLabel">每天有幾份檔案</p>
               <div id="heat"></div>
@@ -141,18 +172,14 @@
           </div>
           <aside class="card">
             <h2>筆記</h2>
-            <p class="quiet" id="mdHint">先選資料夾，才能寫。</p>
+            <p class="quiet" id="mdHint">先選一個位置，才能寫。</p>
             <textarea id="mdBody" class="input-warm" disabled placeholder="寫一段筆記"></textarea>
-            <div class="row">
-              <input id="mdPath" class="input-warm" placeholder="notes/today.md" disabled>
-              <button type="button" id="mdSave" disabled>儲存</button>
-            </div>
+            <button type="button" id="mdSave" disabled>儲存今天的筆記</button>
             <p id="selection"></p>
             <button type="button" id="selectAll">全選這次結果</button>
             <h2>整理</h2>
-            <p class="quiet">先看預覽。確認後才搬，不會蓋掉已有的檔案。可以撤銷。</p>
-            <input id="moveFrom" class="input-warm" placeholder="來源" aria-label="來源">
-            <input id="moveTo" class="input-warm" placeholder="目的" aria-label="目的">
+            <p class="quiet">先點一份檔案，再點目的位置。確認後才搬，不會蓋掉已有的檔案。可以撤銷。</p>
+            <div class="places" id="movePlaces"></div>
             <div class="row">
               <button type="button" id="planMove">預覽</button>
               <button type="button" id="confirmMove">確認搬動</button>
@@ -164,7 +191,7 @@
       </section>
       <section id="links" class="panel">
         <h1>連接</h1>
-        <p class="quiet">Notion、Sheets、Docs、GitHub、飛書、Lark。金鑰留在這台電腦。先看預覽，同意之後才送出。</p>
+        <p class="quiet">Notion、Sheets、Docs、GitHub、飛書、Lark。金鑰留在這台電腦。不填位址就只在這台電腦上記一筆。</p>
         <div class="card">
           <div class="row">
             <select id="kind" aria-label="連接種類">
@@ -175,11 +202,11 @@
               <option value="feishu">飛書</option>
               <option value="lark">Lark</option>
             </select>
-            <input id="resource" class="input-warm grow" placeholder="資源編號" aria-label="資源編號">
+            <input id="resource" class="input-warm grow" placeholder="資源編號，可留空" aria-label="資源編號">
           </div>
           <div class="row">
             <input id="secretValue" class="input-warm grow" type="password" placeholder="金鑰，只留在這台電腦" aria-label="金鑰" autocomplete="off">
-            <input id="baseUrl" class="input-warm grow" placeholder="留空用官方位址；測試可填本機位址" aria-label="位址">
+            <input id="baseUrl" class="input-warm grow" placeholder="留空就只記在這台電腦" aria-label="位址">
           </div>
           <div class="row">
             <label class="quiet"><input id="linkConsent" type="checkbox"> 我同意送出</label>
@@ -203,45 +230,59 @@
       </section>
       <section id="talk" class="panel">
         <h1>對話</h1>
-        <p class="quiet">對話留在這台電腦。可以搜尋、匯入、匯出，也可以清掉太舊的內容。</p>
-        <div class="card" id="threadList"></div>
-        <div class="row">
-          <input id="threadTitle" class="input-warm grow" placeholder="標題">
-          <button type="button" id="newThread">新對話</button>
+        <p class="quiet">左邊是對話清單。點一則就打開。內容留在這台電腦。</p>
+        <div class="talk-layout">
+          <div>
+            <button type="button" class="primary" id="newThread">新對話</button>
+            <div class="thread-list" id="threadList"></div>
+          </div>
+          <div>
+            <h2 id="threadHeading">選一個對話</h2>
+            <div id="messages"></div>
+            <input id="threadTitle" class="input-warm" placeholder="標題，可留空" aria-label="標題">
+            <textarea id="utterance" class="input-warm" placeholder="寫一句話"></textarea>
+            <div class="row">
+              <button type="button" class="primary" id="sendUtterance">留下這句</button>
+              <input id="findText" class="input-warm grow" placeholder="搜尋" aria-label="搜尋">
+              <button type="button" id="findBtn">搜尋</button>
+            </div>
+            <div class="row">
+              <button type="button" id="checkPoint">留下檢查點</button>
+              <button type="button" id="exportThread">匯出</button>
+              <button type="button" id="archiveThread">封存</button>
+              <button type="button" id="keepRecent">只留最近 30 日</button>
+            </div>
+            <h2>匯入</h2>
+            <textarea id="importJson" class="input-warm" placeholder="貼上一段對話"></textarea>
+            <button type="button" id="importThread">匯入這段</button>
+            <p id="talkStatus"></p>
+            <div class="card" id="talkCard"></div>
+          </div>
         </div>
-        <textarea id="utterance" class="input-warm" placeholder="寫一句話"></textarea>
-        <div class="row">
-          <button type="button" id="sendUtterance">留下這句</button>
-          <input id="findText" class="input-warm grow" placeholder="搜尋" aria-label="搜尋">
-          <button type="button" id="findBtn">搜尋</button>
+      </section>
+      <section id="settings" class="panel">
+        <h1>設定</h1>
+        <p class="quiet">模型只在你勾同意後才送一次。Codex 與 Claude 只看版本，不會拿這句話去登入帳號。本機 Ollama 要填這台電腦上的位址。</p>
+        <div class="card">
+          <div class="row">
+            <select id="modelProtocol" aria-label="模型">
+              <option value="ollama">本機 Ollama</option>
+              <option value="openai">相容介面或 https</option>
+              <option value="codex">Codex</option>
+              <option value="claude">Claude</option>
+            </select>
+            <input id="modelBase" class="input-warm grow" placeholder="本機位址或 https://" aria-label="模型位址">
+            <input id="modelName" class="input-warm" placeholder="模型名稱" aria-label="模型名稱">
+          </div>
+          <textarea id="modelPrompt" class="input-warm" placeholder="寫一句要跟模型說的話"></textarea>
+          <div class="row">
+            <label class="quiet"><input id="modelOpt" type="checkbox"> 我同意這一次</label>
+            <label class="quiet"><input id="modelDoc" type="checkbox"> 連文件一起送</label>
+            <button type="button" id="modelSend">送出</button>
+          </div>
+          <p id="settingsOut"></p>
+          <button type="button" id="openModelThread" hidden>打開這則對話</button>
         </div>
-        <div class="row">
-          <button type="button" id="checkPoint">留下檢查點</button>
-          <button type="button" id="exportThread">匯出</button>
-          <button type="button" id="archiveThread">封存</button>
-          <button type="button" id="keepRecent">只留最近 30 日</button>
-        </div>
-        <h2>跟模型說一句</h2>
-        <p class="quiet">本機 Ollama 和你核准的 https 位址是兩條路。Codex 與 Claude 只看版本，不會拿這句話去登入帳號。</p>
-        <div class="row">
-          <select id="modelProtocol" aria-label="模型">
-            <option value="ollama">本機 Ollama</option>
-            <option value="openai">相容介面或 https</option>
-            <option value="codex">Codex</option>
-            <option value="claude">Claude</option>
-          </select>
-          <input id="modelBase" class="input-warm grow" placeholder="本機位址或 https://" aria-label="模型位址">
-          <input id="modelName" class="input-warm" placeholder="模型名稱" aria-label="模型名稱">
-        </div>
-        <div class="row">
-          <label class="quiet"><input id="modelOpt" type="checkbox"> 我同意這一次</label>
-          <label class="quiet"><input id="modelDoc" type="checkbox"> 連文件一起送</label>
-          <button type="button" id="modelSend">送出</button>
-        </div>
-        <h2>匯入</h2>
-        <textarea id="importJson" class="input-warm" placeholder='貼上合成匯出，例如 {"title":"樣本","messages":[{"role":"user","content":"你好復盤"}]}'></textarea>
-        <button type="button" id="importThread">匯入這段</button>
-        <div class="card" id="talkCard"></div>
       </section>
       <section id="ocr" class="panel">
         <h1>文件</h1>
@@ -250,7 +291,7 @@
           <p id="ocrStatus">正在看辨識是否準備好。</p>
           <div class="row">
             <button type="button" id="browseDocs">瀏覽文件</button>
-            <input id="docFile" type="file" accept="application/pdf,image/png,image/jpeg">
+            <input id="docFile" type="file" accept="application/pdf,image/png,image/jpeg" aria-label="選一份文件">
             <button type="button" class="primary" id="readDoc">讀取選好的檔案</button>
           </div>
           <div class="card" id="docBrowser" hidden></div>
@@ -276,26 +317,25 @@
           </div>
         </div>
       </section>
-      <section id="report" class="panel">
-        <h1>彙報</h1>
-        <p class="quiet">這台電腦上的檔案、復盤和沙箱訂單。</p>
-        <div class="card" id="reportCard"></div>
-        <div class="card">
-          <h2>每日復盤</h2>
-          <p class="quiet" id="reviewNote">每日檢查在這台電腦上跑，不會連上你的帳號。</p>
-          <button type="button" id="runGate">跑一次每日檢查</button>
-          <p id="gateOut"></p>
-        </div>
+      <section id="review" class="panel">
+        <h1>復盤</h1>
+        <p class="quiet" id="reviewNote">這一章最多 600 日。每日檢查在這台電腦上跑，不會連上你的帳號。</p>
+        <div class="card" id="reviewCard"></div>
+        <button type="button" id="runGate">跑一次每日檢查</button>
+        <p id="gateOut"></p>
         <div class="card">
           <h2>根據一條證據</h2>
-          <textarea id="evidence" class="input-warm" placeholder="貼上一條證據"></textarea>
+          <textarea id="evidence" class="input-warm" placeholder="寫一條證據"></textarea>
           <button type="button" id="decideBtn">判斷</button>
           <p id="decideOut"></p>
         </div>
       </section>
       <section id="pay" class="panel">
         <h1>沙箱收款</h1>
-        <p class="banner">這是沙箱，不會真的扣款。頁面跳回來不算付款。正式商店的帳號沒有放在這裡。</p>
+        <p class="banner">這是 Vibe Pay 沙箱，不會真的扣款。頁面跳回來不算付款。正式商店的帳號沒有放在這裡。</p>
+        <div class="card" id="payDetail">
+          <p id="payEmpty">還沒有沙箱訂單。建立一筆之後，狀態會留在這台電腦。</p>
+        </div>
         <div class="row">
           <button type="button" class="primary" id="newOrder">建立沙箱訂單</button>
           <button type="button" id="pageReturn">頁面說已付</button>
@@ -312,11 +352,12 @@
     </main>
   </div>
   <nav class="dock" aria-label="手機選單">
+    <button type="button" data-panel="home">彙報</button>
     <button type="button" data-panel="files">檔案</button>
-    <button type="button" data-panel="links">連接</button>
     <button type="button" data-panel="talk">對話</button>
     <button type="button" data-panel="ocr">文件</button>
-    <button type="button" data-panel="report">彙報</button>
+    <button type="button" data-panel="pay">沙箱</button>
+    <button type="button" id="dockMore">更多</button>
   </nav>
   <script src="/app.js"></script>
 </body>

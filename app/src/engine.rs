@@ -138,6 +138,81 @@ impl App {
         json!({"root": mem.root, "source": mem.source, "markdown_enabled": mem.root.is_some()})
     }
 
+    pub fn places(&self) -> Value {
+        let home = home_dir();
+        let mut places = Vec::new();
+        let mut seen = std::collections::BTreeSet::new();
+        let mut push = |id: &str, label: &str, path: PathBuf| {
+            if !path.is_dir() {
+                return;
+            }
+            let Ok(canon) = path.canonicalize() else {
+                return;
+            };
+            if canon == Path::new("/") || !seen.insert(canon.clone()) {
+                return;
+            }
+            let name = canon
+                .file_name()
+                .map(|s| s.to_string_lossy().to_string())
+                .unwrap_or_else(|| label.to_string());
+            places.push(json!({"id": id, "label": label, "name": name, "path": canon}));
+        };
+        if let Some(root) = self.mem.lock().expect("mem").root.clone() {
+            let name = root
+                .file_name()
+                .map(|s| s.to_string_lossy().to_string())
+                .unwrap_or_else(|| "上次".into());
+            push("remembered", &format!("上次的{name}"), root);
+        }
+        push("home", "家目錄", home.clone());
+        for (id, label, rel) in [
+            ("desktop", "桌面", "Desktop"),
+            ("desktop-zh", "桌面", "桌面"),
+            ("documents", "文件", "Documents"),
+            ("documents-zh", "文件", "文件"),
+            ("downloads", "下載", "Downloads"),
+            ("downloads-zh", "下載", "下載"),
+            ("codex", "Codex", ".codex"),
+            ("claude", "Claude", ".claude"),
+            ("cursor", "Cursor", ".cursor"),
+            ("chatgpt", "ChatGPT", ".chatgpt"),
+        ] {
+            push(id, label, home.join(rel));
+        }
+        json!({"places": places})
+    }
+
+    pub fn reveal(&self, path: &str) -> Result<Value, String> {
+        let path = PathBuf::from(path);
+        if path.as_os_str().is_empty() {
+            return Err("還沒選檔案".into());
+        }
+        let meta = fs::symlink_metadata(&path).map_err(|_| "找不到".to_string())?;
+        if meta.file_type().is_symlink() {
+            return Err("不讀取連結檔".into());
+        }
+        let name = path
+            .file_name()
+            .map(|s| s.to_string_lossy().to_string())
+            .unwrap_or_else(|| "檔案".into());
+        let program = if cfg!(windows) {
+            "explorer"
+        } else if cfg!(target_os = "macos") {
+            "open"
+        } else {
+            "xdg-open"
+        };
+        let handed_off = Command::new(program)
+            .arg(&path)
+            .stdin(std::process::Stdio::null())
+            .stdout(std::process::Stdio::null())
+            .stderr(std::process::Stdio::null())
+            .spawn()
+            .is_ok();
+        Ok(json!({"name": name, "handed_off": handed_off}))
+    }
+
     pub fn scan(&self, tz: &str) -> Result<Value, String> {
         let root = self
             .mem
@@ -2497,6 +2572,20 @@ fn open_private(path: &Path, create_new: bool) -> Result<fs::File, String> {
     opts.open(path).map_err(|e| e.to_string())
 }
 
+fn home_dir() -> PathBuf {
+    if let Ok(path) = std::env::var("HOME") {
+        if !path.is_empty() {
+            return PathBuf::from(path);
+        }
+    }
+    if let Ok(path) = std::env::var("USERPROFILE") {
+        if !path.is_empty() {
+            return PathBuf::from(path);
+        }
+    }
+    PathBuf::from(".")
+}
+
 fn normalize_phone(raw: &str) -> Result<String, String> {
     let trimmed = raw.trim();
     if trimmed.chars().any(|c| c.is_ascii_alphabetic()) {
@@ -2760,6 +2849,20 @@ mod tests {
         fs::create_dir_all(&dir).unwrap();
         let app = App::open(&dir, &util::repo_root()).unwrap();
         (app, dir)
+    }
+
+    #[test]
+    fn places_are_named_locations() {
+        let (app, dir) = app();
+        let data = app.places();
+        let places = data["places"].as_array().unwrap();
+        assert!(places.iter().any(|place| place["label"] == "家目錄"));
+        assert!(places.iter().all(|place| {
+            let label = place["label"].as_str().unwrap_or("");
+            !label.is_empty() && !label.starts_with('/') && !label.contains(":\\")
+        }));
+        assert!(app.reveal("").is_err());
+        let _ = fs::remove_dir_all(dir);
     }
 
     #[test]

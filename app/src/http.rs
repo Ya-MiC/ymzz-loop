@@ -109,6 +109,10 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("GET", "/api/dashboard") => app.dashboard(),
         ("GET", "/api/v020") => app.v020(),
         ("GET", "/api/root") => Ok(app.root()),
+        ("GET", "/api/places") => Ok(app.places()),
+        ("POST", "/api/reveal") => {
+            app.reveal(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
+        }
         ("POST", "/api/root") => {
             app.set_root(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
         }
