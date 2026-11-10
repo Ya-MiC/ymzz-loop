@@ -2,6 +2,9 @@ name: installers
 on:
   push:
     branches: [cursor/v021-integrated-app-e023]
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
   workflow_dispatch:
 permissions:
   contents: write
