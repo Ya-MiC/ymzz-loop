@@ -10,19 +10,19 @@
 
 ## 下載
 
-這些檔案由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v021-integrated-app-e023` 上產生。工作流程成功之後，會放到 GitHub 的**草稿預發行** `v0.21.0-preview`（不公開，不收費）。草稿要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。同一次執行也會把檔案留在 Actions 的 artifacts。
+這些檔案由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v021-integrated-app-e023` 上產生。最新一次成功是 [42803995058](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058)，檔案在 GitHub 的**草稿預發行** `v0.21.0-preview`（不公開，不收費）。草稿要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。同一次執行也會把檔案留在 Actions 的 artifacts。
 
 | 系統 | 你要下載的檔 | 現況 |
 | --- | --- | --- |
 | Windows | [`.msi`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64_en-US.msi) 與 [`.exe`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64-setup.exe) | 已在草稿裡 |
 | macOS | [`.dmg`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_aarch64.dmg)（未簽名，Apple 晶片） | 已在草稿裡 |
 | Linux | [`.deb`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.deb) 與 [`.AppImage`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.AppImage) | 已在草稿裡 |
-| Android | 未簽名的 `.apk`（側載）。上架要用 `.aab` | [這次的 artifact](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42794411086) 裡有 `app-universal-release-unsigned.apk`。裡面沒有本機核心，不能打開彙報。沒有 `.aab`，沒有上架 Google Play |
+| Android | 未簽名的 `.apk`（側載）。上架要用 `.aab` | [這次的 artifact](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058) 裡有未簽名的 apk。裡面沒有本機核心，不能打開彙報。沒有 `.aab`，沒有上架 Google Play |
 | iOS | 模擬器 `.app` | 同一次 artifact 裡有 `ymzz-bingce.app`（Apple 晶片模擬器）。沒有 `.ipa`，沒有簽給真機，沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號 |
 
 草稿頁（要登入）：https://github.com/Ya-MiC/ymzz-loop/releases/tag/untagged-4bf6ff0326917ba02f0e
 
-同一批檔也在這次成功的工作流程裡：https://github.com/Ya-MiC/ymzz-loop/actions/runs/42791344089
+同一批檔也在這次成功的工作流程裡：https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058
 
 ### macOS 被系統擋住時
 
@@ -185,15 +185,15 @@ To publish: set the Actions secret `NPM_TOKEN`, configure PyPI trusted publishin
 
 ## Status
 
-The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. A Linux click-through drove 88 controls, including the 390px drawer, against the core in a browser. The installed Windows `.exe`, the AppImage, and the phone shells were not click-tested that way. The draft pre-release still has the previous Windows, macOS, and Linux installers until the next installer run replaces them. Android and iOS artifacts are shells without the local core, so they do not open the briefing. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT. The approved palette is unchanged.
+The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. A Linux click-through drove 88 controls, including the 390px drawer, against the core in a browser. The installed Windows `.exe`, the AppImage, and the phone shells were not click-tested that way. The draft pre-release now has the Windows, macOS, and Linux installers from that run. Android and iOS artifacts are shells without the local core, so they do not open the briefing. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT. The approved palette is unchanged.
 
 Adversarial notes: `docs/v021-adversarial.md`.
 
 ## This run
 
-- 檢查（`ci`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42794411446)
-- 核心測試（`v021`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42794411311)。Linux、Windows、macOS 都過了。
-- 桌面安裝檔在草稿裡。五個系統的檔案在 [42794411086](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42794411086)：`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg`，加上未簽名的 Android `.apk` 和 iOS 模擬器 `.app`。
-- 這台機器已打開過 Linux 套件。頁面是「怎麼稱呼你」。
+- 檢查（`ci`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803997216)
+- 核心測試（`v021`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995214)。Linux 點擊測試、Windows 與 macOS 核心測試都過了。
+- 桌面安裝檔已換上這一版，在草稿裡。五個系統的檔案在 [42803995058](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058)：`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg`，加上未簽名的 Android `.apk` 和 iOS 模擬器 `.app`。
+- Linux 上用核心和瀏覽器點過 88 個控制項，含 390 寬的抽屜。還沒打開這一版的 `.exe` 或 AppImage 來點。
 
 手機上的兩個檔是視窗殼，沒有本機核心，不能打開彙報。沒有上架。
