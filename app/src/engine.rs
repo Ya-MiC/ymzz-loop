@@ -3154,24 +3154,11 @@ mod tests {
         let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
         std::thread::spawn(move || {
-            if let Ok((sock, _)) = listener.accept() {
-                drop(sock);
-            }
-            if let Ok((mut sock, _)) = listener.accept() {
-                use std::io::{Read, Write};
-                let mut buf = Vec::new();
-                let mut tmp = [0u8; 1024];
-                loop {
-                    let n = sock.read(&mut tmp).unwrap_or(0);
-                    if n == 0 {
-                        break;
-                    }
-                    buf.extend_from_slice(&tmp[..n]);
-                    if buf.windows(4).any(|w| w == b"\r\n\r\n") {
-                        break;
-                    }
-                }
-                let got = String::from_utf8_lossy(&buf);
+            for _ in 0..4 {
+                let Ok((mut sock, _)) = listener.accept() else {
+                    break;
+                };
+                let got = read_http_request(&mut sock);
                 let body: &[u8] = if got.contains("Bearer mock-token-not-real") {
                     b"{\"ok\":true}"
                 } else {
@@ -3181,8 +3168,9 @@ mod tests {
                     "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
                     body.len()
                 );
-                sock.write_all(resp.as_bytes()).unwrap();
-                sock.write_all(body).unwrap();
+                use std::io::Write;
+                let _ = sock.write_all(resp.as_bytes());
+                let _ = sock.write_all(body);
             }
         });
         let secret = app.secret_put("mock-token-not-real").unwrap();
