@@ -24,7 +24,9 @@ mod linux {
         header.set_title(Some("ymzz-loop"));
         header.set_show_close_button(true);
         let pick = gtk::Button::with_label("選擇資料夾");
+        let pick_file = gtk::Button::with_label("選擇文件");
         header.pack_start(&pick);
+        header.pack_start(&pick_file);
         window.set_titlebar(Some(&header));
         let web = webkit2gtk::WebView::new();
         let url = format!("http://127.0.0.1:{port}/");
@@ -55,6 +57,33 @@ mod linux {
                     Ok(_) => web_pick.load_uri(&url_pick),
                     Err(err) => eprintln!("root: {err}"),
                 }
+            }
+        });
+        let app_file = Arc::clone(&app);
+        let web_file = web.clone();
+        let window_file = window.clone();
+        let url_file = url.clone();
+        pick_file.connect_clicked(move |_| {
+            let dialog = gtk::FileChooserDialog::with_buttons(
+                Some("選擇文件"),
+                Some(&window_file),
+                gtk::FileChooserAction::Open,
+                &[
+                    ("取消", gtk::ResponseType::Cancel),
+                    ("讀取這份", gtk::ResponseType::Accept),
+                ],
+            );
+            let chosen = if dialog.run() == gtk::ResponseType::Accept {
+                dialog.filename()
+            } else {
+                None
+            };
+            dialog.close();
+            if let Some(path) = chosen {
+                if let Err(err) = app_file.ingest_path(&path.to_string_lossy()) {
+                    eprintln!("document: {err}");
+                }
+                web_file.load_uri(&url_file);
             }
         });
         window.connect_delete_event(|_, _| {

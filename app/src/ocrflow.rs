@@ -191,6 +191,63 @@ pub fn ensure(data_dir: &Path) -> Result<Value, String> {
     }))
 }
 
+pub fn recognize_image(data_dir: &Path, image: &Path) -> Result<Value, String> {
+    let ready = ensure(data_dir)?;
+    let cache = cache_dir(data_dir);
+    let det = model_dir(&cache.join("extracted").join("en_PP-OCRv3_det"));
+    let rec = model_dir(&cache.join("extracted").join("en_PP-OCRv3_rec"));
+    let cls = model_dir(&cache.join("extracted").join("ch_ppocr_mobile_v2.0_cls"));
+    let dict = cache.join("en_dict.txt");
+    if image.symlink_metadata().map(|m| m.file_type().is_symlink()).unwrap_or(true) {
+        return Err("不讀取連結檔".into());
+    }
+    let python = python_for(data_dir);
+    let worker = util::repo_root().join("app/ocr/paddle_worker.py");
+    let mut child = Command::new(&python)
+        .arg(&worker)
+        .arg("recognize")
+        .arg(image)
+        .arg(&det)
+        .arg(&rec)
+        .arg(&cls)
+        .arg(&dict)
+        .env("HOME", &cache)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| format!("ocr python: {e}"))?;
+    let started = std::time::Instant::now();
+    loop {
+        match child.try_wait().map_err(|e| e.to_string())? {
+            Some(status) => {
+                let mut out = String::new();
+                let mut err = String::new();
+                if let Some(mut o) = child.stdout.take() {
+                    o.read_to_string(&mut out).ok();
+                }
+                if let Some(mut e) = child.stderr.take() {
+                    e.read_to_string(&mut err).ok();
+                }
+                if !status.success() {
+                    return Err(format!("辨識沒有完成: {out} {err}"));
+                }
+                let mut value: Value =
+                    serde_json::from_str(out.trim()).map_err(|e| format!("ocr json: {e} {out}"))?;
+                if let Some(obj) = value.as_object_mut() {
+                    obj.insert("pins".into(), ready);
+                    obj.insert("untrusted".into(), json!(true));
+                }
+                return Ok(value);
+            }
+            None if started.elapsed() > Duration::from_secs(120) => {
+                let _ = child.kill();
+                return Err("辨識等太久了".into());
+            }
+            None => std::thread::sleep(Duration::from_millis(50)),
+        }
+    }
+}
+
 pub fn recognize_sample(data_dir: &Path) -> Result<Value, String> {
     let ready = ensure(data_dir)?;
     let cache = cache_dir(data_dir);

@@ -59,6 +59,14 @@ pub fn dispatch(app: &App, req: &Request) -> Response {
     if req.method == "GET" && path == "/app.js" {
         return html_bytes(JS.as_bytes(), "text/javascript; charset=utf-8", None);
     }
+    if req.method == "GET" && path == "/fonts.css" {
+        return html_bytes(FONTS.as_bytes(), "text/css; charset=utf-8", None);
+    }
+    if req.method == "GET" && path.starts_with("/fonts/") {
+        if let Some(bytes) = crate::fonts::bytes(path) {
+            return html_bytes(bytes, "font/woff2", None);
+        }
+    }
     let body = if req.body.is_empty() {
         json!({})
     } else {
@@ -91,6 +99,8 @@ pub fn dispatch(app: &App, req: &Request) -> Response {
 fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, String> {
     match (method, path) {
         ("GET", "/api/health") => Ok(app.health()),
+        ("GET", "/api/onboarding") => Ok(app.onboarding()),
+        ("POST", "/api/onboarding") => app.save_onboarding(body),
         ("GET", "/api/session") => {
             let cfg = app.cfg.lock().expect("cfg").clone();
             Ok(json!({"role": "user", "csrf": cfg.csrf, "loopback": true}))
@@ -102,11 +112,15 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("POST", "/api/root") => {
             app.set_root(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
         }
-        ("POST", "/api/scan") => app.scan(
-            body.get("timezone")
+        ("POST", "/api/scan") => {
+            let fallback = crate::dates::owner_clock_zone();
+            let tz = body
+                .get("timezone")
                 .and_then(|v| v.as_str())
-                .unwrap_or("Asia/Seoul"),
-        ),
+                .filter(|s| !s.is_empty())
+                .unwrap_or(fallback.as_str());
+            app.scan(tz)
+        }
         ("POST", "/api/fixtures/synthetic") => app.load_synthetic(),
         ("POST", "/api/panel1/draft") => app.set_draft(body),
         ("GET", "/api/panel1/draft") => Ok(app.draft()),
@@ -150,7 +164,42 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("POST", "/api/organize/undo") => {
             app.undo_move(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
         }
-        ("GET", "/api/threads") => app.threads_list(false),
+        ("GET", "/api/threads") => app.threads_list(
+            body.get("archived")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+        ),
+        ("POST", "/api/threads/retention") => app.retention(
+            body.get("days")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(30),
+        ),
+        ("GET", "/api/providers") => Ok(app.providers()),
+        ("POST", "/api/v020/gate") => app.review_gate(),
+        ("GET", "/api/ocr/last") => Ok(app.ocr_last()),
+        ("POST", "/api/ocr/path") => {
+            app.ingest_path(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/ocr/ingest") => {
+            if let Some(text) = body.get("text").and_then(|v| v.as_str()) {
+                if !text.is_empty() {
+                    return app.archive_note(
+                        body.get("name").and_then(|v| v.as_str()).unwrap_or("文件.txt"),
+                        text,
+                        "文字",
+                    );
+                }
+            }
+            let b64 = body
+                .get("pdf_base64")
+                .and_then(|v| v.as_str())
+                .unwrap_or("");
+            let bytes = base64_decode(b64)?;
+            app.ingest_document(
+                body.get("name").and_then(|v| v.as_str()).unwrap_or("document.pdf"),
+                &bytes,
+            )
+        }
         ("POST", "/api/threads") => app.threads_create(
             body.get("title")
                 .and_then(|v| v.as_str())
@@ -185,6 +234,15 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         }
         ("POST", "/api/connectors/disconnect") => {
             app.connector_disconnect(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/connectors/preview") => {
+            app.connector_preview(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/connectors/logs") => {
+            app.connector_logs(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/connectors/export") => {
+            app.connector_export(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
         }
         ("GET", "/api/inventory") => Ok(app.inventory()),
         ("GET", "/api/detectors") => app.detectors(),
@@ -324,11 +382,14 @@ fn authorize(app: &App, req: &Request, write: bool, admin: bool) -> Result<(), R
 }
 
 fn path_is_public(req: &Request) -> bool {
-    req.method == "GET"
-        && matches!(
-            req.path.split('?').next().unwrap_or(""),
-            "/" | "/index.html" | "/tokens.css" | "/app.css" | "/app.js" | "/api/health"
-        )
+    if req.method != "GET" {
+        return false;
+    }
+    let path = req.path.split('?').next().unwrap_or("");
+    matches!(
+        path,
+        "/" | "/index.html" | "/tokens.css" | "/app.css" | "/app.js" | "/fonts.css" | "/api/health"
+    ) || (path.starts_with("/fonts/n") && path.ends_with(".woff2") && !path.contains(".."))
 }
 
 fn body_role_ignored(req: &Request) -> bool {
@@ -524,6 +585,7 @@ const INDEX: &str = include_str!("../ui/index.html");
 const CSS: &str = include_str!("../ui/app.css");
 const JS: &str = include_str!("../ui/app.js");
 const TOKENS: &str = include_str!("../ui/tokens.css");
+const FONTS: &str = include_str!("../ui/fonts.css");
 
 pub fn bind_and_serve(app: Arc<App>, port: u16) -> Result<(), String> {
     let _ = net::parse_bind_host("127.0.0.1")?;
@@ -737,7 +799,7 @@ mod tests {
         assert_eq!(sample.status, 200);
         let sample_body = String::from_utf8_lossy(&sample.body);
         assert!(sample_body.contains("USD 123.45"));
-        assert!(sample_body.contains("合成"));
+        assert!(sample_body.contains("內建"));
         let catalog = call(
             &app,
             "GET",

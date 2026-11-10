@@ -45,6 +45,7 @@ struct Mem {
     plans: BTreeMap<String, PlannedMove>,
     orders: BTreeMap<String, pay::Order>,
     pay_secret: Vec<u8>,
+    last_doc: Option<Value>,
 }
 
 pub struct App {
@@ -87,6 +88,7 @@ impl App {
                 plans: BTreeMap::new(),
                 orders,
                 pay_secret,
+                last_doc: None,
             }),
         })
     }
@@ -986,19 +988,27 @@ impl App {
             return Err("secret rejected".into());
         }
         let id = random_id("sec");
+        if crate::keyring::store(&id, value).is_ok() && crate::keyring::load(&id).ok().as_deref() == Some(value)
+        {
+            return Ok(json!({"secret_ref": format!("keyring:{id}"), "stored": true, "store": "keyring"}));
+        }
+        let _ = crate::keyring::clear(&id);
         let dir = self.cfg.lock().expect("cfg").data_dir.join("secrets");
         fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
         let path = dir.join(&id);
         let mut file = open_private(&path, true)?;
         file.write_all(value.as_bytes())
             .map_err(|e| e.to_string())?;
-        Ok(json!({"secret_ref": format!("local:{id}"), "stored": true}))
+        Ok(json!({"secret_ref": format!("local:{id}"), "stored": true, "store": "file"}))
     }
 
     fn load_local_secret(&self, secret_ref: &str) -> Result<String, String> {
+        if let Some(id) = secret_ref.strip_prefix("keyring:") {
+            return crate::keyring::load(id);
+        }
         let id = secret_ref
             .strip_prefix("local:")
-            .ok_or("live loopback sync needs a local: secret_ref")?;
+            .ok_or("this sync needs a key stored on this computer")?;
         if id.is_empty() || id.contains('/') || id.contains("..") {
             return Err("bad secret ref".into());
         }
@@ -1051,13 +1061,41 @@ impl App {
             }
             directories.push(json!({"name": name, "path": entry.path()}));
         }
+        let mut files = Vec::new();
+        for entry in fs::read_dir(&dir).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let name = entry.file_name().to_string_lossy().to_string();
+            if name.starts_with('.') {
+                continue;
+            }
+            let meta = entry.metadata().map_err(|e| e.to_string())?;
+            if meta.file_type().is_symlink() || !meta.is_file() {
+                continue;
+            }
+            let ext = entry
+                .path()
+                .extension()
+                .and_then(|e| e.to_str())
+                .unwrap_or("")
+                .to_ascii_lowercase();
+            if !matches!(ext.as_str(), "pdf" | "png" | "jpg" | "jpeg") {
+                continue;
+            }
+            files.push(json!({"name": name, "path": entry.path()}));
+        }
         directories.sort_by(|a, b| {
             a["name"]
                 .as_str()
                 .unwrap_or("")
                 .cmp(b["name"].as_str().unwrap_or(""))
         });
-        Ok(json!({"path": dir, "directories": directories}))
+        files.sort_by(|a, b| {
+            a["name"]
+                .as_str()
+                .unwrap_or("")
+                .cmp(b["name"].as_str().unwrap_or(""))
+        });
+        Ok(json!({"path": dir, "directories": directories, "files": files}))
     }
 
     pub fn file_groups(&self) -> Value {
@@ -1079,6 +1117,11 @@ impl App {
             .into_iter()
             .find(|c| c["id"] == id)
             .ok_or("connector not found")?;
+        let previous_secret = connector
+            .get("secret_ref")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
         if let Some(obj) = connector.as_object_mut() {
             obj.insert("secret_ref".into(), json!(""));
             obj.insert("team".into(), json!(""));
@@ -1094,8 +1137,58 @@ impl App {
                 params![connector.to_string(), id],
             )
             .map_err(|e| e.to_string())?;
+        self.forget_secret(&previous_secret);
         self.audit("disconnect", id);
         Ok(connector)
+    }
+
+    fn forget_secret(&self, secret_ref: &str) {
+        if let Some(id) = secret_ref.strip_prefix("keyring:") {
+            let _ = crate::keyring::clear(id);
+        }
+        if let Some(id) = secret_ref.strip_prefix("local:") {
+            if !id.is_empty() && !id.contains('/') && !id.contains("..") {
+                let path = self.cfg.lock().expect("cfg").data_dir.join("secrets").join(id);
+                let _ = fs::remove_file(path);
+            }
+        }
+    }
+
+    pub fn connector_preview(&self, id: &str) -> Result<Value, String> {
+        let rows = self.connector_rows()?;
+        let connector = rows
+            .into_iter()
+            .find(|c| c["id"] == id)
+            .ok_or("connector not found")?;
+        let kind = connector.get("kind").and_then(|v| v.as_str()).unwrap_or("");
+        let record = json!({"title": "合成復盤", "date": "2026-11-07", "record_id": "SYN-DRY", "version": "1"});
+        let mapping = connector.get("mapping").cloned().unwrap_or(json!({"mapping": []}));
+        let checked = if mapping.get("mapping").and_then(|v| v.as_array()).map(|a| a.is_empty()).unwrap_or(true) {
+            record.clone()
+        } else {
+            connectors::validate_record(&mapping, &record)?
+        };
+        let built = preview_request(kind, &connector, &checked)?;
+        let headers: Vec<Value> = built
+            .headers
+            .iter()
+            .map(|(k, v)| {
+                if k.eq_ignore_ascii_case("authorization") {
+                    json!({"name": k, "value": "已遮罩"})
+                } else {
+                    json!({"name": k, "value": v})
+                }
+            })
+            .collect();
+        let body = built.body.replace("secret-from-env-not-logged", "已遮罩");
+        Ok(json!({
+            "called": false,
+            "live": false,
+            "method": built.method,
+            "url": built.url,
+            "headers": headers,
+            "body": body,
+        }))
     }
 
     pub fn connector_export(&self, id: &str) -> Result<Value, String> {
@@ -1203,8 +1296,150 @@ impl App {
         let bytes = pdf::digital_pdf("USD 123.45");
         let mut found = self.ocr_bytes(&bytes)?;
         found["synthetic"] = json!(true);
-        found["label"] = json!("合成數位 PDF，不是單據");
+        found["label"] = json!("內建文字範例");
         Ok(found)
+    }
+
+    pub fn ocr_last(&self) -> Value {
+        self.mem
+            .lock()
+            .expect("mem")
+            .last_doc
+            .clone()
+            .unwrap_or(json!({"text": ""}))
+    }
+
+    pub fn ingest_path(&self, path: &str) -> Result<Value, String> {
+        let chosen = self.allowed_user_file(Path::new(path))?;
+        let meta = fs::metadata(&chosen).map_err(|e| e.to_string())?;
+        if meta.len() > 1_048_576 {
+            return Err("這份檔案超過 1 MB，請換一份小一點的".into());
+        }
+        let bytes = fs::read(&chosen).map_err(|e| e.to_string())?;
+        let name = chosen
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or("document");
+        self.ingest_document(name, &bytes)
+    }
+
+    pub fn ingest_document(&self, name: &str, bytes: &[u8]) -> Result<Value, String> {
+        if bytes.len() > 1_048_576 {
+            return Err("這份檔案超過 1 MB，請換一份小一點的".into());
+        }
+        let safe = safe_doc_name(name)?;
+        let lower = safe.to_ascii_lowercase();
+        let (text, how) = if lower.ends_with(".pdf") || bytes.starts_with(b"%PDF") {
+            let found = self.ocr_bytes(bytes)?;
+            if found["has_text_layer"] != true {
+                let value = json!({
+                    "text": "",
+                    "how": "這份 PDF 沒有文字層。請改選圖片，或用內建掃描範例。",
+                    "searchable": false,
+                    "archived": false,
+                });
+                self.mem.lock().expect("mem").last_doc = Some(value.clone());
+                return Ok(value);
+            }
+            (found["text"].as_str().unwrap_or("").to_string(), "文字層")
+        } else if bytes.starts_with(b"\x89PNG") || bytes.starts_with(&[0xFF, 0xD8, 0xFF]) {
+            let data = self.cfg.lock().expect("cfg").data_dir.clone();
+            let inbox = data.join("inbox");
+            fs::create_dir_all(&inbox).map_err(|e| e.to_string())?;
+            let image = inbox.join(&safe);
+            if image.symlink_metadata().map(|m| m.file_type().is_symlink()).unwrap_or(false) {
+                return Err("不讀取連結檔".into());
+            }
+            fs::write(&image, bytes).map_err(|e| e.to_string())?;
+            let recognized = crate::ocrflow::recognize_image(&data, &image)?;
+            let text = recognized["text"].as_str().unwrap_or("").to_string();
+            (text, "掃描")
+        } else {
+            return Err("請選 PDF 或圖片".into());
+        };
+        let saved = self.archive_text(&safe, &text, how)?;
+        self.mem.lock().expect("mem").last_doc = Some(saved.clone());
+        Ok(saved)
+    }
+
+    pub fn archive_note(&self, name: &str, text: &str, how: &str) -> Result<Value, String> {
+        if text.is_empty() || text.len() > 100_000 {
+            return Err("沒有可以留下的文字".into());
+        }
+        let saved = self.archive_text(name, text, how)?;
+        self.mem.lock().expect("mem").last_doc = Some(saved.clone());
+        Ok(saved)
+    }
+
+    fn archive_text(&self, name: &str, text: &str, how: &str) -> Result<Value, String> {
+        let thread = self.document_thread()?;
+        let body = format!("{name}\n{text}");
+        let message = self.message(&thread, "user", &body)?;
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        let dir = data.join("archive");
+        fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let file_name = format!("{}-{name}.md", message["id"].as_str().unwrap_or("doc"));
+        let archive_path = dir.join(&file_name);
+        let page = format!("# {name}\n\n{text}\n");
+        fs::write(&archive_path, page.as_bytes()).map_err(|e| e.to_string())?;
+        let mut copied = String::new();
+        if self.mem.lock().expect("mem").root.is_some() {
+            let rel = format!("archive/{file_name}");
+            if let Ok(wrote) = self.write_md(&rel, &page, false) {
+                copied = wrote["wrote"].as_str().unwrap_or("").to_string();
+            }
+        }
+        Ok(json!({
+            "text": text,
+            "how": how,
+            "name": name,
+            "searchable": true,
+            "archived": true,
+            "archive": archive_path,
+            "copied": copied,
+            "thread": thread,
+        }))
+    }
+
+    fn document_thread(&self) -> Result<String, String> {
+        let list = self.threads_list(false)?;
+        if let Some(items) = list["threads"].as_array() {
+            for item in items {
+                if item["title"] == "文件" {
+                    return Ok(item["id"].as_str().unwrap_or("").to_string());
+                }
+            }
+        }
+        Ok(self.threads_create("文件")?["id"]
+            .as_str()
+            .unwrap_or("")
+            .to_string())
+    }
+
+    fn allowed_user_file(&self, path: &Path) -> Result<PathBuf, String> {
+        let meta = fs::symlink_metadata(path).map_err(|_| "找不到這份檔案".to_string())?;
+        if meta.file_type().is_symlink() || !meta.is_file() {
+            return Err("不讀取連結檔".into());
+        }
+        let canon = path.canonicalize().map_err(|e| e.to_string())?;
+        let mut roots = Vec::new();
+        if let Some(root) = self.mem.lock().expect("mem").root.clone() {
+            if let Ok(real) = root.canonicalize() {
+                roots.push(real);
+            }
+        }
+        if let Ok(home) = std::env::var("HOME") {
+            if let Ok(real) = PathBuf::from(home).canonicalize() {
+                roots.push(real);
+            }
+        }
+        if let Ok(tmp) = PathBuf::from("/tmp").canonicalize() {
+            roots.push(tmp);
+        }
+        if !roots.iter().any(|root| canon.starts_with(root)) {
+            return Err("這份檔案不在你選的資料夾裡".into());
+        }
+        Ok(canon)
     }
 
     pub fn ocr_catalog(&self) -> Value {
@@ -1305,7 +1540,7 @@ impl App {
             );
         }
         if !loopback {
-            let bearer = if secret_ref.starts_with("local:") {
+            let bearer = if secret_ref.starts_with("local:") || secret_ref.starts_with("keyring:") {
                 self.load_local_secret(&secret_ref)?
             } else if !key.is_empty() {
                 key.to_string()
@@ -1345,7 +1580,7 @@ impl App {
         if text.is_empty() {
             return Err("nothing to send".into());
         }
-        let bearer = if secret_ref.starts_with("local:") {
+        let bearer = if secret_ref.starts_with("local:") || secret_ref.starts_with("keyring:") {
             self.load_local_secret(&secret_ref)?
         } else if !key.is_empty() {
             key.to_string()
@@ -1386,6 +1621,13 @@ impl App {
                 json!({"called": false, "reason": "opt_in required", "file_operation": "none"}),
             );
         }
+        let protocol = body
+            .get("protocol")
+            .and_then(|v| v.as_str())
+            .unwrap_or("openai");
+        if protocol == "claude" || protocol == "codex" {
+            return self.provider_cli(body, protocol);
+        }
         let base = body.get("base_url").and_then(|v| v.as_str()).unwrap_or("");
         if blocked_provider_host(base) {
             return Err("nvidia nim is not called".into());
@@ -1408,10 +1650,6 @@ impl App {
                 content.push_str(doc);
             }
         }
-        let protocol = body
-            .get("protocol")
-            .and_then(|v| v.as_str())
-            .unwrap_or("openai");
         let loopback =
             base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:");
         if protocol == "ollama" {
@@ -1442,6 +1680,7 @@ impl App {
                 1,
             )?;
             let reply = raw.split("\r\n\r\n").nth(1).unwrap_or("").to_string();
+            self.remember_chat(body, &reply);
             return Ok(json!({
                 "called": true,
                 "file_operation": "none",
@@ -1479,6 +1718,8 @@ impl App {
                 cancel: None,
             })
             .map_err(|e| redact(&e, &[bearer.as_str()]))?;
+            let reply = redact(&resp.body, &[bearer.as_str()]);
+            self.remember_chat(body, &reply);
             return Ok(json!({
                 "called": true,
                 "file_operation": "none",
@@ -1486,7 +1727,7 @@ impl App {
                 "host": "remote_https",
                 "auth": "not_live_authenticated",
                 "status": resp.status,
-                "reply": redact(&resp.body, &[bearer.as_str()]),
+                "reply": reply,
             }));
         }
         if !loopback {
@@ -1514,9 +1755,52 @@ impl App {
             1,
         )?;
         let reply = raw.split("\r\n\r\n").nth(1).unwrap_or("").to_string();
+        self.remember_chat(body, &reply);
         Ok(
             json!({"called": true, "file_operation": "none", "auto_apply": false, "host": "loopback", "reply": reply}),
         )
+    }
+
+    fn provider_cli(&self, body: &Value, protocol: &str) -> Result<Value, String> {
+        let prompt = body.get("prompt").and_then(|v| v.as_str()).unwrap_or("");
+        if prompt.is_empty() {
+            return Err("prompt required".into());
+        }
+        let installed = which(protocol);
+        if body.get("probe").and_then(|v| v.as_bool()) == Some(true) {
+            if installed.is_none() {
+                let note = "這台電腦沒有這個程式。";
+                self.remember_chat(body, note);
+                return Ok(json!({"called": false, "installed": false, "live_account": false, "note": note}));
+            }
+            let data = self.cfg.lock().expect("cfg").data_dir.clone();
+            let out = run_argv(
+                &[protocol.to_string(), "--version".into()],
+                &data,
+                Duration::from_secs(3),
+            )?;
+            let text = out["stdout"].as_str().unwrap_or("").chars().take(400).collect::<String>();
+            let note = format!("只查了版本，沒有把這句話送去帳號。{text}");
+            self.remember_chat(body, &note);
+            return Ok(json!({"called": true, "installed": true, "live_account": false, "kind": "version", "note": note}));
+        }
+        let note = if installed.is_some() {
+            "程式在這台電腦上。這次沒有用它登入，也沒有把這句話送出去。"
+        } else {
+            "這台電腦沒有這個程式，所以沒有送出。"
+        };
+        self.remember_chat(body, note);
+        Ok(json!({"called": false, "installed": installed.is_some(), "live_account": false, "note": note}))
+    }
+
+    fn remember_chat(&self, body: &Value, reply: &str) {
+        let Some(thread) = body.get("thread").and_then(|v| v.as_str()).filter(|s| !s.is_empty()) else {
+            return;
+        };
+        let prompt = body.get("prompt").and_then(|v| v.as_str()).unwrap_or("");
+        let _ = self.message(thread, "user", prompt);
+        let clipped: String = reply.chars().take(2000).collect();
+        let _ = self.message(thread, "assistant", &clipped);
     }
 
     pub fn ocr_remove(&self) -> Result<Value, String> {
@@ -2033,9 +2317,13 @@ impl App {
         let last = fs::read_to_string(repo.join(".ymzz/last-run"))
             .ok()
             .map(|s| s.trim().to_string());
+        let clock = crate::dates::owner_clock_zone();
         Ok(json!({
             "package": "node automation remains the writer",
-            "timezone": cfg.get("timezone").cloned().unwrap_or(json!("")),
+            "timezone": clock,
+            "clock_zone": clock,
+            "clock_label": crate::dates::zone_label(&clock),
+            "schedule_timezone": cfg.get("timezone").cloned().unwrap_or(json!("")),
             "remind_time": cfg.get("remind_time").cloned().unwrap_or(json!("")),
             "sinks": cfg.get("sinks").cloned().unwrap_or(json!([])),
             "markdown_files": notes,
@@ -2046,18 +2334,120 @@ impl App {
         }))
     }
 
+    pub fn review_gate(&self) -> Result<Value, String> {
+        let repo = self.cfg.lock().expect("cfg").repo_root.clone();
+        let script = repo.join("scripts/gate.mjs");
+        if !script.is_file() {
+            return Err("每日復盤腳本不在這個資料夾".into());
+        }
+        let node = which("node").ok_or("這台電腦沒有 Node，每日檢查沒有跑")?;
+        let result = run_argv(
+            &[node.to_string_lossy().to_string(), script.to_string_lossy().to_string()],
+            &repo,
+            Duration::from_secs(8),
+        )?;
+        Ok(json!({
+            "called": true,
+            "live_account": false,
+            "code": result["code"],
+            "output": result["stdout"],
+            "note": "每日檢查跑完了。沒有連上帳號。",
+        }))
+    }
+
+    pub fn onboarding(&self) -> Value {
+        let profile = self.read_profile();
+        let phone = profile["phone"].as_str().unwrap_or("");
+        json!({
+            "nickname": profile["nickname"].as_str().unwrap_or("用戶"),
+            "phone_set": !phone.is_empty(),
+            "phone_last4": phone_last4(phone),
+            "onboarding_done": profile["onboarding_done"].as_bool().unwrap_or(false),
+            "step": profile["step"].as_u64().unwrap_or(1),
+            "suggested_nickname": suggested_nickname(phone),
+        })
+    }
+
+    pub fn save_onboarding(&self, body: &Value) -> Result<Value, String> {
+        let mut profile = self.read_profile();
+        if body.get("skip_phone").and_then(|v| v.as_bool()) == Some(true) {
+            profile["phone"] = json!("");
+        } else if let Some(raw) = body.get("phone").and_then(|v| v.as_str()) {
+            if raw.trim().is_empty() {
+                profile["phone"] = json!("");
+            } else {
+                profile["phone"] = json!(normalize_phone(raw)?);
+            }
+        }
+        let phone = profile["phone"].as_str().unwrap_or("");
+        let typed = body.get("nickname").and_then(|v| v.as_str()).unwrap_or("").trim();
+        if typed.is_empty() {
+            profile["nickname"] = json!(suggested_nickname(phone));
+        } else {
+            if typed.chars().count() > 32 || typed.chars().any(|c| c.is_control()) {
+                return Err("稱呼請留在 32 字以內".into());
+            }
+            profile["nickname"] = json!(typed);
+        }
+        if let Some(step) = body.get("step").and_then(|v| v.as_u64()) {
+            if (1..=6).contains(&step) {
+                profile["step"] = json!(step);
+            }
+        }
+        if body.get("done").and_then(|v| v.as_bool()) == Some(true) {
+            profile["onboarding_done"] = json!(true);
+            profile["step"] = json!(6);
+        }
+        self.write_profile(&profile)?;
+        self.audit("onboarding", "saved");
+        Ok(self.onboarding())
+    }
+
+    fn profile_path(&self) -> PathBuf {
+        self.cfg.lock().expect("cfg").data_dir.join("profile.json")
+    }
+
+    fn read_profile(&self) -> Value {
+        let path = self.profile_path();
+        fs::read_to_string(path)
+            .ok()
+            .and_then(|text| serde_json::from_str(&text).ok())
+            .unwrap_or_else(|| json!({"nickname": "用戶", "phone": "", "onboarding_done": false, "step": 1}))
+    }
+
+    fn write_profile(&self, profile: &Value) -> Result<(), String> {
+        let path = self.profile_path();
+        if path.symlink_metadata().map(|m| m.file_type().is_symlink()).unwrap_or(false) {
+            return Err("profile symlink rejected".into());
+        }
+        let mut file = open_private(&path, false)?;
+        file.write_all(profile.to_string().as_bytes())
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
     pub fn dashboard(&self) -> Result<Value, String> {
         let threads = self.threads_list(false)?;
         let v020 = self.v020()?;
         let mem = self.mem.lock().expect("mem");
+        let source_label = match mem.source.as_str() {
+            "filesystem" => "這台電腦的資料夾",
+            "synthetic" => "合成樣本",
+            "none" | "" => "還沒掃描",
+            _ => "本機",
+        };
         Ok(json!({
             "analogy": "local report to the owner",
             "files_indexed": mem.records.len(),
             "source": mem.source,
+            "source_label": source_label,
+            "clock_zone": v020["clock_zone"].clone(),
+            "clock_label": v020["clock_label"].clone(),
             "snapshot": mem.snapshot.as_ref().map(|s| s.ids.len()),
             "threads": threads["threads"].as_array().map(|a| a.len()).unwrap_or(0),
             "orders": mem.orders.len(),
             "telemetry": mem.telemetry,
+            "nickname": self.read_profile()["nickname"].clone(),
             "v020": v020,
             "not": ["accounting firm software", "OpenViking", "a hosted mailbox"],
         }))
@@ -2105,6 +2495,84 @@ fn open_private(path: &Path, create_new: bool) -> Result<fs::File, String> {
         opts.mode(0o600);
     }
     opts.open(path).map_err(|e| e.to_string())
+}
+
+fn normalize_phone(raw: &str) -> Result<String, String> {
+    let trimmed = raw.trim();
+    if trimmed.chars().any(|c| c.is_ascii_alphabetic()) {
+        return Err("電話只留數字，或先跳過".into());
+    }
+    let plus = trimmed.starts_with('+');
+    let digits: String = trimmed.chars().filter(|c| c.is_ascii_digit()).collect();
+    if !(8..=15).contains(&digits.len()) {
+        return Err("電話要有 8 到 15 個數字，或先跳過".into());
+    }
+    if plus {
+        Ok(format!("+{digits}"))
+    } else {
+        Ok(digits)
+    }
+}
+
+fn phone_last4(phone: &str) -> String {
+    let digits: String = phone.chars().filter(|c| c.is_ascii_digit()).collect();
+    if digits.len() < 4 {
+        String::new()
+    } else {
+        digits[digits.len() - 4..].to_string()
+    }
+}
+
+fn suggested_nickname(phone: &str) -> String {
+    let last4 = phone_last4(phone);
+    if last4.is_empty() {
+        "用戶".to_string()
+    } else {
+        format!("用戶{last4}")
+    }
+}
+
+fn read_http_request(sock: &mut std::net::TcpStream) -> String {
+    use std::io::Read;
+    let _ = sock.set_read_timeout(Some(Duration::from_secs(2)));
+    let mut buf = Vec::new();
+    let mut tmp = [0u8; 1024];
+    loop {
+        let n = sock.read(&mut tmp).unwrap_or(0);
+        if n == 0 {
+            break;
+        }
+        buf.extend_from_slice(&tmp[..n]);
+        if let Some(pos) = buf.windows(4).position(|w| w == *b"\r\n\r\n") {
+            let header = String::from_utf8_lossy(&buf[..pos]).to_ascii_lowercase();
+            let len = header
+                .lines()
+                .find_map(|line| line.strip_prefix("content-length:"))
+                .and_then(|v| v.trim().parse::<usize>().ok())
+                .unwrap_or(0);
+            if buf.len() >= pos + 4 + len {
+                break;
+            }
+        }
+        if buf.len() > 65_536 {
+            break;
+        }
+    }
+    String::from_utf8_lossy(&buf).to_string()
+}
+
+fn safe_doc_name(name: &str) -> Result<String, String> {
+    let base = Path::new(name)
+        .file_name()
+        .and_then(|s| s.to_str())
+        .unwrap_or("");
+    if base.is_empty() || base == "." || base == ".." || base.contains('/') || base.contains('\\') {
+        return Err("檔名不能用".into());
+    }
+    if base.chars().any(|c| c.is_control()) {
+        return Err("檔名不能用".into());
+    }
+    Ok(base.chars().take(80).collect())
 }
 
 fn chat_completions_url(base: &str) -> String {
@@ -2785,8 +3253,7 @@ mod tests {
         std::thread::spawn(move || {
             use std::io::{Read, Write};
             let (mut sock, _) = listener.accept().unwrap();
-            let mut buf = [0u8; 4096];
-            let _ = sock.read(&mut buf);
+            let _ = read_http_request(&mut sock);
             let body = b"{\"choices\":[{\"message\":{\"content\":\"local-reply\"}}]}";
             let resp = format!(
                 "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
@@ -2823,9 +3290,7 @@ mod tests {
         std::thread::spawn(move || {
             use std::io::{Read, Write};
             let (mut sock, _) = ollama.accept().unwrap();
-            let mut buf = [0u8; 4096];
-            let _ = sock.read(&mut buf);
-            let got = String::from_utf8_lossy(&buf);
+            let got = read_http_request(&mut sock);
             assert!(got.contains("POST /api/chat"));
             assert!(got.contains("\"stream\":false"));
             let body = b"{\"message\":{\"content\":\"ollama-reply\"}}";
@@ -2889,6 +3354,54 @@ mod tests {
                 .unwrap()
                 .contains("not_bundled"));
         }
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn a_digital_pdf_becomes_a_searchable_archive() {
+        let (app, dir) = app();
+        let saved = app
+            .ingest_document("receipt.pdf", &pdf::digital_pdf("USD 123.45"))
+            .unwrap();
+        assert_eq!(saved["searchable"], true);
+        assert!(saved["text"].as_str().unwrap().contains("USD 123.45"));
+        assert!(dir.join("archive").read_dir().unwrap().next().is_some());
+        let hits = app.search("USD").unwrap();
+        assert!(hits["hits"].as_array().unwrap().iter().any(|hit| hit["snippet"]
+            .as_str()
+            .unwrap_or("")
+            .contains("USD")));
+        let held = app
+            .provider_chat(&json!({"opt_in": true, "protocol": "codex", "prompt": "hello archive", "thread": saved["thread"]}))
+            .unwrap();
+        assert_eq!(held["live_account"], false);
+        assert_eq!(held["called"], false);
+        let dash = app.dashboard().unwrap();
+        assert_ne!(dash["clock_zone"].as_str().unwrap(), "Etc/UTC");
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn onboarding_nickname_uses_the_phone_tail_and_stays_out_of_the_report() {
+        let (app, dir) = app();
+        let saved = app
+            .save_onboarding(&json!({"phone": "+82 10-1234-5678"}))
+            .unwrap();
+        assert_eq!(saved["suggested_nickname"], "用戶5678");
+        assert_eq!(saved["nickname"], "用戶5678");
+        assert_eq!(saved["phone_last4"], "5678");
+        assert!(!saved.to_string().contains("1234"));
+        let named = app
+            .save_onboarding(&json!({"nickname": "湛記", "skip_phone": true, "done": true}))
+            .unwrap();
+        assert_eq!(named["nickname"], "湛記");
+        assert_eq!(named["phone_set"], false);
+        assert_eq!(named["onboarding_done"], true);
+        let report = app.dashboard().unwrap().to_string();
+        assert!(report.contains("湛記"));
+        assert!(!report.contains("5678"));
+        assert!(app.save_onboarding(&json!({"phone": "12ab345678"})).is_err());
+        assert!(app.save_onboarding(&json!({"phone": "123"})).is_err());
         let _ = fs::remove_dir_all(&dir);
     }
 }

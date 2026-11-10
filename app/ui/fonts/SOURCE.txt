@@ -1,0 +1,9 @@
+Noto Sans SC variable slices in this directory are unmodified woff2 files
+downloaded from fonts.gstatic.com on 2026-11-10. They are the weight-axis
+slices Google Fonts serves for Noto Sans SC, limited to the ranges the
+window uses. Other glyphs fall back to the next installed face.
+
+The license is OFL.txt, copied from
+https://github.com/google/fonts/blob/main/ofl/notosanssc/OFL.txt
+The copyright line in that file names Adobe Source Han Sans. Noto Sans SC
+is the Google Fonts name of that family. These bytes were not renamed.

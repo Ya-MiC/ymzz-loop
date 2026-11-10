@@ -1,0 +1,122 @@
+name: installers
+on:
+  push:
+    branches: [cursor/v021-integrated-app-e023]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  desktop:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            args: --bundles deb,appimage
+          - os: windows-latest
+            args: --bundles nsis,msi
+          - os: macos-latest
+            args: --bundles dmg
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@1.83.0
+      - name: Compile the local core
+        run: cargo build --release --manifest-path app/Cargo.toml
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Stage the core next to the window
+        shell: bash
+        run: |
+          mkdir -p src-tauri/binaries/core
+          if [ -f app/target/release/ymzz-vibe.exe ]; then
+            cp app/target/release/ymzz-vibe.exe src-tauri/binaries/core/ymzz-vibe.exe
+          else
+            cp app/target/release/ymzz-vibe src-tauri/binaries/core/ymzz-vibe
+            chmod 755 src-tauri/binaries/core/ymzz-vibe
+          fi
+      - name: Linux packages
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev patchelf xdg-utils libfuse2 file squashfs-tools
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: src-tauri
+          tagName: v0.21.0-preview
+          releaseName: 稟冊 0.21.0 預覽
+          releaseDraft: true
+          prerelease: true
+          releaseBody: |
+            未簽名的預覽安裝檔。沙箱收款不會扣款。還沒上架 Google Play、App Store 或 TestFlight。
+            macOS 若被 Gatekeeper 擋住：系統設定 → 隱私權與安全性 → 仍要打開。
+          args: ${{ matrix.args }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ymzz-bingce-${{ matrix.os }}
+          path: |
+            src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.msi
+            src-tauri/target/release/bundle/**/*.exe
+            src-tauri/target/release/bundle/**/*.dmg
+          if-no-files-found: warn
+  android:
+    continue-on-error: true
+    runs-on: ubuntu-22.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+      - name: Android SDK pieces
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;28.0.12433566"
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version 2.12.4 --locked
+      - name: Init and build a sideload APK
+        working-directory: src-tauri
+        run: |
+          cargo tauri android init --ci
+          cargo tauri android build --apk --target aarch64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ymzz-bingce-android-apk
+          path: src-tauri/gen/android/**/*.apk
+          if-no-files-found: error
+  ios:
+    continue-on-error: true
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios,aarch64-apple-ios-sim
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version 2.12.4 --locked
+      - name: Simulator build
+        working-directory: src-tauri
+        run: |
+          cargo tauri ios init --ci
+          cargo tauri ios build --target aarch64-sim
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ymzz-bingce-ios-simulator
+          path: src-tauri/gen/apple/**/*.app
+          if-no-files-found: warn

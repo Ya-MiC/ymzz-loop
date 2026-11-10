@@ -1,0 +1,51 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ymzz-bingce",
+  "version": "0.21.0",
+  "identifier": "dev.ymzz.bingce",
+  "build": {
+    "frontendDist": "../app/ui"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [
+      {
+        "label": "main",
+        "title": "稟冊",
+        "url": "http://127.0.0.1:1413/",
+        "width": 1100,
+        "height": 780,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "resources": {
+      "binaries/core/": "core/",
+      "../scripts/": "scripts/",
+      "../app/ocr/paddle_worker.py": "ocr/paddle_worker.py",
+      "../app/ocr/pins.json": "ocr/pins.json",
+      "../app/ocr/requirements-ocr-hashed.txt": "ocr/requirements-ocr-hashed.txt"
+    },
+    "linux": {
+      "deb": {
+        "depends": ["libwebkit2gtk-4.1-0", "libgtk-3-0", "python3", "python3-venv", "python3-pip", "curl", "ca-certificates"]
+      }
+    },
+    "macOS": {
+      "minimumSystemVersion": "10.15"
+    }
+  }
+}

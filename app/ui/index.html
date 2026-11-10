@@ -1,53 +1,117 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-density="compact">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ymzz-loop 0.21 · 本機復盤</title>
+  <title>稟冊</title>
   <link rel="stylesheet" href="/tokens.css">
+  <link rel="stylesheet" href="/fonts.css">
   <link rel="stylesheet" href="/app.css">
 </head>
 <body>
-  <div class="app">
+  <section id="onboard" class="onboard" hidden>
+    <p class="quiet" id="onboardProgress">第 1 步，共 6 步</p>
+    <ol class="dots" id="onboardDots" aria-hidden="true"></ol>
+    <div class="card onboard-card" data-step="1">
+      <h1>怎麼稱呼你</h1>
+      <p class="quiet">這是只留在這台電腦上的稱呼。電話用來組成預設名字，不會送走。</p>
+      <label class="quiet" for="nickInput">稱呼</label>
+      <input id="nickInput" class="input-warm" maxlength="32" placeholder="用戶" aria-label="稱呼">
+      <label class="quiet" for="phoneInput">電話，可留空</label>
+      <input id="phoneInput" class="input-warm" inputmode="tel" autocomplete="off" placeholder="8 到 15 個數字" aria-label="電話">
+      <p class="quiet" id="nickHint"></p>
+      <p class="warn" id="nickError"></p>
+      <div class="row">
+        <button type="button" id="nickSkip">先不填電話</button>
+        <button type="button" class="primary" id="nickNext">下一步</button>
+      </div>
+    </div>
+    <div class="card onboard-card" data-step="2" hidden>
+      <h1>選一個資料夾</h1>
+      <p class="quiet">稟冊只整理這個資料夾裡的檔案。還沒選的話，下面是空的。</p>
+      <div class="row">
+        <input id="onboardPath" class="input-warm grow" placeholder="資料夾路徑" aria-label="資料夾路徑">
+        <button type="button" id="onboardBrowse">瀏覽</button>
+      </div>
+      <div class="card" id="onboardBrowser"></div>
+      <p class="warn" id="folderError"></p>
+      <div class="row">
+        <button type="button" id="folderBack">返回</button>
+        <button type="button" id="folderSkip">先跳過</button>
+        <button type="button" class="primary" id="folderNext">用這個資料夾</button>
+      </div>
+    </div>
+    <div class="card onboard-card" data-step="3" hidden>
+      <h1>東西留在這台電腦</h1>
+      <p>檔案、對話和復盤都在這台電腦。沒有你的同意，不會把內容送出去。</p>
+      <p class="quiet">沙箱收款不會真的扣款。正式商店的帳號沒有放在這裡。</p>
+      <div class="row">
+        <button type="button" id="privacyBack">返回</button>
+        <button type="button" id="privacySkip">先跳過</button>
+        <button type="button" class="primary" id="privacyNext">我知道了</button>
+      </div>
+    </div>
+    <div class="card onboard-card" data-step="4" hidden>
+      <h1>文件辨識可以以後再裝</h1>
+      <p class="quiet">現在不下載也可以讀有文字的 PDF。掃描圖片要另外準備辨識，會花一些時間。</p>
+      <p id="onboardOcr"></p>
+      <div class="row">
+        <button type="button" id="ocrBack">返回</button>
+        <button type="button" id="ocrSkip">先跳過</button>
+        <button type="button" class="primary" id="ocrNext">開始準備</button>
+      </div>
+    </div>
+    <div class="card onboard-card" data-step="5" hidden>
+      <h1>連接可以以後再設</h1>
+      <p class="quiet">Notion、試算表、文件、GitHub、飛書、Lark 都先不連。金鑰只在你之後願意時才留在這台電腦。</p>
+      <div class="row">
+        <button type="button" id="linkBack">返回</button>
+        <button type="button" id="linkSkip">先跳過</button>
+        <button type="button" class="primary" id="linkNext">下一步</button>
+      </div>
+    </div>
+    <div class="card onboard-card" data-step="6" hidden>
+      <h1 id="doneTitle">準備好了</h1>
+      <p class="quiet" id="doneCopy">接下來看到的是這台電腦的彙報。</p>
+      <div class="row">
+        <button type="button" id="doneBack">返回</button>
+        <button type="button" class="primary" id="doneNext">看彙報</button>
+      </div>
+    </div>
+  </section>
+  <div class="app" id="workspace">
     <aside class="side">
-      <p class="brand">ymzz-loop</p>
-      <p class="quiet">0.21 本機核心 · 支付寶黑客松示範</p>
-      <p class="quiet" id="fontNote"></p>
+      <p class="brand">稟冊</p>
+      <p class="quiet" id="brandNick">晏銘湛箴</p>
       <nav class="nav" aria-label="主選單">
-        <button type="button" data-panel="files" aria-current="page">1 檔案星雲</button>
-        <button type="button" data-panel="links">2 我的連接</button>
-        <button type="button" data-panel="device">3 這台電腦</button>
-        <button type="button" data-panel="talk">對話紀錄</button>
-        <button type="button" data-panel="ocr">文件辨識</button>
+        <button type="button" data-panel="files" aria-current="page">檔案</button>
+        <button type="button" data-panel="links">連接</button>
+        <button type="button" data-panel="device">這台電腦</button>
+        <button type="button" data-panel="talk">對話</button>
+        <button type="button" data-panel="ocr">文件</button>
         <button type="button" data-panel="report">彙報</button>
         <button type="button" data-panel="pay">沙箱收款</button>
       </nav>
-      <label class="quiet" for="surface">同一個表面只使用一套色</label>
+      <label class="quiet" for="surface">配色</label>
       <select id="surface">
-        <option value="cloud">雲箋 · 鎖定淺色</option>
-        <option value="earth">陶土 · 鎖定淺色</option>
-        <option value="dusk">暮靄 · 衍生待驗證</option>
-        <option value="wood">暮林 · 衍生待驗證</option>
+        <option value="cloud">雲箋</option>
+        <option value="earth">陶土</option>
+        <option value="dusk">暮靄</option>
+        <option value="wood">暮林</option>
       </select>
     </aside>
     <main class="main">
-      <ol class="steps longform">
-        <li>選資料夾</li>
-        <li>按查詢</li>
-        <li>看預覽</li>
-        <li>確認才搬動</li>
-        <li>沙箱收款與本機檔案分開</li>
-      </ol>
+      <p class="quiet steps-line">選資料夾，查詢，看過再搬。收款和檔案是分開的。</p>
       <section id="files" class="panel active">
-        <h1>檔案星雲</h1>
-        <p class="quiet longform">暖紙白表面。預設只有兩個篩選：日期，以及磁碟 × 檔案類型。改條件不會搜尋，要按「查詢」。</p>
-        <p class="banner" id="sampleBanner" hidden>合成樣本，不是這台電腦的檔案。</p>
+        <h1>檔案</h1>
+        <p class="quiet">先選日期和類型，再按查詢。改條件不會自己搜。</p>
+        <p class="banner" id="sampleBanner" hidden>這是合成樣本，不是這台電腦裡的檔案。</p>
         <div class="row">
-          <input id="rootPath" class="input-warm grow" placeholder="資料夾路徑，例如 /home/you/notes" aria-label="資料夾">
-          <button type="button" id="browseRoot">瀏覽資料夾</button>
-          <button type="button" id="useRoot">使用這個資料夾</button>
-          <button type="button" id="scanRoot">掃描中繼資料</button>
-          <button type="button" id="loadSample">載入合成樣本</button>
+          <input id="rootPath" class="input-warm grow" placeholder="資料夾" aria-label="資料夾">
+          <button type="button" id="browseRoot">瀏覽</button>
+          <button type="button" id="useRoot">用這個資料夾</button>
+          <button type="button" id="scanRoot">掃描</button>
+          <button type="button" id="loadSample">載入樣本</button>
         </div>
         <div class="row" id="presets">
           <button type="button" data-preset="3">3 日</button>
@@ -57,40 +121,40 @@
           <button type="button" data-preset="365">365 日</button>
         </div>
         <div class="row">
-          <input id="start" class="input-warm" aria-label="開始日期" placeholder="開始 YYYY-MM-DD">
-          <input id="end" class="input-warm" aria-label="結束日期" placeholder="結束 YYYY-MM-DD">
-          <select id="typeGroup" aria-label="磁碟與類型"></select>
+          <input id="start" class="input-warm" aria-label="開始日期" placeholder="開始">
+          <input id="end" class="input-warm" aria-label="結束日期" placeholder="結束">
+          <select id="typeGroup" aria-label="類型"></select>
           <button type="button" class="primary" id="runQuery">查詢</button>
         </div>
         <p class="quiet" id="draftState">尚未查詢。</p>
         <div class="split">
-          <div>
+          <div class="stack">
             <div class="canvas" id="graph" role="img" aria-label="檔案關係"></div>
             <div class="card" id="drawer" aria-label="這一組的檔案"></div>
             <div class="card" id="browser" hidden></div>
             <div class="card">
-              <p id="heatLabel">日期計數。這不是語義等高線。</p>
+              <p id="heatLabel">每天有幾份檔案</p>
               <div id="heat"></div>
               <p class="grey" id="semantic"></p>
-              <svg id="compare" width="100%" height="120" aria-label="上次查詢灰線"></svg>
+              <svg id="compare" width="100%" height="96" aria-label="和上次查詢比較"></svg>
             </div>
           </div>
           <aside class="card">
-            <h2>Markdown</h2>
-            <p class="quiet" id="mdHint">先選資料夾，才能寫入。</p>
+            <h2>筆記</h2>
+            <p class="quiet" id="mdHint">先選資料夾，才能寫。</p>
             <textarea id="mdBody" class="input-warm" disabled placeholder="寫一段筆記"></textarea>
             <div class="row">
               <input id="mdPath" class="input-warm" placeholder="notes/today.md" disabled>
-              <button type="button" id="mdSave" disabled>儲存新檔</button>
+              <button type="button" id="mdSave" disabled>儲存</button>
             </div>
             <p id="selection"></p>
-            <button type="button" id="selectAll">全選本次結果</button>
+            <button type="button" id="selectAll">全選這次結果</button>
             <h2>整理</h2>
-            <p class="quiet">先預覽。輸入 CONFIRM 才搬動，而且不覆蓋已有檔案。可以撤銷。</p>
-            <input id="moveFrom" class="input-warm" placeholder="來源，例如 a.md" aria-label="來源">
-            <input id="moveTo" class="input-warm" placeholder="目的，例如 sorted/a.md" aria-label="目的">
+            <p class="quiet">先看預覽。確認後才搬，不會蓋掉已有的檔案。可以撤銷。</p>
+            <input id="moveFrom" class="input-warm" placeholder="來源" aria-label="來源">
+            <input id="moveTo" class="input-warm" placeholder="目的" aria-label="目的">
             <div class="row">
-              <button type="button" id="planMove">預覽搬動</button>
+              <button type="button" id="planMove">預覽</button>
               <button type="button" id="confirmMove">確認搬動</button>
               <button type="button" id="undoMove">撤銷</button>
             </div>
@@ -99,123 +163,148 @@
         </div>
       </section>
       <section id="links" class="panel">
-        <h1>我的連接</h1>
-        <p class="quiet longform">這裡接的是你自己的 Notion、Sheets、Docs、GitHub、飛書或 Lark。預設不打外網。Oomol 只記錄金鑰參考與團隊名，不是 Login with Oomol。</p>
+        <h1>連接</h1>
+        <p class="quiet">Notion、Sheets、Docs、GitHub、飛書、Lark。金鑰留在這台電腦。先看預覽，同意之後才送出。</p>
         <div class="card">
           <div class="row">
             <select id="kind" aria-label="連接種類">
               <option value="notion">Notion</option>
-              <option value="google_sheets">Google Sheets</option>
-              <option value="google_docs">Google Docs</option>
+              <option value="google_sheets">Google 試算表</option>
+              <option value="google_docs">Google 文件</option>
               <option value="github">GitHub</option>
               <option value="feishu">飛書</option>
               <option value="lark">Lark</option>
-              <option value="oomol_hosted">Oomol 託管</option>
             </select>
-            <input id="resource" class="input-warm grow" placeholder="資源 ID，不要貼權杖">
-            <input id="secretRef" class="input-warm grow" placeholder="已存的 secret_ref，或留空改用下面的金鑰" aria-label="金鑰參考">
-            <input id="secretValue" class="input-warm grow" type="password" placeholder="金鑰只寫進本機 0600 檔" aria-label="本機金鑰" autocomplete="off">
-            <label class="quiet"><input id="linkConsent" type="checkbox"> 同意送出</label>
-            <label class="quiet"><input id="linkApprove" type="checkbox"> 核准打官方 HTTPS 主機</label>
-            <input id="baseUrl" class="input-warm grow" placeholder="本機測試位址 http://127.0.0.1:…，留空才用官方主機" aria-label="測試位址">
-            <button type="button" class="primary" id="saveLink">儲存連接</button>
+            <input id="resource" class="input-warm grow" placeholder="資源編號" aria-label="資源編號">
           </div>
-          <button type="button" id="syncLink">用合成紀錄同步一次（本機）</button>
-          <button type="button" id="dropLink">中斷連接</button>
+          <div class="row">
+            <input id="secretValue" class="input-warm grow" type="password" placeholder="金鑰，只留在這台電腦" aria-label="金鑰" autocomplete="off">
+            <input id="baseUrl" class="input-warm grow" placeholder="留空用官方位址；測試可填本機位址" aria-label="位址">
+          </div>
+          <div class="row">
+            <label class="quiet"><input id="linkConsent" type="checkbox"> 我同意送出</label>
+            <label class="quiet"><input id="linkApprove" type="checkbox"> 我核准這個位址</label>
+          </div>
+          <div class="row">
+            <button type="button" class="primary" id="saveLink">儲存</button>
+            <button type="button" id="previewLink">預覽，先不送</button>
+            <button type="button" id="syncLink">送出一筆合成紀錄</button>
+            <button type="button" id="logLink">看紀錄</button>
+            <button type="button" id="exportLink">匯出設定</button>
+            <button type="button" id="dropLink">中斷並清掉金鑰</button>
+          </div>
           <pre class="mono" id="linkOut"></pre>
         </div>
       </section>
       <section id="device" class="panel">
         <h1>這台電腦</h1>
-        <p class="quiet">數值來自這台機器。沒有的項目寫未知或沒有，不補一個型號。</p>
-        <pre class="mono" id="deviceOut">讀取中。</pre>
+        <p class="quiet">讀得到的才寫。讀不到就留空。</p>
+        <div class="card" id="deviceCard"></div>
       </section>
       <section id="talk" class="panel">
-        <h1>對話紀錄</h1>
-        <p class="quiet longform">對話留在這台電腦。搜尋使用併入的 T3 文字模組。沒有預設上傳。</p>
+        <h1>對話</h1>
+        <p class="quiet">對話留在這台電腦。可以搜尋、匯入、匯出，也可以清掉太舊的內容。</p>
+        <div class="card" id="threadList"></div>
         <div class="row">
           <input id="threadTitle" class="input-warm grow" placeholder="標題">
           <button type="button" id="newThread">新對話</button>
         </div>
-        <textarea id="utterance" class="input-warm" placeholder="寫一句合成內容"></textarea>
+        <textarea id="utterance" class="input-warm" placeholder="寫一句話"></textarea>
         <div class="row">
-          <button type="button" id="sendUtterance">送出</button>
-          <input id="findText" class="input-warm grow" placeholder="搜尋至少兩個字">
+          <button type="button" id="sendUtterance">留下這句</button>
+          <input id="findText" class="input-warm grow" placeholder="搜尋" aria-label="搜尋">
           <button type="button" id="findBtn">搜尋</button>
+        </div>
+        <div class="row">
           <button type="button" id="checkPoint">留下檢查點</button>
-          <button type="button" id="exportThread">匯出這段</button>
+          <button type="button" id="exportThread">匯出</button>
           <button type="button" id="archiveThread">封存</button>
+          <button type="button" id="keepRecent">只留最近 30 日</button>
         </div>
-        <p class="quiet">搜尋、匯入清理、串流收集與行程群組保護走已執行的 T3 模組。本機 Ollama 與遠端 HTTPS 是兩條路。NVIDIA 不打。文件內容要另外勾同意。</p>
+        <h2>跟模型說一句</h2>
+        <p class="quiet">本機 Ollama 和你核准的 https 位址是兩條路。Codex 與 Claude 只看版本，不會拿這句話去登入帳號。</p>
         <div class="row">
-          <select id="modelProtocol" aria-label="模型通道">
+          <select id="modelProtocol" aria-label="模型">
             <option value="ollama">本機 Ollama</option>
-            <option value="openai">本機相容或遠端 HTTPS</option>
+            <option value="openai">相容介面或 https</option>
+            <option value="codex">Codex</option>
+            <option value="claude">Claude</option>
           </select>
-          <input id="modelBase" class="input-warm grow" placeholder="http://127.0.0.1:11434 或 https:// 你核准的位址" aria-label="模型位址">
-          <input id="modelName" class="input-warm" placeholder="模型名稱" aria-label="模型名稱" value="">
+          <input id="modelBase" class="input-warm grow" placeholder="本機位址或 https://" aria-label="模型位址">
+          <input id="modelName" class="input-warm" placeholder="模型名稱" aria-label="模型名稱">
         </div>
         <div class="row">
-          <label class="quiet"><input id="modelOpt" type="checkbox"> 同意打這一次</label>
-          <label class="quiet"><input id="modelDoc" type="checkbox"> 連文件內容一起送</label>
-          <button type="button" id="modelSend">送出一句</button>
+          <label class="quiet"><input id="modelOpt" type="checkbox"> 我同意這一次</label>
+          <label class="quiet"><input id="modelDoc" type="checkbox"> 連文件一起送</label>
+          <button type="button" id="modelSend">送出</button>
         </div>
-        <pre class="mono" id="talkOut"></pre>
+        <h2>匯入</h2>
+        <textarea id="importJson" class="input-warm" placeholder='貼上合成匯出，例如 {"title":"樣本","messages":[{"role":"user","content":"你好復盤"}]}'></textarea>
+        <button type="button" id="importThread">匯入這段</button>
+        <div class="card" id="talkCard"></div>
       </section>
       <section id="ocr" class="panel">
-        <h1>文件辨識</h1>
-        <p class="quiet longform">數位 PDF 先抽文字層。掃描圖用釘好校驗碼的 PaddleOCR 2.7。下載會核對本機算出的 sha256。準備環境由這個視窗在背景安裝有校驗碼的套件，不必自己下指令。登記 API 不會發請求。</p>
+        <h1>文件</h1>
+        <p class="quiet">選一份 PDF 或圖片。有文字的 PDF 直接抽出來。圖片會辨識。結果可以搜尋，也會留一份在這台電腦。</p>
         <div class="card">
-          <p id="ocrStatus">讀取執行環境。</p>
-          <p id="ocrResult"></p>
-          <pre class="mono" id="ocrCatalog"></pre>
+          <p id="ocrStatus">正在看辨識是否準備好。</p>
           <div class="row">
-            <button type="button" id="ocrRefresh">重新讀取目錄</button>
-            <button type="button" id="ocrDownload">下載並核對模型</button>
-            <button type="button" id="ocrRecognize">辨識合成掃描圖</button>
-            <button type="button" id="ocrSample">抽出合成數位 PDF</button>
-            <button type="button" id="ocrRuntime">準備辨識環境</button>
+            <button type="button" id="browseDocs">瀏覽文件</button>
+            <input id="docFile" type="file" accept="application/pdf,image/png,image/jpeg">
+            <button type="button" class="primary" id="readDoc">讀取選好的檔案</button>
+          </div>
+          <div class="card" id="docBrowser" hidden></div>
+          <p id="ocrResult"></p>
+          <div class="row">
+            <button type="button" id="ocrSample">用內建文字範例</button>
+            <button type="button" id="ocrRecognize">用內建掃描範例</button>
+            <button type="button" id="ocrDownload">下載辨識模型</button>
+            <button type="button" id="ocrRuntime">準備辨識</button>
             <button type="button" id="ocrCancel">取消</button>
-            <button type="button" id="ocrRemove">清除快取、環境與 API 設定</button>
+            <button type="button" id="ocrRemove">清掉辨識資料</button>
           </div>
         </div>
         <div class="card">
-          <h2>選用的 API</h2>
-          <p class="quiet">登記只留遮罩。送出才會打到你填的位址：本機用 http://127.0.0.1，遠端必須是 https。只送你貼上的文字。</p>
-          <input id="ocrEndpoint" class="input-warm" placeholder="http://127.0.0.1:… 或 https://…" aria-label="API 位址">
+          <h2>辨識服務</h2>
+          <p class="quiet">登記不會送出。送出時只帶你貼上的文字。</p>
+          <input id="ocrEndpoint" class="input-warm" placeholder="本機位址或 https://" aria-label="辨識位址">
           <input id="ocrText" class="input-warm" placeholder="要送出的文字" aria-label="辨識文字">
-          <label class="quiet"><input id="ocrOpt" type="checkbox"> 我同意這一次打到上面的本機位址</label>
+          <label class="quiet"><input id="ocrOpt" type="checkbox"> 我同意這一次</label>
           <div class="row">
-            <button type="button" id="ocrSaveApi">只登記，不呼叫</button>
+            <button type="button" id="ocrSaveApi">只登記</button>
             <button type="button" id="ocrInvoke">送出這段文字</button>
           </div>
         </div>
       </section>
       <section id="report" class="panel">
-        <h1>給主人的彙報</h1>
-        <p class="quiet longform">把本機檔案、600 日復盤進度、對話和沙箱訂單放在同一張紙上。不是會計軟體，不是雲端信箱，也不會把檔案上傳走。</p>
+        <h1>彙報</h1>
+        <p class="quiet">這台電腦上的檔案、復盤和沙箱訂單。</p>
         <div class="card" id="reportCard"></div>
         <div class="card">
-          <h2>有依據的判斷</h2>
-          <p class="quiet">判斷只引用你貼上的證據。低信心與文件辨識都要人看過。不會自動刪檔，也不會對外轉帳。</p>
+          <h2>每日復盤</h2>
+          <p class="quiet" id="reviewNote">每日檢查在這台電腦上跑，不會連上你的帳號。</p>
+          <button type="button" id="runGate">跑一次每日檢查</button>
+          <p id="gateOut"></p>
+        </div>
+        <div class="card">
+          <h2>根據一條證據</h2>
           <textarea id="evidence" class="input-warm" placeholder="貼上一條證據"></textarea>
-          <button type="button" id="decideBtn">根據這條證據判斷</button>
+          <button type="button" id="decideBtn">判斷</button>
           <p id="decideOut"></p>
         </div>
-        <pre class="mono" id="reportOut"></pre>
       </section>
       <section id="pay" class="panel">
         <h1>沙箱收款</h1>
-        <p class="banner">沙箱基礎收款。頁面返回不是付款。正式商戶憑證另存，這裡沒有。活動細則頁尚未完整核對，所以不宣稱合規。WeaveFox 不是必用。本機檔案不因未付款而鎖住。</p>
+        <p class="banner">這是沙箱，不會真的扣款。頁面跳回來不算付款。正式商店的帳號沒有放在這裡。</p>
         <div class="row">
           <button type="button" class="primary" id="newOrder">建立沙箱訂單</button>
-          <button type="button" id="pageReturn">頁面返回說已付</button>
+          <button type="button" id="pageReturn">頁面說已付</button>
           <button type="button" id="settleOrder">簽名通知</button>
-          <button type="button" id="repeatNotify">再送同一通知</button>
+          <button type="button" id="repeatNotify">再送同一次</button>
           <button type="button" id="queryOrder">簽名查單</button>
           <button type="button" id="failDeliver">交付失敗</button>
-          <button type="button" id="deliverOrder">交付權益</button>
-          <button type="button" id="refundOrder">部分退款 40 分</button>
+          <button type="button" id="deliverOrder">交付</button>
+          <button type="button" id="refundOrder">退一部分</button>
           <button type="button" id="failPay">付款失敗</button>
         </div>
         <pre class="mono" id="payOut"></pre>
@@ -226,6 +315,7 @@
     <button type="button" data-panel="files">檔案</button>
     <button type="button" data-panel="links">連接</button>
     <button type="button" data-panel="talk">對話</button>
+    <button type="button" data-panel="ocr">文件</button>
     <button type="button" data-panel="report">彙報</button>
   </nav>
   <script src="/app.js"></script>

@@ -39,16 +39,83 @@ pub fn range_ok(start: &str, end: &str) -> Result<(NaiveDate, NaiveDate), String
     Ok((s, e))
 }
 
-pub fn today_in_zone(tz: &str) -> Result<String, String> {
-    if tz.len() > 80
-        || tz
+pub fn zone_name_ok(tz: &str) -> bool {
+    !tz.is_empty()
+        && tz.len() <= 80
+        && tz
             .chars()
-            .any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+'))
-    {
+            .all(|c| c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+')
+}
+
+/// Owner clock. `YMZZ_TZ` wins. A real system zone wins over UTC.
+/// UTC and a missing zone use Asia/Seoul, which is the owner's zone, not a secret.
+pub fn prefer_zone(detected: Option<&str>, override_tz: Option<&str>) -> String {
+    if let Some(tz) = override_tz {
+        if zone_name_ok(tz) {
+            return tz.to_string();
+        }
+    }
+    if let Some(tz) = detected {
+        if zone_name_ok(tz) && tz != "UTC" && tz != "Etc/UTC" {
+            return tz.to_string();
+        }
+    }
+    "Asia/Seoul".to_string()
+}
+
+pub fn detect_system_zone() -> Option<String> {
+    let path = std::fs::read_link("/etc/localtime").ok()?;
+    let text = path.to_string_lossy();
+    let zone = text.split("zoneinfo/").nth(1)?.trim_start_matches('/').to_string();
+    if zone_name_ok(&zone) {
+        Some(zone)
+    } else {
+        None
+    }
+}
+
+pub fn owner_clock_zone() -> String {
+    let override_tz = std::env::var("YMZZ_TZ").ok();
+    prefer_zone(detect_system_zone().as_deref(), override_tz.as_deref())
+}
+
+pub fn zone_label(tz: &str) -> &'static str {
+    match tz {
+        "Asia/Seoul" => "首爾",
+        "Asia/Taipei" => "台北",
+        "Asia/Shanghai" => "上海",
+        "Asia/Hong_Kong" => "香港",
+        "Asia/Tokyo" => "東京",
+        "Etc/UTC" | "UTC" => "世界協調時",
+        _ => "本機",
+    }
+}
+
+fn python_bin() -> String {
+    use std::sync::OnceLock;
+    static BIN: OnceLock<String> = OnceLock::new();
+    BIN.get_or_init(|| {
+        for name in ["python3", "python"] {
+            let ok = std::process::Command::new(name)
+                .arg("--version")
+                .output()
+                .map(|out| out.status.success())
+                .unwrap_or(false);
+            if ok {
+                return name.to_string();
+            }
+        }
+        "python3".to_string()
+    })
+    .clone()
+}
+
+pub fn today_in_zone(tz: &str) -> Result<String, String> {
+    if !zone_name_ok(tz) {
         return Err("rejected timezone name".into());
     }
     let script = "import datetime,sys,zoneinfo\nprint(datetime.datetime.now(zoneinfo.ZoneInfo(sys.argv[1])).date().isoformat())\n";
-    let out = std::process::Command::new("python3")
+    let out = std::process::Command::new(python_bin())
         .arg("-c")
         .arg(script)
         .arg(tz)
@@ -66,11 +133,7 @@ pub fn today_in_zone(tz: &str) -> Result<String, String> {
 }
 
 pub fn local_dates_for_unix(tz: &str, stamps: &[i64]) -> Result<Vec<Option<String>>, String> {
-    if tz.len() > 80
-        || tz
-            .chars()
-            .any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+'))
-    {
+    if !zone_name_ok(tz) {
         return Err("rejected timezone name".into());
     }
     let payload = serde_json::to_string(stamps).map_err(|e| e.to_string())?;
@@ -85,7 +148,7 @@ for s in stamps:
         out.append(datetime.datetime.fromtimestamp(s, tz).date().isoformat())
 print(json.dumps(out))
 "#;
-    let mut child = std::process::Command::new("python3")
+    let mut child = std::process::Command::new(python_bin())
         .arg("-c")
         .arg(script)
         .arg(tz)
@@ -153,6 +216,16 @@ mod tests {
         assert!(range_ok("2026-11-08", "2026-11-07").is_err());
         assert!(preset_days(14).is_err());
         assert_eq!(preset_days(90).unwrap(), 90);
+    }
+
+    #[test]
+    fn utc_falls_back_to_the_owner_zone() {
+        assert_eq!(prefer_zone(Some("Etc/UTC"), None), "Asia/Seoul");
+        assert_eq!(prefer_zone(Some("UTC"), None), "Asia/Seoul");
+        assert_eq!(prefer_zone(None, None), "Asia/Seoul");
+        assert_eq!(prefer_zone(Some("Asia/Taipei"), None), "Asia/Taipei");
+        assert_eq!(prefer_zone(Some("Etc/UTC"), Some("Asia/Tokyo")), "Asia/Tokyo");
+        assert_eq!(zone_label("Asia/Seoul"), "首爾");
     }
 
     #[test]

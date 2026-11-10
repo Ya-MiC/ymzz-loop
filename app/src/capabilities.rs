@@ -10,12 +10,12 @@ struct Row {
 
 const ROWS: &[Row] = &[
     Row { id: "T01", implemented: true, tested: "http::tests::pages_and_auth", unverified: "", gap: "No hosted app.t3.codes client." },
-    Row { id: "T02", implemented: true, tested: "the Linux GTK window compiles in this tree", unverified: "Windows and macOS windows were not compiled or opened.", gap: "The Linux shell is GTK 3 plus system WebKitGTK. Electron is not bundled. Tauri was not used. Windows and macOS shells were not built." },
+    Row { id: "T02", implemented: true, tested: "src-tauri builds the Tauri 2 shell around this core", unverified: "A window was opened on Linux. Windows, macOS, Android, and iOS installers are produced only when the GitHub Actions jobs succeed.", gap: "The shipped window is Tauri 2. The older GTK window remains available as ymzz-vibe desktop and is not the installer. Windows, macOS, Android, and iOS bundles are unsigned and exist only after the installer workflow succeeds." },
     Row { id: "T03", implemented: false, tested: "", unverified: "", gap: "No iOS or Android store client." },
     Row { id: "T04", implemented: true, tested: "main help text", unverified: "A Linux amd64 deb is produced by scripts/package-deb.sh when that script is run. This row does not mean Windows or macOS packages were built.", gap: "Windows and macOS installers were not built. winget, Homebrew, and AUR are not produced." },
     Row { id: "T05", implemented: true, tested: "net::tests::port_413_is_decimal_and_non_loopback_is_refused", unverified: "", gap: "systemd unit is printed only. It is not installed." },
     Row { id: "T06", implemented: true, tested: "inventory::tests::inventory_does_not_invent_gpu_or_tpu", unverified: "macOS and Windows were not executed.", gap: "Only this Linux host was sampled." },
-    Row { id: "T10", implemented: true, tested: "engine::tests::provider_fixture_runs", unverified: "Live Claude, Codex, Cursor, Grok, OpenCode, fx, Kiro, Pi, Muse were not invoked.", gap: "Upstream Effect provider packages are not vendored." },
+    Row { id: "T10", implemented: true, tested: "engine::tests::a_digital_pdf_becomes_a_searchable_archive", unverified: "Live Claude and Codex account calls were not made.", gap: "The window can store a session and probe --version. It does not send the sentence to those accounts. Upstream Effect provider packages are not vendored." },
     Row { id: "T11", implemented: true, tested: "engine::tests::provider_fixture_runs", unverified: "", gap: "No multi-account pool." },
     Row { id: "T12", implemented: true, tested: "engine::tests::permission_and_terminal", unverified: "", gap: "danger-full still requires CONFIRM. Modes are not a byte-for-byte T3 port." },
     Row { id: "T13", implemented: true, tested: "http::tests::pages_and_auth", unverified: "", gap: "Policy is a local admin flag, not an org MDM." },
@@ -41,7 +41,7 @@ const ROWS: &[Row] = &[
     Row { id: "T33", implemented: true, tested: "engine::tests::threads_roundtrip_and_search", unverified: "", gap: "" },
     Row { id: "T34", implemented: false, tested: "", unverified: "", gap: "T3 window snap-shot is not implemented. Query snapshots are a different feature and are tested." },
     Row { id: "T35", implemented: true, tested: "ui keybindings", unverified: "", gap: "Only query, panels, and sidebar bindings are wired." },
-    Row { id: "T36", implemented: true, tested: "test/v021-tokens.test.mjs", unverified: "Dark derivative colors are not claimed final.", gap: "Noto Sans SC Variable is specified and not bundled in this build." },
+    Row { id: "T36", implemented: true, tested: "test/v021-tokens.test.mjs", unverified: "Dark derivative colors are not claimed final.", gap: "Noto Sans SC variable slices used by the window are bundled under SIL OFL. Glyphs outside those slices use the next installed face." },
     Row { id: "T37", implemented: false, tested: "", unverified: "", gap: "No mobile push notifications." },
     Row { id: "T38", implemented: true, tested: "engine::tests::threads_roundtrip_and_search", unverified: "", gap: "JSON import only. No browser profile import." },
     Row { id: "T39", implemented: true, tested: "engine::tests::task_and_hook", unverified: "", gap: "Inbound loopback hook only. No outbound webhook fan-out." },

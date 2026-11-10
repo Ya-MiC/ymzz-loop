@@ -1,135 +1,175 @@
-# ymzz-loop · product-only branch
+# 稟冊
 
-> **This branch has no showcase website** (`site/` and Pages deploy are excluded).
-> It is the **automation product** only: Notion daily review → Sheets + Markdown (+ optional Feishu).
->
-> v0.21 adds a local Rust app in `app/` (`ymzz-vibe`). It does not replace the Node review. See [docs/v021-run.md](docs/v021-run.md). The repository `LICENSE` is still MIT; ownership notes are in [docs/LICENSE-BOUNDARY.md](docs/LICENSE-BOUNDARY.md).
+稟冊是晏銘湛箴（ymzz）的本機私人事務稟報。它留在你這台電腦上，把檔案、對話和復盤收成一份給你看的彙報。稱呼、電話和金鑰不送走。
 
-## Get this into your own repo (no website)
+「稟」是呈給擁有者的報告，「冊」是留在本機的那一本。產品要交的是這份彙報，不是一個搜尋框，也不是放在別處的共享資料庫。
 
-**Option A — Download ZIP**
-GitHub → green **Code** → **Download ZIP** (or open
-https://github.com/Ya-MiC/ymzz-loop/archive/refs/heads/product.zip ).
-Create an empty repo, unpack the ZIP into it, push.
+安裝檔名是 `ymzz-bingce`。視窗標題是「稟冊」。
 
-**Option B — clone this branch only**
+## 下載
 
-```bash
-git clone --depth 1 --branch product --single-branch https://github.com/Ya-MiC/ymzz-loop.git my-ymzz-loop
-cd my-ymzz-loop
-# point at YOUR empty repo, then push
-git remote set-url origin https://github.com/YOU/my-ymzz-loop.git
-git push -u origin product:main
+這些檔案由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v021-integrated-app-e023` 上產生。工作流程成功之後，會放到 GitHub 的**草稿預發行** `v0.21.0-preview`（不公開，不收費）。草稿要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。同一次執行也會把檔案留在 Actions 的 artifacts。
+
+| 系統 | 你要下載的檔 | 現況 |
+| --- | --- | --- |
+| Windows | `.msi` 與 `.exe` | 等工作流程跑完，從上面的草稿或 artifacts 下載 |
+| macOS | `.dmg`（未簽名） | 同上 |
+| Linux | `.deb` 與 `.AppImage` | 同上。這台開發機也會先打出一份 `.deb` 做驗證 |
+| Android | `.apk` 可側載；上架要用 `.aab` | 工作流程會試。手機裡還沒有能用的本機核心，不要把它當成已經能用的安裝檔。沒有上架 Google Play |
+| iOS | 模擬器建置 | 工作流程會試。沒有簽過名的 `.ipa`，也沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號 |
+
+這次執行的精確網址，會在工作流程啟動後補到這份說明的最下方。
+
+### macOS 被系統擋住時
+
+安裝檔沒有簽名。打開時若出現「無法驗證開發者」：
+
+1. 在 Finder 對 `ymzz-bingce` 按右鍵，選「打開」，再按「打開」。
+2. 或到「系統設定 → 隱私權與安全性」，在封鎖訊息旁邊按「仍要打開」。
+
+### Android 上架清單（還沒做）
+
+Google Play 要你自己的開發者帳號，這份儲存庫沒有代為註冊，也沒有上傳。若你之後要上架，準備這些：
+
+- 應用程式名稱：稟冊
+- 套件名稱：`dev.ymzz.bingce`
+- 上傳 `.aab`，不要把側載用的 `.apk` 當成上架檔
+- 短說明：留在這台裝置上的私人事務稟報
+- 隱私說明：檔案、稱呼、電話和金鑰留在裝置上；沙箱收款不會扣款
+- 內容分級、商店截圖、以及你自己的開發者帳號
+
+側載時要在裝置上允許未知來源。現在還沒有一份可以這樣裝、而且打得開彙報的 Android 檔。
+
+## 第一次打開
+
+共 6 步。每一步有進度、返回，以及可以跳過的地方。主按鈕只有一個。
+
+1. 怎麼稱呼你。不填電話時預設是「用戶」。有電話時是「用戶」加電話最後四碼。電話只留在這台電腦。字母或不足 8 個數字會停下來說明。
+2. 選一個資料夾。沒有子資料夾時寫「這裡沒有子資料夾。」
+3. 東西留在這台電腦。
+4. 文件辨識可以以後再裝。主按鈕是「開始準備」，「先跳過」不下載。
+5. 連接可以以後再設。
+6. 看彙報。
+
+下面是 Linux 上實際點過的畫面。其他系統要等安裝檔做出來才能拍。
+
+![第 1 步，稱呼](docs/onboarding/01-nickname.png)
+
+![電話含字母時停住](docs/onboarding/01-phone-invalid.png)
+
+![有電話時提示預設稱呼](docs/onboarding/01-phone-hint.png)
+
+![第 2 步，空資料夾](docs/onboarding/02-folder.png)
+
+![第 3 步，留在這台電腦](docs/onboarding/03-privacy.png)
+
+![第 4 步，辨識可之後再裝](docs/onboarding/04-ocr.png)
+
+![第 5 步，連接可之後再設](docs/onboarding/05-connectors.png)
+
+![第 6 步，準備看彙報](docs/onboarding/06-finish.png)
+
+![進入彙報](docs/onboarding/07-dashboard.png)
+
+## 開始用
+
+從安裝檔打開「稟冊」。視窗會連到這台電腦上的 `127.0.0.1`，不需要先裝別的執行環境。
+
+若你是從原始碼跑，在儲存庫根目錄：
+
+```sh
+sh scripts/prepare-tauri-core.sh
+cargo install tauri-cli --version 2.12.4 --locked
+cargo tauri build --bundles deb,appimage
 ```
 
-Do **not** use “Use this template” / fork of `main` if you want to avoid the marketing site — `main` includes `site/`.
+第二行的 `cargo tauri` 要在 `src-tauri` 目錄執行，或加上 `--config src-tauri/tauri.conf.json`。核心必須先編譯，視窗才找得到它。
 
-Showcase site (read-only demo): https://ya-mic.github.io/ymzz-loop/
+## 裡頭有什麼
+
+- 檔案整理：選資料夾、掃描、查詢、寫入筆記。這是原來 v0.20 那條線。
+- 對話紀錄：留在本機。可以看、搜尋、匯入一份合成匯出、設定保留天數。Codex 與 Claude 的路徑只看本機有沒有那個程式，不把句子送到帳號。
+- 600 日復盤：彙報上可以跑每日檢查。檢查在這台電腦上，不連你的帳號。
+- 彙報：檔案數、對話數、沙箱訂單、時區。這台機器沒有自己的時區時，顯示首爾。
+- 文件：有文字的 PDF 會收進可搜尋的紀錄。沒有文字層的 PDF 會請你改選圖片。掃描圖片要另外準備辨識。
+- 沙箱收款：頁面跳回來不算付款。不會真的扣款。正式商店的帳號沒有放在這裡。
+
+## 套件
+
+2026-11-10 查過：npm 上的 `ymzz`、`@ymzz/bingce`，以及 PyPI 上的 `ymzz`、`ymzz-bingce`，都還沒有人發佈。
+
+本儲存庫裡有兩份還沒發佈的套件：
+
+- `packages/ymzz`：Node SDK 與 `ymzz` 指令。算預設稱呼和 600 日章節。`npm test` 與 `npm pack` 已通過。
+- `packages/ymzz-py`：Python SDK。算稱呼，並拒絕危險的封存路徑。`python -m build` 與 `twine check` 已通過。
+
+沒有你的權杖，不會發佈。你要發佈時：
+
+1. 在 npm 建立帳號，把 Automation token 存成這個儲存庫的 Actions secret，名字必須是 `NPM_TOKEN`。
+2. 在 PyPI 用 Trusted Publishing，專案名 `ymzz`，對準工作流程 `.github/workflows/publish-packages.yml`。
+3. 到 Actions 手動跑 `publish-packages`，把輸入 `publish` 設為 true。預設是 false，只打包、不發佈。沒有 `NPM_TOKEN` 時，npm 那一步會失敗而且不會上傳。
+
+## 現況
+
+| 項目 | 狀態 |
+| --- | --- |
+| 本機核心、彙報、檔案整理、沙箱收款 | 有測試，在這台電腦上跑過 |
+| 第一次開啟的六個畫面 | Linux 上點過，截圖在上面 |
+| Tauri 2 視窗 | 原始碼在 `src-tauri`。核心是旁邊的程式，因為核心還用 Rust 1.83，Tauri 2.12 需要更新的套件，不能編成同一個程式 |
+| Linux / Windows / macOS 安裝檔 | 工作流程會做。以那次 artifacts 和草稿發行裡真正有的檔為準 |
+| Android、iOS | 工作流程會試。還沒有能打開彙報的手機安裝檔。沒有上架 |
+| 辨識模型 | 要另外準備。有文字的 PDF 不需要它 |
+| 連接 Notion、試算表、文件、GitHub、飛書、Lark | 可以預覽和保存金鑰。沒有用你的帳號真的呼叫 |
+| 對話和 Claude / Codex 帳號 | 沒有把句子送出去。不能說已經和那些產品對等 |
+| npm、PyPI | 包好了，沒發佈 |
+| 授權 | 仍是 MIT |
+
+對打的細節在 `docs/v021-adversarial.md`。修過的一件事：嚮導原本蓋不住後面的檔案頁。安全檢查包含未授權寫入、電話不外洩、以及不讀符號連結。
 
 ---
 
-<p align="center"><img src="site/og.png" alt="ymzz-loop — a day you never review is a day you don’t get back" width="100%"></p>
+# Bingce
 
-<p align="center"><b>English</b> · <a href="README.zh-Hant.md">繁體中文</a> · <a href="README.zh-CN.md">简体中文</a> · <a href="README.ko.md">한국어</a></p>
+Bingce (稟冊) is the local steward under the ymzz brand, 晏銘湛箴. It stays on your computer and brings you a briefing of files, conversations, and the daily review. The nickname, phone number, and keys stay on that computer.
 
-# ymzz-loop
-**A day you never review is a day you don’t get back. Start today.**  
-One deploy = one **600-day chapter** of daily review, counting **600→0** — a gentle clock, then a **600-day summary** and the loop pauses.  
-GitHub Actions in **your** fork opens today’s blank page in Notion, emails the link, and **auto-ingests yesterday** into Google Sheets + your GitHub Markdown (optional Feishu).  
-**$0 · MIT · multi-end · no AI quota · any time zone** — Notion write → Sheets + Git (+ Feishu).  
-**[Open the 10-min start guide →](https://ya-mic.github.io/ymzz-loop/start.html)** · **[Showcase →](https://ya-mic.github.io/ymzz-loop/)** · **[Get automation only (no website) →](https://github.com/Ya-MiC/ymzz-loop/tree/product)** · [Architecture](docs/architecture.md) · [Changelog](CHANGELOG.md)
+The product is the briefing brought to its owner, and the local record that briefing comes from.
 
-<p align="center">
-<a href="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml"><img src="https://github.com/Ya-MiC/ymzz-loop/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-CDBFE0" alt="MIT"></a>
-<img src="https://img.shields.io/badge/cost-%240%2Fmonth-B7C8A8" alt="$0/month">
-</p>
+## Downloads
 
+The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) builds on branch `cursor/v021-integrated-app-e023`. A successful run attaches files to the private GitHub draft pre-release `v0.21.0-preview` and to Actions artifacts. Drafts are free and visible only after you sign in: [Releases](https://github.com/Ya-MiC/ymzz-loop/releases).
 
-## How the loop works
+| System | File | Status |
+| --- | --- | --- |
+| Windows | `.msi` and `.exe` | Download from the draft or the artifacts after the workflow succeeds |
+| macOS | unsigned `.dmg` | Same |
+| Linux | `.deb` and `.AppImage` | Same |
+| Android | sideload `.apk`; Play needs an `.aab` | The job is allowed to try. There is no mobile build that opens the briefing. Nothing was uploaded to Google Play |
+| iOS | simulator build | No signed `.ipa`, no TestFlight, no App Store. Those need your Apple developer account |
 
-```mermaid
-flowchart LR
-  A["1 · Template → Notion<br>+ email reminder"] --> B["2 · You write in Notion"]
-  B --> C["3 · Next run backs up yesterday"]
-  C --> D["Google Sheets"]
-  C --> E["Your GitHub fork (.md)"]
-  D -. "↻" .-> A
-```
+If macOS blocks the unsigned app: right-click it, choose Open, then Open again. Or use System Settings → Privacy & Security → Open Anyway.
 
-1. **In** — at your chosen time, a blank daily-review template is created in your Notion and you get an email with the link.
-2. **Write** — fill it in on any device.
-3. **Keep** — the next run copies yesterday to Google Sheets and to `notion/YYYY/*.md` in your own fork. Then it repeats every day until the chapter ends with a summary (600→0).
+Google Play still needs your own developer account. The listing to prepare is the name 稟冊, package `dev.ymzz.bingce`, an `.aab`, and a privacy description that says data stays on the device and the payment screen does not charge. Do not treat a sideload APK as a store upload.
 
-## What it does
-At the time you choose (default **07:00 UTC**), GitHub Actions:
-1. creates today's blank review page in Notion (sections ①–⑩);
-2. emails you a link to that page;
-3. syncs **yesterday's** review and your current holdings to Google Sheets (tabs 「每日復盤」 and 「持倉」), optionally to **Feishu / Lark Bitable** (see [docs/feishu.md](docs/feishu.md)), and to `notion/YYYY/MMDD_HHMM_<zone>.md` in this repo (e.g. `1105_0705_utc.md`; the zone is written inside).
+## First run
 
-It uses only GitHub's free Actions minutes and the free Notion/Google APIs. **Chapter (600→0):** first success starts with **600 days remaining**; each calendar day decrements; at **0** the daily loop **pauses** so the chapter can close with a **600-day summary**. Deploy a newer ymzz-loop version for the next chapter; your Notion / Sheets / Markdown stay yours. Until then, each run re-enables the schedule, a keepalive commit is added after 45 quiet days (GitHub pauses schedules after 60), runs time out after 10 minutes, and failures email you.
+Six screens, in Traditional Chinese: nickname, folder, local-only explanation, optional recognition download, optional connectors, then the briefing. The default nickname is 用戶 plus the last four digits of a phone number kept only on this computer. Screenshots from Linux are in the Chinese section above.
 
-## Template
-- **Daily Review**: date, score, mood, energy, Keep, Problem, Try, decisions, top 3 for tomorrow, inputs, platforms, market/holdings notes, deep-work hours, done.
-- **Holdings** (any broker, entered by you): ticker, platform, class, quantity, cost, price, value, currency, weight, thesis, stop/target, updated, note.
-- Frameworks: KPT (Keep/Problem/Try), Zeng Guofan's daily self-review, Lyubishchev time log, trading-journal daily review (Brett Steenbarger).
+## What is included
 
-## Time zone
-| Where | Example | Priority |
-|---|---|---|
-| Repo Variables `YMZZ_TZ` / `YMZZ_REMIND_TIME` | `America/Los_Angeles` / `21:30` | 1 |
-| `sync.config.json` `timezone` / `remind_time` | `Asia/Seoul` / `07:00` | 2 |
-| Default | `Etc/UTC` / `07:00` | 3 |
+File organization from v0.20, local conversation records, a 600-day review, the briefing, document reading, and the Vibe Pay sandbox. The sandbox does not charge. A page redirect is not a payment. No merchant account is stored here.
 
-Cron is UTC-only, so the workflow wakes hourly. A dependency-free gate exits in seconds unless local time ≥ your reminder time and today hasn't run (`.ymzz/last-run`). Late or skipped schedules catch up the next hour. Public repos: free; private: ≈720 min/month, under the 2,000 free minutes.
+## Packages
 
-## Setup (once, ~10 min)
-Prefer the guided page: https://ya-mic.github.io/ymzz-loop/start.html
-1. **Notion integration** — https://www.notion.so/profile/integrations → New integration (Internal) named `ymzz` → copy the token. Open your review page → `⋯` → Connections → add `ymzz`.
-2. **Create databases** (Node.js 20+):
-   ```bash
-   git clone https://github.com/<you>/ymzz-loop && cd ymzz-loop
-   NOTION_TOKEN=<token> ./setup.sh "https://www.notion.so/<your-page>"
-   git add sync.config.json && git commit -m "setup ids" && git push
-   ```
-   Windows PowerShell: `$env:NOTION_TOKEN="..."; npm install; node scripts/setup-notion.mjs "<page URL>"`
-3. **Google service account** — https://console.cloud.google.com → new project → enable Google Sheets API → IAM → Service accounts → create → Keys → Add key → JSON. Create a Google Sheet and **share** it with the service-account email (Editor). `SHEET_ID` is the part in `/d/<SHEET_ID>/edit`.
-4. **Gmail app password** — https://myaccount.google.com/apppasswords (requires 2-Step Verification) → 16-character password.
-5. **GitHub Secrets** — Settings → Secrets and variables → Actions → New repository secret:
+On 2026-11-10, `ymzz` and `@ymzz/bingce` were unpublished on npm, and `ymzz` and `ymzz-bingce` were unpublished on PyPI. This repo contains `packages/ymzz` and `packages/ymzz-py`. `npm pack` and `twine check` passed. Nothing was published.
 
-   | Secret | Value |
-   |---|---|
-   | `NOTION_TOKEN` | Notion integration token |
-   | `GOOGLE_SERVICE_ACCOUNT_JSON` | the whole JSON file |
-   | `SHEET_ID` | Google Sheet ID |
-   | `SMTP_USER` | your Gmail |
-   | `SMTP_PASS` | 16-character app password |
-   | `MAIL_TO` | where reminders go |
-   | `SMTP_HOST` / `SMTP_PORT` | optional, default smtp.gmail.com / 465 |
-6. **Time zone (optional)** — Variables tab → `YMZZ_TZ` (IANA name, e.g. `America/Los_Angeles`) and `YMZZ_REMIND_TIME` (`HH:MM`). The website's picker generates both.
-7. **First run** — Actions → daily-review → Run workflow. You should get an email, today's page in Notion, and two tabs in the Sheet.
+To publish: set the Actions secret `NPM_TOKEN`, configure PyPI trusted publishing for project `ymzz` and workflow `publish-packages.yml`, then run that workflow manually with `publish` set to true.
 
+## Status
 
-## Optional support / 贊助
+The local core, the six-step first run on Linux, and the Tauri 2 window source are in this branch. Desktop installers exist when the workflow artifacts exist. Android and iOS do not yet open the briefing, because the core still builds on Rust 1.83 and Tauri 2.12 cannot be linked into that same crate graph. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT.
 
-ymzz-loop stays **free and MIT**. Tips are optional and are not part of setup. If it helps you, details are on the support page.
+Adversarial notes: `docs/v021-adversarial.md`.
 
-**USDC on Arbitrum One only. Sending other tokens or using other networks may lose funds.**
+## This run
 
-```
-0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A
-```
-
-Receive-only address (no wallet connect on the site). Optional (not part of setup): https://ya-mic.github.io/ymzz-loop/support.html · [ArbiScan](https://arbiscan.io/address/0x9C4345b0a652D063a79321fe099C65a7Dc5a9C3A)
-
-## Extend
-Optional Feishu secrets: `FEISHU_APP_ID`, `FEISHU_APP_SECRET`, `FEISHU_BITABLE_APP_TOKEN`, `FEISHU_BITABLE_TABLE_ID` (off when unset). Credits / font licenses: [CREDITS.md](CREDITS.md).
-
-A new destination is one file: `scripts/sinks/<name>.mjs` implementing `{ name, enabled(env), write(ctx) }`. See [docs/architecture.md](docs/architecture.md).
-
-## Community
-[Contributing](CONTRIBUTING.md) · [Code of Conduct](CODE_OF_CONDUCT.md) · [Security](SECURITY.md) · [Third-party](THIRD_PARTY.md) · [Trademark](TRADEMARK.md)
-
-## License
-[MIT](LICENSE) © 2026 YanMing Cao · **晏銘湛箴** — Small software, big order.
-ymzz-loop is independent and not affiliated with or endorsed by Notion, Google, GitHub, or Interactive Brokers.
+安裝檔工作流程啟動後，精確網址補在這裡。

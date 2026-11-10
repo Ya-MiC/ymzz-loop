@@ -1,0 +1,9 @@
+{
+  "identifier": "default",
+  "description": "The local window loads the loopback steward. No extra commands.",
+  "windows": ["main"],
+  "permissions": ["core:default"],
+  "remote": {
+    "urls": ["http://127.0.0.1:1413/*", "http://localhost:1413/*"]
+  }
+}

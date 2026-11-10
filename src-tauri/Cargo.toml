@@ -1,0 +1,19 @@
+[package]
+name = "ymzz-bingce"
+version = "0.21.0"
+description = "稟冊 — Tauri 2 window for the ymzz local steward"
+edition = "2021"
+license = "MIT"
+publish = false
+
+[build-dependencies]
+tauri-build = { version = "=2.7.4", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "=2.12.5", features = [] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

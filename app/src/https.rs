@@ -494,6 +494,22 @@ mod tests {
     use std::sync::Mutex;
     use std::thread;
 
+    fn request_complete(buf: &[u8]) -> bool {
+        let Some(end) = buf.windows(4).position(|w| w == b"\r\n\r\n") else {
+            return false;
+        };
+        let header = String::from_utf8_lossy(&buf[..end]);
+        let need = header
+            .lines()
+            .find_map(|line| {
+                line.to_ascii_lowercase()
+                    .strip_prefix("content-length:")
+                    .and_then(|v| v.trim().parse::<usize>().ok())
+            })
+            .unwrap_or(0);
+        buf.len() >= end + 4 + need
+    }
+
     fn fixture() -> (u16, CertificateDer<'static>, Arc<Mutex<Vec<String>>>) {
         install_crypto();
         let certified =
@@ -523,12 +539,23 @@ mod tests {
                 let mut buf = Vec::new();
                 let mut tmp = [0u8; 2048];
                 loop {
-                    let n = tls.read(&mut tmp).unwrap_or(0);
-                    if n == 0 {
-                        break;
+                    match tls.read(&mut tmp) {
+                        Ok(0) => break,
+                        Ok(n) => {
+                            buf.extend_from_slice(&tmp[..n]);
+                            if request_complete(&buf) {
+                                break;
+                            }
+                        }
+                        Err(err)
+                            if err.kind() == std::io::ErrorKind::WouldBlock
+                                || err.kind() == std::io::ErrorKind::TimedOut =>
+                        {
+                            break;
+                        }
+                        Err(_) => break,
                     }
-                    buf.extend_from_slice(&tmp[..n]);
-                    if buf.windows(4).any(|w| w == b"\r\n\r\n") {
+                    if buf.len() > 65_536 {
                         break;
                     }
                 }
