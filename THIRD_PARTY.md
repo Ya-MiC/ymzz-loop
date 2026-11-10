@@ -19,4 +19,4 @@ The website loads no fonts, scripts or styles from third parties; Latin fonts ar
 
 | Feishu / Lark Open API | — | proprietary API ToS (no SDK vendored) | https://open.feishu.cn/ | optional sink `scripts/sinks/feishu.mjs` |
 | T3 Code | v0.1.8 (`bf469bb`) | MIT | https://github.com/pingdotgg/t3code | pure modules under `third_party/t3code/`; see `NOTICE.md`. Not the whole monorepo. |
-| PaddleOCR | not bundled | Apache-2.0 | https://github.com/PaddlePaddle/PaddleOCR | probe only, `app/ocr/paddle_worker.py`. Weights are not downloaded. |
+| PaddleOCR | 2.7.3, not vendored in git | Apache-2.0 | https://github.com/PaddlePaddle/PaddleOCR | `app/ocr/paddle_worker.py` calls `PaddleOCR.ocr` when the isolated runtime exists. Model pins in `app/ocr/pins.json` are sha256 computed from downloaded bytes. The wheels and weights are not committed. |

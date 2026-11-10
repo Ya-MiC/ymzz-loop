@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=ymzz-loop
+Comment=Local review and sandbox payment demo
+Exec=ymzz-vibe desktop
+Terminal=false
+Categories=Utility;
+StartupNotify=false

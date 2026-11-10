@@ -1,5 +1,7 @@
 fn pdf_escape(text: &str) -> String {
-    text.replace('\\', "\\\\").replace('(', "\\(").replace(')', "\\)")
+    text.replace('\\', "\\\\")
+        .replace('(', "\\(")
+        .replace(')', "\\)")
 }
 
 fn build_pdf(stream: &str, image: bool) -> Vec<u8> {
@@ -11,7 +13,11 @@ fn build_pdf(stream: &str, image: bool) -> Vec<u8> {
     } else {
         objects.push(b"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 300 144] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>".to_vec());
     }
-    let stream_obj = format!("<< /Length {} >>\nstream\n{}\nendstream", stream.len(), stream);
+    let stream_obj = format!(
+        "<< /Length {} >>\nstream\n{}\nendstream",
+        stream.len(),
+        stream
+    );
     objects.push(stream_obj.into_bytes());
     if image {
         objects.push(b"<< /Type /XObject /Subtype /Image /Width 1 /Height 1 /ColorSpace /DeviceGray /BitsPerComponent 8 /Length 1 >>\nstream\n \nendstream".to_vec());
@@ -32,7 +38,13 @@ fn build_pdf(stream: &str, image: bool) -> Vec<u8> {
     for off in offsets {
         out.extend(format!("{off:010} 00000 n \n").into_bytes());
     }
-    out.extend(format!("trailer << /Size {} /Root 1 0 R >>\nstartxref\n{xref_at}\n%%EOF\n", objects.len() + 1).into_bytes());
+    out.extend(
+        format!(
+            "trailer << /Size {} /Root 1 0 R >>\nstartxref\n{xref_at}\n%%EOF\n",
+            objects.len() + 1
+        )
+        .into_bytes(),
+    );
     out
 }
 
@@ -64,7 +76,11 @@ pub fn extract_text_layer(bytes: &[u8]) -> PdfText {
         rest = &rest[end..];
     }
     let has = !text.trim().is_empty();
-    PdfText { text, has_text_layer: has, source: "pdf_text_layer" }
+    PdfText {
+        text,
+        has_text_layer: has,
+        source: "pdf_text_layer",
+    }
 }
 
 fn strings_before_tj(stream: &str) -> String {
@@ -122,7 +138,11 @@ mod tests {
     fn scanned_pdf_has_no_text_layer() {
         let pdf = scanned_pdf();
         let got = extract_text_layer(&pdf);
-        assert!(!got.has_text_layer, "scan bytes unexpectedly had text {}", got.text);
+        assert!(
+            !got.has_text_layer,
+            "scan bytes unexpectedly had text {}",
+            got.text
+        );
         assert!(got.text.trim().is_empty());
     }
 }

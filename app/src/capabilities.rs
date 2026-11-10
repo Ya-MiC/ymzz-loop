@@ -10,7 +10,7 @@ struct Row {
 
 const ROWS: &[Row] = &[
     Row { id: "T01", implemented: true, tested: "http::tests::pages_and_auth", unverified: "", gap: "No hosted app.t3.codes client." },
-    Row { id: "T02", implemented: false, tested: "", unverified: "", gap: "Electron is not bundled. Tauri was not compiled: webkit2gtk is absent and this build will not sudo to install it." },
+    Row { id: "T02", implemented: false, tested: "", unverified: "ymzz-vibe desktop opens the loopback UI and the page has a folder browser. Tauri was not compiled here.", gap: "Electron is not bundled. Tauri was not compiled: webkit2gtk is absent and this build will not sudo to install it. The shipping shell is the Rust binary plus a browser, not a packaged WebView." },
     Row { id: "T03", implemented: false, tested: "", unverified: "", gap: "No iOS or Android store client." },
     Row { id: "T04", implemented: true, tested: "main help text", unverified: "", gap: "No winget, Homebrew, deb, or AUR package is produced here." },
     Row { id: "T05", implemented: true, tested: "net::tests::port_413_is_decimal_and_non_loopback_is_refused", unverified: "", gap: "systemd unit is printed only. It is not installed." },
@@ -102,7 +102,10 @@ pub fn matrix() -> Value {
             })
         })
         .collect();
-    let gaps = rows.iter().filter(|r| r["gap"].as_str().unwrap_or("").is_empty() == false).count();
+    let gaps = rows
+        .iter()
+        .filter(|r| !r["gap"].as_str().unwrap_or("").is_empty())
+        .count();
     json!({
         "product": "ymzz-vibe",
         "version": env!("CARGO_PKG_VERSION"),
@@ -133,11 +136,17 @@ mod tests {
         for n in 1..=6 {
             assert!(ids.iter().any(|id| id == &format!("T0{n}")));
         }
-        for n in [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45] {
+        for n in [
+            10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31,
+            32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+        ] {
             assert!(ids.iter().any(|id| id == &format!("T{n}")), "missing T{n}");
         }
         for n in 1..=35 {
-            assert!(ids.iter().any(|id| id == &format!("S{n:02}")), "missing S{n:02}");
+            assert!(
+                ids.iter().any(|id| id == &format!("S{n:02}")),
+                "missing S{n:02}"
+            );
         }
         for must_gap in ["T02", "T03", "T23", "T34", "T37", "T40", "T41", "T44"] {
             let row = rows.iter().find(|r| r["id"] == must_gap).unwrap();

@@ -40,7 +40,11 @@ pub fn range_ok(start: &str, end: &str) -> Result<(NaiveDate, NaiveDate), String
 }
 
 pub fn today_in_zone(tz: &str) -> Result<String, String> {
-    if tz.len() > 80 || tz.chars().any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+')) {
+    if tz.len() > 80
+        || tz
+            .chars()
+            .any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+'))
+    {
         return Err("rejected timezone name".into());
     }
     let script = "import datetime,sys,zoneinfo\nprint(datetime.datetime.now(zoneinfo.ZoneInfo(sys.argv[1])).date().isoformat())\n";
@@ -62,7 +66,11 @@ pub fn today_in_zone(tz: &str) -> Result<String, String> {
 }
 
 pub fn local_dates_for_unix(tz: &str, stamps: &[i64]) -> Result<Vec<Option<String>>, String> {
-    if tz.len() > 80 || tz.chars().any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+')) {
+    if tz.len() > 80
+        || tz
+            .chars()
+            .any(|c| !(c.is_ascii_alphanumeric() || c == '/' || c == '_' || c == '-' || c == '+'))
+    {
         return Err("rejected timezone name".into());
     }
     let payload = serde_json::to_string(stamps).map_err(|e| e.to_string())?;
@@ -89,11 +97,16 @@ print(json.dumps(out))
     {
         use std::io::Write;
         let stdin = child.stdin.as_mut().ok_or("stdin")?;
-        stdin.write_all(payload.as_bytes()).map_err(|e| e.to_string())?;
+        stdin
+            .write_all(payload.as_bytes())
+            .map_err(|e| e.to_string())?;
     }
     let out = child.wait_with_output().map_err(|e| e.to_string())?;
     if !out.status.success() {
-        return Err(format!("zone conversion failed: {}", String::from_utf8_lossy(&out.stderr)));
+        return Err(format!(
+            "zone conversion failed: {}",
+            String::from_utf8_lossy(&out.stderr)
+        ));
     }
     let v: Vec<Option<String>> = serde_json::from_slice(&out.stdout).map_err(|e| e.to_string())?;
     if v.len() != stamps.len() {

@@ -26,14 +26,22 @@ pub fn sample() -> Value {
             .map(|s| s.trim().to_string())
     });
     let mem = fs::read_to_string("/proc/meminfo").ok().and_then(|t| {
-        t.lines().find(|l| l.starts_with("MemTotal")).map(|l| l.trim().to_string())
+        t.lines()
+            .find(|l| l.starts_with("MemTotal"))
+            .map(|l| l.trim().to_string())
     });
     let os_release = fs::read_to_string("/etc/os-release").unwrap_or_default();
     let pretty = os_release
         .lines()
         .find(|l| l.starts_with("PRETTY_NAME="))
-        .map(|l| l.trim_start_matches("PRETTY_NAME=").trim_matches('"').to_string());
-    let kernel = fs::read_to_string("/proc/sys/kernel/osrelease").ok().map(|s| s.trim().to_string());
+        .map(|l| {
+            l.trim_start_matches("PRETTY_NAME=")
+                .trim_matches('"')
+                .to_string()
+        });
+    let kernel = fs::read_to_string("/proc/sys/kernel/osrelease")
+        .ok()
+        .map(|s| s.trim().to_string());
     let product = read_trim("/sys/class/dmi/id/product_name");
     let vendor = read_trim("/sys/class/dmi/id/sys_vendor");
     json!({
@@ -67,11 +75,17 @@ pub fn sample() -> Value {
 }
 
 fn cpu_present() -> bool {
-    fs::read_to_string("/proc/cpuinfo").ok().map(|t| t.contains("model name") || t.contains("processor")).unwrap_or(false)
+    fs::read_to_string("/proc/cpuinfo")
+        .ok()
+        .map(|t| t.contains("model name") || t.contains("processor"))
+        .unwrap_or(false)
 }
 
 fn read_trim(path: &str) -> Option<String> {
-    fs::read_to_string(path).ok().map(|s| s.trim().to_string()).filter(|s| !s.is_empty())
+    fs::read_to_string(path)
+        .ok()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty())
 }
 
 fn os_class() -> &'static str {
@@ -79,7 +93,11 @@ fn os_class() -> &'static str {
         "linux" => "linux",
         "windows" => "windows",
         "macos" => {
-            if std::env::consts::ARCH == "aarch64" { "apple_silicon" } else { "intel_mac" }
+            if std::env::consts::ARCH == "aarch64" {
+                "apple_silicon"
+            } else {
+                "intel_mac"
+            }
         }
         _ => "unknown",
     }
@@ -117,15 +135,51 @@ fn gpu() -> Value {
 
 pub fn builtin_detectors() -> Vec<Value> {
     let rows = [
-        ("code", "Visual Studio Code", "code", "https://code.visualstudio.com/docs/setup/linux", true),
-        ("claude", "Claude Code", "claude", "https://code.claude.com/docs/en/quickstart", true),
-        ("codex", "Codex CLI", "codex", "https://developers.openai.com/codex/cli", true),
-        ("cursor-agent", "Cursor CLI", "agent", "https://cursor.com/cli", true),
+        (
+            "code",
+            "Visual Studio Code",
+            "code",
+            "https://code.visualstudio.com/docs/setup/linux",
+            true,
+        ),
+        (
+            "claude",
+            "Claude Code",
+            "claude",
+            "https://code.claude.com/docs/en/quickstart",
+            true,
+        ),
+        (
+            "codex",
+            "Codex CLI",
+            "codex",
+            "https://developers.openai.com/codex/cli",
+            true,
+        ),
+        (
+            "cursor-agent",
+            "Cursor CLI",
+            "agent",
+            "https://cursor.com/cli",
+            true,
+        ),
         ("grok", "Grok CLI", "grok", "https://x.ai/cli", true),
-        ("opencode", "OpenCode", "opencode", "https://opencode.ai", true),
+        (
+            "opencode",
+            "OpenCode",
+            "opencode",
+            "https://opencode.ai",
+            true,
+        ),
         ("fx", "fx", "fx", "https://fx.sh", true),
         ("kiro", "Kiro", "kiro", "", true),
-        ("pi", "pi", "pi", "https://pi.dev/docs/latest/quickstart", true),
+        (
+            "pi",
+            "pi",
+            "pi",
+            "https://pi.dev/docs/latest/quickstart",
+            true,
+        ),
         ("muse", "Muse", "muse", "", true),
         ("hermes", "Hermes", "hermes", "", false),
     ];
@@ -199,14 +253,19 @@ mod tests {
         assert_eq!(v["invented"], false);
         assert_eq!(v["tpu"]["status"], "absent");
         let gpu = &v["gpu"];
-        assert!(gpu["status"] == "present" || gpu["status"] == "absent" || gpu["status"] == "unknown");
+        assert!(
+            gpu["status"] == "present" || gpu["status"] == "absent" || gpu["status"] == "unknown"
+        );
         if let Some(cards) = gpu.get("cards").and_then(|c| c.as_array()) {
             for card in cards {
                 assert!(card.get("marketing_name").unwrap().is_null());
             }
         }
         assert!(v["openrouter_note"].as_str().unwrap().contains("no top-10"));
-        let hermes = builtin_detectors().into_iter().find(|d| d["id"] == "hermes").unwrap();
+        let hermes = builtin_detectors()
+            .into_iter()
+            .find(|d| d["id"] == "hermes")
+            .unwrap();
         assert_eq!(hermes["version_command_trusted"], false);
         assert!(which("this-binary-should-not-exist").is_none());
     }

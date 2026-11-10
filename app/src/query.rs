@@ -24,8 +24,19 @@ pub struct QuerySpec {
     pub end: String,
     pub drive: Option<String>,
     pub ext: Option<String>,
+    pub group: Option<String>,
     pub more_enabled: bool,
     pub name_contains: Option<String>,
+}
+
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct SnapItem {
+    pub id: String,
+    pub path: String,
+    pub drive: String,
+    pub ext: String,
+    pub modified: String,
+    pub group: String,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -48,11 +59,19 @@ pub struct QuerySnap {
     pub end: String,
     pub drive: Option<String>,
     pub ext: Option<String>,
+    #[serde(default)]
+    pub group: Option<String>,
+    #[serde(default)]
+    pub items: Vec<SnapItem>,
     pub formula: String,
 }
 
 pub fn group_key(drive: &str, ext: &str) -> String {
-    let label = if ext.is_empty() { "（無副檔名）" } else { ext };
+    let label = if ext.is_empty() {
+        "（無副檔名）"
+    } else {
+        ext
+    };
     if drive.ends_with(':') {
         format!("{drive}{label}")
     } else {
@@ -62,12 +81,19 @@ pub fn group_key(drive: &str, ext: &str) -> String {
 
 pub fn apply_query(records: &[Rec], spec: &QuerySpec) -> Result<QuerySnap, String> {
     let _ = range_ok(&spec.start, &spec.end)?;
+    let grouped = spec.group.as_deref().is_some_and(|g| !g.is_empty());
+    let split = spec.drive.as_deref().is_some_and(|d| !d.is_empty())
+        || spec.ext.as_deref().is_some_and(|e| !e.is_empty());
+    if grouped && split {
+        return Err("type filter is one group; do not also send drive and extension".into());
+    }
     let mut ids = Vec::new();
     let mut versions = BTreeMap::new();
     let mut skipped = 0usize;
     let mut unknown_mtime = 0usize;
     let mut groups = BTreeMap::new();
     let mut per_day = BTreeMap::new();
+    let mut items = Vec::new();
     for rec in records {
         if !rec.readable || rec.escapes {
             skipped += 1;
@@ -90,6 +116,12 @@ pub fn apply_query(records: &[Rec], spec: &QuerySpec) -> Result<QuerySnap, Strin
                 continue;
             }
         }
+        let key = group_key(&rec.drive, &rec.ext);
+        if let Some(group) = spec.group.as_deref() {
+            if !group.is_empty() && key != group {
+                continue;
+            }
+        }
         if spec.more_enabled {
             if let Some(name) = spec.name_contains.as_deref() {
                 if !name.is_empty() && !rec.path.contains(name) {
@@ -99,8 +131,16 @@ pub fn apply_query(records: &[Rec], spec: &QuerySpec) -> Result<QuerySnap, Strin
         }
         ids.push(rec.id.clone());
         versions.insert(rec.id.clone(), rec.version.clone());
-        *groups.entry(group_key(&rec.drive, &rec.ext)).or_insert(0) += 1;
+        *groups.entry(key.clone()).or_insert(0) += 1;
         *per_day.entry(day.to_string()).or_insert(0) += 1;
+        items.push(SnapItem {
+            id: rec.id.clone(),
+            path: rec.path.clone(),
+            drive: rec.drive.clone(),
+            ext: rec.ext.clone(),
+            modified: day.to_string(),
+            group: key,
+        });
     }
     Ok(QuerySnap {
         ids,
@@ -113,11 +153,18 @@ pub fn apply_query(records: &[Rec], spec: &QuerySpec) -> Result<QuerySnap, Strin
         end: spec.end.clone(),
         drive: spec.drive.clone(),
         ext: spec.ext.clone(),
+        group: spec.group.clone(),
+        items,
         formula: "y = day_count / period_total".into(),
     })
 }
 
-pub fn spec_from_preset(today: &str, preset: u32, drive: Option<String>, ext: Option<String>) -> Result<QuerySpec, String> {
+pub fn spec_from_preset(
+    today: &str,
+    preset: u32,
+    drive: Option<String>,
+    ext: Option<String>,
+) -> Result<QuerySpec, String> {
     let days = preset_days(preset)?;
     let (s, e) = inclusive_window(parse_ymd(today)?, days)?;
     Ok(QuerySpec {
@@ -125,6 +172,7 @@ pub fn spec_from_preset(today: &str, preset: u32, drive: Option<String>, ext: Op
         end: fmt_ymd(e),
         drive,
         ext,
+        group: None,
         more_enabled: false,
         name_contains: None,
     })
@@ -139,8 +187,17 @@ pub fn series(snap: &QuerySnap) -> Result<Vec<DayPoint>, String> {
     loop {
         let key = fmt_ymd(day);
         let count = snap.per_day.get(&key).copied().unwrap_or(0);
-        let ratio = if total == 0 { None } else { Some(count as f64 / total as f64) };
-        points.push(DayPoint { rel_day: rel, date: key, count, ratio });
+        let ratio = if total == 0 {
+            None
+        } else {
+            Some(count as f64 / total as f64)
+        };
+        points.push(DayPoint {
+            rel_day: rel,
+            date: key,
+            count,
+            ratio,
+        });
         if day == end {
             break;
         }
@@ -188,9 +245,16 @@ pub fn records_from_synthetic(v: &Value) -> Vec<Rec> {
                         drive: r.get("drive")?.as_str()?.to_string(),
                         path: r.get("path")?.as_str()?.to_string(),
                         ext: r.get("type")?.as_str()?.to_string(),
-                        modified: r.get("modified_local_date").and_then(|d| d.as_str()).map(|s| s.to_string()),
+                        modified: r
+                            .get("modified_local_date")
+                            .and_then(|d| d.as_str())
+                            .map(|s| s.to_string()),
                         readable: r.get("readable").and_then(|b| b.as_bool()).unwrap_or(false),
-                        version: r.get("version").and_then(|s| s.as_str()).unwrap_or("").to_string(),
+                        version: r
+                            .get("version")
+                            .and_then(|s| s.as_str())
+                            .unwrap_or("")
+                            .to_string(),
                         bytes: r.get("bytes").and_then(|n| n.as_u64()).unwrap_or(0),
                         skip_reason: if r.get("readable").and_then(|b| b.as_bool()) == Some(false) {
                             Some("not_readable".into())
@@ -212,22 +276,36 @@ mod tests {
 
     #[test]
     fn synthetic_fixture_matches_expected_ids() {
-        let meta: Value = serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).unwrap();
-        let expected: Value = serde_json::from_str(include_str!("../fixtures/expected_queries.json")).unwrap();
+        let meta: Value =
+            serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).unwrap();
+        let expected: Value =
+            serde_json::from_str(include_str!("../fixtures/expected_queries.json")).unwrap();
         let records = records_from_synthetic(&meta);
         for q in expected["queries"].as_array().unwrap() {
             let spec = QuerySpec {
                 start: q["start"].as_str().unwrap().into(),
                 end: q["end"].as_str().unwrap().into(),
-                drive: q.get("drive").and_then(|d| d.as_str()).map(|s| s.to_string()),
-                ext: q.get("type").and_then(|d| d.as_str()).map(|s| s.to_string()),
+                drive: q
+                    .get("drive")
+                    .and_then(|d| d.as_str())
+                    .map(|s| s.to_string()),
+                ext: q
+                    .get("type")
+                    .and_then(|d| d.as_str())
+                    .map(|s| s.to_string()),
+                group: None,
                 more_enabled: false,
                 name_contains: None,
             };
             let snap = apply_query(&records, &spec).unwrap();
             let mut got = snap.ids.clone();
             got.sort();
-            let mut exp: Vec<String> = q["expected_ids"].as_array().unwrap().iter().map(|x| x.as_str().unwrap().to_string()).collect();
+            let mut exp: Vec<String> = q["expected_ids"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|x| x.as_str().unwrap().to_string())
+                .collect();
             exp.sort();
             assert_eq!(got, exp, "{}", q["name"]);
         }
@@ -235,7 +313,8 @@ mod tests {
 
     #[test]
     fn more_filter_is_not_a_third_default() {
-        let meta: Value = serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).unwrap();
+        let meta: Value =
+            serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).unwrap();
         let records = records_from_synthetic(&meta);
         let mut spec = spec_from_preset("2026-11-07", 3, None, None).unwrap();
         spec.name_contains = Some("file-1".into());
@@ -243,7 +322,12 @@ mod tests {
         spec.more_enabled = true;
         let applied = apply_query(&records, &spec).unwrap();
         assert!(ignored.ids.len() > applied.ids.len());
-        assert!(applied.ids.iter().all(|id| records.iter().find(|r| &r.id == id).unwrap().path.contains("file-1")));
+        assert!(applied.ids.iter().all(|id| records
+            .iter()
+            .find(|r| &r.id == id)
+            .unwrap()
+            .path
+            .contains("file-1")));
     }
 
     #[test]
@@ -259,6 +343,8 @@ mod tests {
             end: "2026-11-07".into(),
             drive: None,
             ext: None,
+            group: None,
+            items: vec![],
             formula: "y = day_count / period_total".into(),
         };
         let points = series(&snap).unwrap();
@@ -271,5 +357,22 @@ mod tests {
         assert_eq!(group_key("C:", ".py"), "C:.py");
         assert_eq!(group_key("/home", ".md"), "/home .md");
         assert!(!group_key("/Volumes/Notes", ".pdf").contains("C:"));
+        assert_eq!(group_key("/Volumes/Notes", ".pdf"), "/Volumes/Notes .pdf");
+    }
+
+    #[test]
+    fn one_group_selector_filters_and_rejects_a_split_type() {
+        let meta: Value =
+            serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).unwrap();
+        let records = records_from_synthetic(&meta);
+        let mut spec = spec_from_preset("2026-11-07", 3, None, None).unwrap();
+        spec.group = Some("D:.py".into());
+        let snap = apply_query(&records, &spec).unwrap();
+        assert!(snap.ids.contains(&"SYN-001".to_string()));
+        assert!(snap.items.iter().all(|item| item.group == "D:.py"));
+        spec.drive = Some("D:".into());
+        assert!(apply_query(&records, &spec)
+            .unwrap_err()
+            .contains("one group"));
     }
 }

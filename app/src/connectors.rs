@@ -32,8 +32,13 @@ pub fn notion_upsert(token: &str, database_id: &str, body: &Value) -> BuiltReque
 pub fn sheets_append(token: &str, sheet_id: &str, range: &str, values: &Value) -> BuiltRequest {
     BuiltRequest {
         method: "POST".into(),
-        url: format!("https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}/values/{range}:append"),
-        headers: vec![auth_header(token), ("Content-Type".into(), "application/json".into())],
+        url: format!(
+            "https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}/values/{range}:append"
+        ),
+        headers: vec![
+            auth_header(token),
+            ("Content-Type".into(), "application/json".into()),
+        ],
         body: json!({"values": values, "valueInputOption": "RAW"}).to_string(),
     }
 }
@@ -42,8 +47,12 @@ pub fn docs_batch(token: &str, doc_id: &str, text: &str) -> BuiltRequest {
     BuiltRequest {
         method: "POST".into(),
         url: format!("https://docs.googleapis.com/v1/documents/{doc_id}:batchUpdate"),
-        headers: vec![auth_header(token), ("Content-Type".into(), "application/json".into())],
-        body: json!({"requests": [{"insertText": {"text": text, "location": {"index": 1}}}]}).to_string(),
+        headers: vec![
+            auth_header(token),
+            ("Content-Type".into(), "application/json".into()),
+        ],
+        body: json!({"requests": [{"insertText": {"text": text, "location": {"index": 1}}}]})
+            .to_string(),
     }
 }
 
@@ -60,12 +69,25 @@ pub fn github_comment(token: &str, repo: &str, issue: u64, body: &str) -> BuiltR
     }
 }
 
-pub fn feishu_or_lark(lark: bool, token: &str, app_token: &str, table: &str, fields: &Value) -> BuiltRequest {
-    let host = if lark { "https://open.larksuite.com" } else { "https://open.feishu.cn" };
+pub fn feishu_or_lark(
+    lark: bool,
+    token: &str,
+    app_token: &str,
+    table: &str,
+    fields: &Value,
+) -> BuiltRequest {
+    let host = if lark {
+        "https://open.larksuite.com"
+    } else {
+        "https://open.feishu.cn"
+    };
     BuiltRequest {
         method: "POST".into(),
         url: format!("{host}/open-apis/bitable/v1/apps/{app_token}/tables/{table}/records"),
-        headers: vec![auth_header(token), ("Content-Type".into(), "application/json".into())],
+        headers: vec![
+            auth_header(token),
+            ("Content-Type".into(), "application/json".into()),
+        ],
         body: json!({"fields": fields}).to_string(),
     }
 }
@@ -88,7 +110,11 @@ pub fn redact_headers(headers: &[(String, String)]) -> Vec<(String, String)> {
         .iter()
         .map(|(k, v)| {
             let key = k.to_ascii_lowercase();
-            if key.contains("authorization") || key.contains("token") || key.contains("secret") || key == "x-oo-team-name" {
+            if key.contains("authorization")
+                || key.contains("token")
+                || key.contains("secret")
+                || key == "x-oo-team-name"
+            {
                 (k.clone(), "«redacted»".into())
             } else {
                 (k.clone(), v.clone())
@@ -99,14 +125,65 @@ pub fn redact_headers(headers: &[(String, String)]) -> Vec<(String, String)> {
 
 pub static ENV_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());
 
+#[derive(Clone, Copy)]
+pub struct ExchangePolicy {
+    pub allow_loopback: bool,
+    pub allow_public: bool,
+}
+
 /// Real HTTP/1.1 exchange. Public hosts stay closed unless the owner sets
 /// YMZZ_CONNECTOR_NET=1 and YMZZ_CONNECTOR_ALLOW_PUBLIC=1. Tests use 127.0.0.1.
 pub fn exchange(req: &BuiltRequest) -> Result<String, String> {
-    if std::env::var("YMZZ_CONNECTOR_NET").ok().as_deref() != Some("1") {
-        return Err("live_network_disabled".into());
+    exchange_with(
+        req,
+        ExchangePolicy {
+            allow_loopback: std::env::var("YMZZ_CONNECTOR_NET").ok().as_deref() == Some("1"),
+            allow_public: std::env::var("YMZZ_CONNECTOR_ALLOW_PUBLIC").ok().as_deref() == Some("1"),
+        },
+        1,
+    )
+}
+
+pub fn exchange_with(
+    req: &BuiltRequest,
+    policy: ExchangePolicy,
+    attempts: u32,
+) -> Result<String, String> {
+    let mut last = String::from("connect failed");
+    let tries = attempts.max(1);
+    for attempt in 0..tries {
+        match exchange_once(req, policy) {
+            Ok(body) => return Ok(body),
+            Err(err)
+                if err.contains("live_network_disabled")
+                    || err.contains("blocked")
+                    || err.contains("tls_")
+                    || err.contains("bad url")
+                    || err.contains("bad port") =>
+            {
+                return Err(err);
+            }
+            Err(err) => {
+                last = err;
+                if attempt + 1 < tries {
+                    std::thread::sleep(Duration::from_millis(30));
+                }
+            }
+        }
     }
-    let rest = req.url.strip_prefix("https://").or_else(|| req.url.strip_prefix("http://")).ok_or("bad url")?;
-    let (hostport, path) = rest.split_once('/').map(|(h, p)| (h, format!("/{p}"))).unwrap_or((rest, "/".into()));
+    Err(last)
+}
+
+fn exchange_once(req: &BuiltRequest, policy: ExchangePolicy) -> Result<String, String> {
+    let rest = req
+        .url
+        .strip_prefix("https://")
+        .or_else(|| req.url.strip_prefix("http://"))
+        .ok_or("bad url")?;
+    let (hostport, path) = rest
+        .split_once('/')
+        .map(|(h, p)| (h, format!("/{p}")))
+        .unwrap_or((rest, "/".into()));
     let (host, port) = if let Some((h, p)) = hostport.split_once(':') {
         (h.to_string(), p.parse::<u16>().map_err(|_| "bad port")?)
     } else if req.url.starts_with("https://") {
@@ -114,16 +191,25 @@ pub fn exchange(req: &BuiltRequest) -> Result<String, String> {
     } else {
         (hostport.to_string(), 80)
     };
-    if host != "127.0.0.1" && std::env::var("YMZZ_CONNECTOR_ALLOW_PUBLIC").ok().as_deref() != Some("1") {
+    if !policy.allow_loopback {
+        return Err("live_network_disabled".into());
+    }
+    if host != "127.0.0.1" && host != "localhost" && !policy.allow_public {
         return Err("public_connector_host_blocked_without_explicit_allow".into());
     }
     if port == 443 {
         return Err("tls_to_public_hosts_is_not_enabled_in_this_build".into());
     }
-    let mut stream = TcpStream::connect((host.as_str(), port)).map_err(|e| format!("connect: {e}"))?;
+    let mut stream =
+        TcpStream::connect((host.as_str(), port)).map_err(|e| format!("connect: {e}"))?;
     stream.set_read_timeout(Some(Duration::from_secs(3))).ok();
     stream.set_write_timeout(Some(Duration::from_secs(3))).ok();
-    let mut header = format!("{} {} HTTP/1.1\r\nHost: {host}:{port}\r\nConnection: close\r\nContent-Length: {}\r\n", req.method, path, req.body.len());
+    let mut header = format!(
+        "{} {} HTTP/1.1\r\nHost: {host}:{port}\r\nConnection: close\r\nContent-Length: {}\r\n",
+        req.method,
+        path,
+        req.body.len()
+    );
     for (k, v) in &req.headers {
         if k.eq_ignore_ascii_case("host") {
             continue;
@@ -134,20 +220,40 @@ pub fn exchange(req: &BuiltRequest) -> Result<String, String> {
         header.push_str("\r\n");
     }
     header.push_str("\r\n");
-    stream.write_all(header.as_bytes()).map_err(|e| e.to_string())?;
-    stream.write_all(req.body.as_bytes()).map_err(|e| e.to_string())?;
+    stream
+        .write_all(header.as_bytes())
+        .map_err(|e| e.to_string())?;
+    stream
+        .write_all(req.body.as_bytes())
+        .map_err(|e| e.to_string())?;
     let mut buf = Vec::new();
     stream.read_to_end(&mut buf).map_err(|e| e.to_string())?;
-    String::from_utf8(buf).map_err(|e| e.to_string())
+    let text = String::from_utf8(buf).map_err(|e| e.to_string())?;
+    if !text.starts_with("HTTP/") {
+        return Err("empty http response".into());
+    }
+    Ok(text)
 }
 
 pub fn validate_record(mapping: &Value, record: &Value) -> Result<Value, String> {
-    let rows = mapping.get("mapping").and_then(|m| m.as_array()).ok_or("mapping.mapping array required")?;
+    let rows = mapping
+        .get("mapping")
+        .and_then(|m| m.as_array())
+        .ok_or("mapping.mapping array required")?;
     let mut out = serde_json::Map::new();
     for row in rows {
-        let logical = row.get("logical_field").and_then(|s| s.as_str()).ok_or("logical_field")?;
-        let kind = row.get("source_type").and_then(|s| s.as_str()).unwrap_or("rich_text");
-        let required = row.get("required").and_then(|b| b.as_bool()).unwrap_or(false);
+        let logical = row
+            .get("logical_field")
+            .and_then(|s| s.as_str())
+            .ok_or("logical_field")?;
+        let kind = row
+            .get("source_type")
+            .and_then(|s| s.as_str())
+            .unwrap_or("rich_text");
+        let required = row
+            .get("required")
+            .and_then(|b| b.as_bool())
+            .unwrap_or(false);
         let value = record.get(logical).cloned();
         if value.is_none() || value.as_ref().unwrap().is_null() || value.as_ref().unwrap() == "" {
             if required {
@@ -194,7 +300,11 @@ mod tests {
     #[test]
     fn hosts_stay_on_their_own_products() {
         let _guard = ENV_LOCK.lock().expect("env");
-        let n = notion_upsert("secret-token", "db", &json!({"parent": {"database_id": "db"}}));
+        let n = notion_upsert(
+            "secret-token",
+            "db",
+            &json!({"parent": {"database_id": "db"}}),
+        );
         assert!(n.url.contains("api.notion.com"));
         assert!(!n.url.contains("feishu"));
         let sheet = sheets_append("tok", "sheet", "A1", &json!([["a"]]));
@@ -210,7 +320,10 @@ mod tests {
         assert_ne!(feishu.url, lark.url);
         let oo = oomol_hosted("tok", "team-a", &json!({"jsonrpc":"2.0"}));
         assert_eq!(oo.url, "https://connector.oomol.com/v1/mcp");
-        assert!(oo.headers.iter().any(|(k, v)| k == "x-oo-team-name" && v == "team-a"));
+        assert!(oo
+            .headers
+            .iter()
+            .any(|(k, v)| k == "x-oo-team-name" && v == "team-a"));
         let redacted = redact_headers(&oo.headers);
         assert!(redacted.iter().all(|(_, v)| v != "tok" && v != "team-a"));
         std::env::remove_var("YMZZ_CONNECTOR_NET");
@@ -224,10 +337,23 @@ mod tests {
         let port = listener.local_addr().unwrap().port();
         thread::spawn(move || {
             let (mut sock, _) = listener.accept().unwrap();
-            let mut buf = [0u8; 2048];
-            let _ = sock.read(&mut buf);
+            let mut buf = Vec::new();
+            let mut tmp = [0u8; 1024];
+            loop {
+                let n = sock.read(&mut tmp).unwrap_or(0);
+                if n == 0 {
+                    break;
+                }
+                buf.extend_from_slice(&tmp[..n]);
+                if buf.windows(4).any(|w| w == b"\r\n\r\n") {
+                    break;
+                }
+            }
             let body = b"{\"ok\":true}";
-            let resp = format!("HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", body.len());
+            let resp = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
             sock.write_all(resp.as_bytes()).unwrap();
             sock.write_all(body).unwrap();
         });
@@ -235,7 +361,10 @@ mod tests {
         let req = BuiltRequest {
             method: "POST".into(),
             url: format!("http://127.0.0.1:{port}/sync"),
-            headers: vec![("Authorization".into(), "Bearer secret-token".into()), ("Content-Type".into(), "application/json".into())],
+            headers: vec![
+                ("Authorization".into(), "Bearer secret-token".into()),
+                ("Content-Type".into(), "application/json".into()),
+            ],
             body: "{\"doc_id\":\"SYN\"}".into(),
         };
         let raw = exchange(&req).unwrap();
@@ -243,7 +372,13 @@ mod tests {
         assert!(raw.contains("\"ok\":true"));
         std::env::remove_var("YMZZ_CONNECTOR_NET");
         let mapping = json!({"mapping":[{"logical_field":"title","source_type":"title","required":true},{"logical_field":"mood","source_type":"number","required":false},{"logical_field":"date","source_type":"date","required":true}]});
-        assert!(validate_record(&mapping, &json!({"title":"t","date":"2026-11-07","mood":3})).is_ok());
-        assert!(validate_record(&mapping, &json!({"title":"t","date":"2026-11-07","mood":"high"})).is_err());
+        assert!(
+            validate_record(&mapping, &json!({"title":"t","date":"2026-11-07","mood":3})).is_ok()
+        );
+        assert!(validate_record(
+            &mapping,
+            &json!({"title":"t","date":"2026-11-07","mood":"high"})
+        )
+        .is_err());
     }
 }

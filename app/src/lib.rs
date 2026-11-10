@@ -7,6 +7,7 @@ pub mod http;
 pub mod inventory;
 pub mod mcp;
 pub mod net;
+pub mod ocrflow;
 pub mod paths;
 pub mod pay;
 pub mod pdf;

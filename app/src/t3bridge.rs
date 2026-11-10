@@ -19,7 +19,9 @@ pub fn call(cmd: &str, input: &Value) -> Result<Value, String> {
         .map_err(|e| format!("node bridge: {e}"))?;
     {
         let stdin = child.stdin.as_mut().ok_or("bridge stdin")?;
-        stdin.write_all(input.to_string().as_bytes()).map_err(|e| e.to_string())?;
+        stdin
+            .write_all(input.to_string().as_bytes())
+            .map_err(|e| e.to_string())?;
     }
     let out = child.wait_with_output().map_err(|e| e.to_string())?;
     if !out.status.success() {
@@ -28,16 +30,27 @@ pub fn call(cmd: &str, input: &Value) -> Result<Value, String> {
             String::from_utf8_lossy(&out.stderr)
         ));
     }
-    serde_json::from_slice(&out.stdout).map_err(|e| format!("bridge json: {e} {}", String::from_utf8_lossy(&out.stdout)))
+    serde_json::from_slice(&out.stdout)
+        .map_err(|e| format!("bridge json: {e} {}", String::from_utf8_lossy(&out.stdout)))
 }
 
 pub fn thread_offsets(text: &str, query: &str) -> Result<Vec<usize>, String> {
     let v = call("thread-search", &json!({"text": text, "query": query}))?;
-    Ok(v.get("offsets").and_then(|x| x.as_array()).map(|a| a.iter().filter_map(|n| n.as_u64().map(|u| u as usize)).collect()).unwrap_or_default())
+    Ok(v.get("offsets")
+        .and_then(|x| x.as_array())
+        .map(|a| {
+            a.iter()
+                .filter_map(|n| n.as_u64().map(|u| u as usize))
+                .collect()
+        })
+        .unwrap_or_default())
 }
 
 pub fn rank(value: &str, query: &str) -> Result<Option<f64>, String> {
-    let v = call("rank", &json!({"value": value.to_lowercase(), "query": query.to_lowercase()}))?;
+    let v = call(
+        "rank",
+        &json!({"value": value.to_lowercase(), "query": query.to_lowercase()}),
+    )?;
     Ok(v.get("score").and_then(|s| s.as_f64()))
 }
 
@@ -56,11 +69,17 @@ pub fn host_class(host: &str) -> Result<Value, String> {
 
 pub fn clean_commit_message(message: &str) -> Result<String, String> {
     let v = call("merge-message", &json!({"message": message}))?;
-    Ok(v.get("message").and_then(|m| m.as_str()).unwrap_or(message).to_string())
+    Ok(v.get("message")
+        .and_then(|m| m.as_str())
+        .unwrap_or(message)
+        .to_string())
 }
 
 pub fn model_short(name: &str, families: &[&str]) -> Result<Option<String>, String> {
-    let v = call("model-short-name", &json!({"name": name, "families": families}))?;
+    let v = call(
+        "model-short-name",
+        &json!({"name": name, "families": families}),
+    )?;
     Ok(match &v["short"] {
         Value::String(s) => Some(s.clone()),
         _ => None,

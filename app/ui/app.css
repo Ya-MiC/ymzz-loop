@@ -48,6 +48,8 @@ code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size:
 .chip { display: inline-flex; align-items: center; min-height: 32px; padding: 0 var(--sp-3); border-radius: 999px; background: var(--bg-1); color: var(--ink-1); box-shadow: inset 0 0 0 2px var(--accent); }
 .split { display: grid; grid-template-columns: 1.4fr .8fr; gap: var(--sp-4); }
 .canvas { background: var(--bg-0); min-height: 280px; border-radius: 16px; }
+.drawer-row, .browser button { display: block; width: 100%; text-align: left; min-height: var(--hit); }
+.graph-hit { cursor: pointer; }
 .grey { color: var(--ink-3); }
 .steps { display: flex; gap: var(--sp-2); flex-wrap: wrap; padding: 0; margin: var(--sp-3) 0; list-style: none; }
 .steps li { background: var(--bg-1); border-radius: 999px; padding: 6px 12px; }

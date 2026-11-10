@@ -1,0 +1,46 @@
+{
+  "engine": "PaddleOCR",
+  "engine_version": "2.7.3",
+  "engine_license": "Apache-2.0",
+  "engine_origin": "https://github.com/PaddlePaddle/PaddleOCR",
+  "source_list": "https://github.com/PaddlePaddle/PaddleOCR/blob/release/2.7/doc/doc_en/models_list_en.md",
+  "provenance": "sha256 and md5 were computed in this workspace from the downloaded bytes. No detached signature or upstream checksum file was found for these three archives. A BOS Content-MD5 header was not captured for the PP-OCRv3 English archives, so these digests are our pins of the bytes we fetched, not an independent upstream verification.",
+  "files": [
+    {
+      "id": "en_PP-OCRv3_det",
+      "role": "detection",
+      "version": "PP-OCRv3",
+      "url": "https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_det_infer.tar",
+      "bytes": 4003840,
+      "sha256": "e740eb522521827cc83da3ba33e1c70ccfd9b3cf7d9a24a420ce4ca5ebb8794f",
+      "md5": "8dbdf73a57cbb1d226be1095e115801b"
+    },
+    {
+      "id": "en_PP-OCRv3_rec",
+      "role": "recognition",
+      "version": "PP-OCRv3",
+      "url": "https://paddleocr.bj.bcebos.com/PP-OCRv3/english/en_PP-OCRv3_rec_infer.tar",
+      "bytes": 9963520,
+      "sha256": "94402088520ae3938c51eb8782da1cd7c1bc46d5531766de99f77ee9c2f23343",
+      "md5": "91db0f3a367f10188805186a0fd3a109"
+    },
+    {
+      "id": "ch_ppocr_mobile_v2.0_cls",
+      "role": "angle",
+      "version": "PP-OCR mobile v2.0",
+      "url": "https://paddleocr.bj.bcebos.com/dygraph_v2.0/ch/ch_ppocr_mobile_v2.0_cls_infer.tar",
+      "bytes": 2188800,
+      "sha256": "507352585040d035da3b1e6374694ad679a850acb0a36a8d0d47984176357717",
+      "md5": "cbdc179887a85c539c681d177b45bd48"
+    },
+    {
+      "id": "en_dict",
+      "role": "dictionary",
+      "version": "PaddleOCR release/2.7 ppocr/utils/en_dict.txt",
+      "url": "https://raw.githubusercontent.com/PaddlePaddle/PaddleOCR/release/2.7/ppocr/utils/en_dict.txt",
+      "bytes": 190,
+      "sha256": "5662df9d2d03f0e8ca0d3b0649d6acbab904b6a14b3d3521463c71c37c668ce3",
+      "md5": null
+    }
+  ]
+}

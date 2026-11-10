@@ -16,6 +16,7 @@ fn main() {
     let cmd = args.remove(0);
     match cmd.as_str() {
         "serve" => serve(&args),
+        "desktop" => desktop(&args),
         "mcp" => mcp_stdio(),
         "capabilities" => {
             println!("{}", ymzz_vibe::capabilities::matrix());
@@ -36,10 +37,11 @@ fn serve(args: &[String]) {
     while i < args.len() {
         match args[i].as_str() {
             "--port" => {
-                port = net::parse_port(args.get(i + 1).map(String::as_str).unwrap_or("")).unwrap_or_else(|e| {
-                    eprintln!("{e}");
-                    std::process::exit(2);
-                });
+                port = net::parse_port(args.get(i + 1).map(String::as_str).unwrap_or(""))
+                    .unwrap_or_else(|e| {
+                        eprintln!("{e}");
+                        std::process::exit(2);
+                    });
                 i += 2;
             }
             "--data" => {
@@ -64,7 +66,59 @@ fn serve(args: &[String]) {
         }
     };
     eprintln!("local-first core. Payment screen is a sandbox demo, not a merchant checkout.");
-    eprintln!("session token is in {} (mode 0600). This process will not sudo.", data.join("session.token").display());
+    eprintln!(
+        "session token is in {} (mode 0600). This process will not sudo.",
+        data.join("session.token").display()
+    );
+    if let Err(err) = ymzz_vibe::http::bind_and_serve(app, port) {
+        eprintln!("{err}");
+        std::process::exit(1);
+    }
+}
+
+fn desktop(args: &[String]) {
+    let mut port = 1413u16;
+    let mut data = default_data();
+    let mut i = 0;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--port" => {
+                port = net::parse_port(args.get(i + 1).map(String::as_str).unwrap_or(""))
+                    .unwrap_or_else(|e| {
+                        eprintln!("{e}");
+                        std::process::exit(2);
+                    });
+                i += 2;
+            }
+            "--data" => {
+                data = PathBuf::from(args.get(i + 1).cloned().unwrap_or_default());
+                i += 2;
+            }
+            other => {
+                eprintln!("unknown argument {other}");
+                std::process::exit(2);
+            }
+        }
+    }
+    eprintln!("desktop listens on 127.0.0.1:{port}. Port 413 is privileged; this program will not sudo or pick another port.");
+    let app = match App::open(&data, &util::repo_root()) {
+        Ok(app) => Arc::new(app),
+        Err(err) => {
+            eprintln!("open data dir: {err}");
+            std::process::exit(1);
+        }
+    };
+    let url = format!("http://127.0.0.1:{port}/");
+    std::thread::spawn(move || {
+        std::thread::sleep(std::time::Duration::from_millis(400));
+        let opened = std::process::Command::new("xdg-open").arg(&url).status();
+        if opened.map(|s| s.success()).unwrap_or(false) {
+            return;
+        }
+        eprintln!(
+            "open {url} in a browser. Choose a folder from the page; no shell command is required."
+        );
+    });
     if let Err(err) = ymzz_vibe::http::bind_and_serve(app, port) {
         eprintln!("{err}");
         std::process::exit(1);
@@ -81,7 +135,9 @@ fn mcp_stdio() {
     let mut locked = stdin.lock();
     for line in BufRead::lines(&mut locked) {
         let Ok(line) = line else { break };
-        if line.trim().is_empty() { continue; }
+        if line.trim().is_empty() {
+            continue;
+        }
         let out = mcp::handle(&app, &line);
         println!("{out}");
     }
@@ -91,7 +147,9 @@ fn default_data() -> PathBuf {
     if let Ok(p) = env::var("YMZZ_DATA_DIR") {
         return PathBuf::from(p);
     }
-    env::var("HOME").map(|h| PathBuf::from(h).join(".local/share/ymzz-vibe")).unwrap_or_else(|_| PathBuf::from("/tmp/ymzz-vibe"))
+    env::var("HOME")
+        .map(|h| PathBuf::from(h).join(".local/share/ymzz-vibe"))
+        .unwrap_or_else(|_| PathBuf::from("/tmp/ymzz-vibe"))
 }
 
 fn print_help() {
@@ -100,6 +158,7 @@ fn print_help() {
          Local-first file, conversation, and review core for the Alipay hackathon demo.\n\
          The payment screen is a sandbox. It does not charge a merchant account.\n\n\
          Commands:\n\
+           ymzz-vibe desktop [--port 1413] [--data DIR]\n\
            ymzz-vibe serve [--port 1413] [--data DIR]\n\
            ymzz-vibe mcp\n\
            ymzz-vibe capabilities\n\n\

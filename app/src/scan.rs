@@ -32,7 +32,11 @@ pub fn scan_root(root: &Path, tz: &str) -> Result<Vec<Rec>, String> {
     };
     let mut out = Vec::new();
     for (idx, item) in found.into_iter().enumerate() {
-        let modified = if item.mtime.is_none() { None } else { dates.get(idx).cloned().flatten() };
+        let modified = if item.mtime.is_none() {
+            None
+        } else {
+            dates.get(idx).cloned().flatten()
+        };
         out.push(Rec {
             id: item.id,
             drive: item.drive,
@@ -91,7 +95,16 @@ fn walk(root: &Path, dir: &Path, out: &mut Vec<Found>) -> Result<(), String> {
             let escapes = fs::canonicalize(&path)
                 .map(|c| !c.starts_with(root))
                 .unwrap_or(true);
-            let mut rec = skip_file(root, &path, if escapes { "symlink_escapes_root" } else { "symlink_not_followed" }, false);
+            let mut rec = skip_file(
+                root,
+                &path,
+                if escapes {
+                    "symlink_escapes_root"
+                } else {
+                    "symlink_not_followed"
+                },
+                false,
+            );
             rec.escapes = escapes;
             rec.kind = "symlink".into();
             out.push(rec);
@@ -112,11 +125,19 @@ fn walk(root: &Path, dir: &Path, out: &mut Vec<Found>) -> Result<(), String> {
             out.push(rec);
             continue;
         }
-        let mtime = meta.modified().ok().and_then(|t| t.duration_since(UNIX_EPOCH).ok()).map(|d| d.as_secs() as i64);
-        let rel = path.strip_prefix(root).unwrap_or(&path).to_string_lossy().replace('\\', "/");
+        let mtime = meta
+            .modified()
+            .ok()
+            .and_then(|t| t.duration_since(UNIX_EPOCH).ok())
+            .map(|d| d.as_secs() as i64);
+        let rel = path
+            .strip_prefix(root)
+            .unwrap_or(&path)
+            .to_string_lossy()
+            .replace('\\', "/");
         let version = format!("{}:{}", meta.len(), mtime.unwrap_or(0));
         out.push(Found {
-            id: format!("fs_{}", crate::util::sha256_bytes(rel.as_bytes())[..16].to_string()),
+            id: format!("fs_{}", &crate::util::sha256_bytes(rel.as_bytes())[..16]),
             drive: mount_label(&path),
             rel,
             ext: extension_of(&name),
@@ -133,10 +154,14 @@ fn walk(root: &Path, dir: &Path, out: &mut Vec<Found>) -> Result<(), String> {
 }
 
 fn skip_file(root: &Path, path: &Path, reason: &str, readable_error: bool) -> Found {
-    let rel = path.strip_prefix(root).unwrap_or(path).to_string_lossy().replace('\\', "/");
+    let rel = path
+        .strip_prefix(root)
+        .unwrap_or(path)
+        .to_string_lossy()
+        .replace('\\', "/");
     let name = path.file_name().and_then(|s| s.to_str()).unwrap_or("");
     Found {
-        id: format!("skip_{}", crate::util::sha256_bytes(rel.as_bytes())[..12].to_string()),
+        id: format!("skip_{}", &crate::util::sha256_bytes(rel.as_bytes())[..12]),
         drive: mount_label(path),
         rel,
         ext: extension_of(name),
@@ -144,7 +169,11 @@ fn skip_file(root: &Path, path: &Path, reason: &str, readable_error: bool) -> Fo
         readable: false,
         version: "unread".into(),
         bytes: 0,
-        skip: Some(if readable_error { format!("unreadable:{reason}") } else { reason.into() }),
+        skip: Some(if readable_error {
+            format!("unreadable:{reason}")
+        } else {
+            reason.into()
+        }),
         escapes: false,
         kind: "skipped".into(),
     }
@@ -155,7 +184,10 @@ fn skip_dir(root: &Path, path: &Path, reason: &str) -> Found {
 }
 
 pub fn rel_of(root: &Path, path: &Path) -> String {
-    path.strip_prefix(root).unwrap_or(path).to_string_lossy().replace('\\', "/")
+    path.strip_prefix(root)
+        .unwrap_or(path)
+        .to_string_lossy()
+        .replace('\\', "/")
 }
 
 pub fn ensure_dir(path: &PathBuf) -> Result<(), String> {

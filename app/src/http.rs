@@ -7,6 +7,8 @@ use std::net::TcpListener;
 use std::sync::Arc;
 use std::time::Duration;
 
+const MAX_BODY: usize = 1_048_576;
+
 pub struct Request {
     pub method: String,
     pub path: String,
@@ -26,16 +28,25 @@ pub fn serve(app: Arc<App>, listener: TcpListener) {
         let app = Arc::clone(&app);
         std::thread::spawn(move || {
             let _ = stream.set_read_timeout(Some(Duration::from_secs(8)));
-            if let Ok(req) = read_request(&mut stream) {
-                let res = dispatch(&app, &req);
-                let _ = write_response(&mut stream, &res);
-            }
+            let res = match read_request(&mut stream) {
+                Ok(req) => dispatch(&app, &req),
+                Err(err) => json_response(400, &json!({"ok": false, "error": err})),
+            };
+            let _ = write_response(&mut stream, &res);
         });
     }
 }
 
 pub fn dispatch(app: &App, req: &Request) -> Response {
     let path = req.path.split('?').next().unwrap_or("/");
+    if let Err(res) = authorize(
+        app,
+        req,
+        req.method != "GET" && req.method != "HEAD",
+        path.starts_with("/api/admin"),
+    ) {
+        return res;
+    }
     if req.method == "GET" && (path == "/" || path == "/index.html") {
         return html(INDEX, Some(session_cookie(app)));
     }
@@ -48,10 +59,17 @@ pub fn dispatch(app: &App, req: &Request) -> Response {
     if req.method == "GET" && path == "/app.js" {
         return html_bytes(JS.as_bytes(), "text/javascript; charset=utf-8", None);
     }
-    if let Err(res) = authorize(app, req, req.method != "GET" && req.method != "HEAD", path.starts_with("/api/admin")) {
-        return res;
-    }
-    let body = if req.body.is_empty() { json!({}) } else { serde_json::from_slice(&req.body).unwrap_or(json!({})) };
+    let body = if req.body.is_empty() {
+        json!({})
+    } else {
+        match serde_json::from_slice::<Value>(&req.body) {
+            Ok(value) if value.is_object() => value,
+            Ok(_) => {
+                return json_response(400, &json!({"ok": false, "error": "json object required"}))
+            }
+            Err(_) => return json_response(400, &json!({"ok": false, "error": "malformed json"})),
+        }
+    };
     let result = route(app, req.method.as_str(), path, &body);
     match result {
         Ok(value) => json_response(200, &value),
@@ -81,22 +99,45 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("GET", "/api/dashboard") => app.dashboard(),
         ("GET", "/api/v020") => app.v020(),
         ("GET", "/api/root") => Ok(app.root()),
-        ("POST", "/api/root") => app.set_root(body.get("path").and_then(|v| v.as_str()).unwrap_or("")),
-        ("POST", "/api/scan") => app.scan(body.get("timezone").and_then(|v| v.as_str()).unwrap_or("Asia/Seoul")),
+        ("POST", "/api/root") => {
+            app.set_root(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/scan") => app.scan(
+            body.get("timezone")
+                .and_then(|v| v.as_str())
+                .unwrap_or("Asia/Seoul"),
+        ),
         ("POST", "/api/fixtures/synthetic") => app.load_synthetic(),
         ("POST", "/api/panel1/draft") => app.set_draft(body),
         ("GET", "/api/panel1/draft") => Ok(app.draft()),
+        ("GET", "/api/panel1/groups") => Ok(app.file_groups()),
+        ("POST", "/api/browse") => {
+            app.browse(body.get("path").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/secrets") => {
+            app.secret_put(body.get("value").and_then(|v| v.as_str()).unwrap_or(""))
+        }
         ("POST", "/api/panel1/query") => app.query(),
         ("GET", "/api/panel1/snapshot") => Ok(app.snapshot()),
         ("GET", "/api/panel1/compare") => Ok(app.compare()),
-        ("POST", "/api/panel1/select-all") => app.select_all(body.get("dynamic").and_then(|v| v.as_bool()).unwrap_or(false)),
+        ("POST", "/api/panel1/select-all") => app.select_all(
+            body.get("dynamic")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+        ),
         ("POST", "/api/panel1/persist") => app.persist_snapshot(),
         ("POST", "/api/panel1/restore") => app.restore_snapshot(),
-        ("POST", "/api/panel1/semantic") => Ok(app.semantic(body.get("opt_in").and_then(|v| v.as_bool()).unwrap_or(false))),
+        ("POST", "/api/panel1/semantic") => Ok(app.semantic(
+            body.get("opt_in")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+        )),
         ("POST", "/api/md") => app.write_md(
             body.get("path").and_then(|v| v.as_str()).unwrap_or(""),
             body.get("body").and_then(|v| v.as_str()).unwrap_or(""),
-            body.get("dry_run").and_then(|v| v.as_bool()).unwrap_or(false),
+            body.get("dry_run")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         ),
         ("POST", "/api/organize/plan") => app.plan_move(
             body.get("from").and_then(|v| v.as_str()).unwrap_or(""),
@@ -106,9 +147,15 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
             body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
             body.get("confirm").and_then(|v| v.as_str()).unwrap_or(""),
         ),
-        ("POST", "/api/organize/undo") => app.undo_move(body.get("id").and_then(|v| v.as_str()).unwrap_or("")),
+        ("POST", "/api/organize/undo") => {
+            app.undo_move(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
         ("GET", "/api/threads") => app.threads_list(false),
-        ("POST", "/api/threads") => app.threads_create(body.get("title").and_then(|v| v.as_str()).unwrap_or("未命名")),
+        ("POST", "/api/threads") => app.threads_create(
+            body.get("title")
+                .and_then(|v| v.as_str())
+                .unwrap_or("未命名"),
+        ),
         ("POST", "/api/search") => app.search(body.get("q").and_then(|v| v.as_str()).unwrap_or("")),
         ("POST", "/api/threads/message") => app.message(
             body.get("thread").and_then(|v| v.as_str()).unwrap_or(""),
@@ -118,47 +165,89 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
         ("POST", "/api/threads/import") => app.import_thread(body),
         ("POST", "/api/threads/archive") => app.archive_thread(
             body.get("thread").and_then(|v| v.as_str()).unwrap_or(""),
-            body.get("archived").and_then(|v| v.as_bool()).unwrap_or(true),
+            body.get("archived")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(true),
         ),
-        ("POST", "/api/threads/checkpoint") => app.checkpoint(body.get("thread").and_then(|v| v.as_str()).unwrap_or("")),
-        ("POST", "/api/threads/restore") => app.restore_checkpoint(body.get("id").and_then(|v| v.as_str()).unwrap_or("")),
-        ("POST", "/api/threads/export") => app.export_thread(body.get("thread").and_then(|v| v.as_str()).unwrap_or("")),
+        ("POST", "/api/threads/checkpoint") => {
+            app.checkpoint(body.get("thread").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/threads/restore") => {
+            app.restore_checkpoint(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/threads/export") => {
+            app.export_thread(body.get("thread").and_then(|v| v.as_str()).unwrap_or(""))
+        }
         ("GET", "/api/connectors") => app.connectors(),
         ("POST", "/api/connectors") => app.connector_save(body),
-        ("POST", "/api/connectors/sync") => app.connector_sync(
-            body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
-            body,
-        ),
-        ("POST", "/api/connectors/disconnect") => app.connector_disconnect(body.get("id").and_then(|v| v.as_str()).unwrap_or("")),
+        ("POST", "/api/connectors/sync") => {
+            app.connector_sync(body.get("id").and_then(|v| v.as_str()).unwrap_or(""), body)
+        }
+        ("POST", "/api/connectors/disconnect") => {
+            app.connector_disconnect(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
         ("GET", "/api/inventory") => Ok(app.inventory()),
         ("GET", "/api/detectors") => app.detectors(),
         ("GET", "/api/ocr/catalog") => Ok(app.ocr_catalog()),
         ("POST", "/api/ocr/download") => app.ocr_download(),
+        ("POST", "/api/ocr/recognize") => app.ocr_recognize_sample(),
+        ("POST", "/api/ocr/cancel") => app.ocr_cancel(),
+        ("POST", "/api/ocr/runtime") => app.ocr_runtime(),
         ("POST", "/api/ocr/sample") => app.ocr_sample(),
         ("POST", "/api/ocr/api") => app.ocr_api(body),
+        ("POST", "/api/provider") => app.provider_chat(body),
         ("POST", "/api/ocr/remove") => app.ocr_remove(),
         ("GET", "/api/activity") => app.activity(),
         ("POST", "/api/ocr/extract") => {
-            let b64 = body.get("pdf_base64").and_then(|v| v.as_str()).unwrap_or("");
+            let b64 = body
+                .get("pdf_base64")
+                .and_then(|v| v.as_str())
+                .unwrap_or("");
             let bytes = base64_decode(b64)?;
             app.ocr_bytes(&bytes)
         }
         ("POST", "/api/decisions") => app.decide(body),
         ("GET", "/api/pay/catalog") => Ok(app.pay_catalog()),
-        ("POST", "/api/pay/orders") => app.pay_order(body.get("sku").and_then(|v| v.as_str()).unwrap_or("")),
-        ("POST", "/api/pay/settle") => app.pay_settle(body.get("id").and_then(|v| v.as_str()).unwrap_or("")),
+        ("POST", "/api/pay/orders") => {
+            app.pay_order(body.get("sku").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/pay/settle") => {
+            app.pay_settle(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/pay/page-return") => app.pay_page_return(
+            body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
+            body.get("claimed").and_then(|v| v.as_str()).unwrap_or(""),
+        ),
+        ("POST", "/api/pay/query") => {
+            app.pay_query(body.get("id").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/pay/notify") => app.pay_notify(
+            body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
+            body.get("event_id").and_then(|v| v.as_str()).unwrap_or(""),
+            body.get("status").and_then(|v| v.as_str()).unwrap_or(""),
+        ),
         ("POST", "/api/pay/deliver") => app.pay_deliver(
             body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
-            body.get("fail_next").and_then(|v| v.as_bool()).unwrap_or(false),
+            body.get("fail_next")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
         ),
         ("POST", "/api/pay/refund") => app.pay_refund(
             body.get("id").and_then(|v| v.as_str()).unwrap_or(""),
-            body.get("amount_cents").and_then(|v| v.as_i64()).unwrap_or(0),
+            body.get("amount_cents")
+                .and_then(|v| v.as_i64())
+                .unwrap_or(0),
         ),
         ("GET", "/api/pay/reconcile") => Ok(app.pay_reconcile()),
         ("POST", "/api/pay/production") => Ok(app.pay_production()),
-        ("POST", "/api/permission") => app.set_permission(body.get("mode").and_then(|v| v.as_str()).unwrap_or("")),
-        ("POST", "/api/admin/policy") => Ok(app.set_policy(body.get("terminal").and_then(|v| v.as_bool()).unwrap_or(false))),
+        ("POST", "/api/permission") => {
+            app.set_permission(body.get("mode").and_then(|v| v.as_str()).unwrap_or(""))
+        }
+        ("POST", "/api/admin/policy") => Ok(app.set_policy(
+            body.get("terminal")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
+        )),
         ("POST", "/mcp") => Ok(crate::mcp::handle(app, &body.to_string())),
         _ => Err("not found".into()),
     }
@@ -167,9 +256,15 @@ fn route(app: &App, method: &str, path: &str, body: &Value) -> Result<Value, Str
 fn authorize(app: &App, req: &Request, write: bool, admin: bool) -> Result<(), Response> {
     let cfg = app.cfg.lock().expect("cfg").clone();
     let host = req.headers.get("host").map(|s| s.as_str()).unwrap_or("");
-    let expected = [format!("127.0.0.1:{}", cfg.port), format!("localhost:{}", cfg.port)];
+    let expected = [
+        format!("127.0.0.1:{}", cfg.port),
+        format!("localhost:{}", cfg.port),
+    ];
     if cfg.port != 0 && !expected.iter().any(|h| h == host) {
-        return Err(json_response(403, &json!({"ok": false, "error": "forbidden host"})));
+        return Err(json_response(
+            403,
+            &json!({"ok": false, "error": "forbidden host"}),
+        ));
     }
     if let Some(origin) = req.headers.get("origin") {
         let allowed = [
@@ -177,7 +272,10 @@ fn authorize(app: &App, req: &Request, write: bool, admin: bool) -> Result<(), R
             format!("http://localhost:{}", cfg.port),
         ];
         if !allowed.iter().any(|o| o == origin) {
-            return Err(json_response(403, &json!({"ok": false, "error": "forbidden origin"})));
+            return Err(json_response(
+                403,
+                &json!({"ok": false, "error": "forbidden origin"}),
+            ));
         }
     }
     let header_session = req.headers.get("x-ymzz-session").map(|s| s.as_str());
@@ -195,15 +293,28 @@ fn authorize(app: &App, req: &Request, write: bool, admin: bool) -> Result<(), R
     } else if path_is_public(req) {
         "public"
     } else {
-        return Err(json_response(401, &json!({"ok": false, "error": "session required"})));
+        return Err(json_response(
+            401,
+            &json!({"ok": false, "error": "session required"}),
+        ));
     };
     if admin && role != "admin" {
-        return Err(json_response(403, &json!({"ok": false, "error": "forbidden role"})));
+        return Err(json_response(
+            403,
+            &json!({"ok": false, "error": "forbidden role"}),
+        ));
     }
     if write {
-        let csrf = req.headers.get("x-ymzz-csrf").map(|s| s.as_str()).unwrap_or("");
+        let csrf = req
+            .headers
+            .get("x-ymzz-csrf")
+            .map(|s| s.as_str())
+            .unwrap_or("");
         if csrf != cfg.csrf {
-            return Err(json_response(403, &json!({"ok": false, "error": "forbidden csrf"})));
+            return Err(json_response(
+                403,
+                &json!({"ok": false, "error": "forbidden csrf"}),
+            ));
         }
     }
     let _ = body_role_ignored(req);
@@ -211,23 +322,36 @@ fn authorize(app: &App, req: &Request, write: bool, admin: bool) -> Result<(), R
 }
 
 fn path_is_public(req: &Request) -> bool {
-    req.method == "GET" && matches!(req.path.split('?').next().unwrap_or(""), "/" | "/index.html" | "/tokens.css" | "/app.css" | "/app.js" | "/api/health")
+    req.method == "GET"
+        && matches!(
+            req.path.split('?').next().unwrap_or(""),
+            "/" | "/index.html" | "/tokens.css" | "/app.css" | "/app.js" | "/api/health"
+        )
 }
 
 fn body_role_ignored(req: &Request) -> bool {
-    serde_json::from_slice::<Value>(&req.body).ok().and_then(|v| v.get("role").cloned()).is_some()
+    serde_json::from_slice::<Value>(&req.body)
+        .ok()
+        .and_then(|v| v.get("role").cloned())
+        .is_some()
 }
 
 fn session_cookie(app: &App) -> String {
     let cfg = app.cfg.lock().expect("cfg").clone();
-    format!("ymzz_session={}; HttpOnly; SameSite=Strict; Path=/", cfg.session_token)
+    format!(
+        "ymzz_session={}; HttpOnly; SameSite=Strict; Path=/",
+        cfg.session_token
+    )
 }
 
 fn json_response(status: u16, value: &Value) -> Response {
     Response {
         status,
         headers: vec![
-            ("content-type".into(), "application/json; charset=utf-8".into()),
+            (
+                "content-type".into(),
+                "application/json; charset=utf-8".into(),
+            ),
             ("cache-control".into(), "no-store".into()),
             ("x-content-type-options".into(), "nosniff".into()),
         ],
@@ -248,7 +372,11 @@ fn html_bytes(body: &[u8], content_type: &str, cookie: Option<String>) -> Respon
     if let Some(cookie) = cookie {
         headers.push(("set-cookie".into(), cookie));
     }
-    Response { status: 200, headers, body: body.to_vec() }
+    Response {
+        status: 200,
+        headers,
+        body: body.to_vec(),
+    }
 }
 
 fn read_request(stream: &mut impl Read) -> Result<Request, String> {
@@ -257,13 +385,17 @@ fn read_request(stream: &mut impl Read) -> Result<Request, String> {
     let header_end;
     loop {
         let n = stream.read(&mut tmp).map_err(|e| e.to_string())?;
-        if n == 0 { return Err("closed".into()); }
+        if n == 0 {
+            return Err("closed".into());
+        }
         buf.extend_from_slice(&tmp[..n]);
         if let Some(pos) = find_header_end(&buf) {
             header_end = pos;
             break;
         }
-        if buf.len() > 2_000_000 { return Err("too large".into()); }
+        if buf.len() > 2_000_000 {
+            return Err("too large".into());
+        }
     }
     let head = String::from_utf8_lossy(&buf[..header_end]).to_string();
     let mut lines = head.split("\r\n");
@@ -272,20 +404,42 @@ fn read_request(stream: &mut impl Read) -> Result<Request, String> {
     let method = parts.next().unwrap_or("GET").to_string();
     let path = parts.next().unwrap_or("/").to_string();
     let mut headers = HashMap::new();
+    let mut seen_len = false;
+    let mut len = 0usize;
     for line in lines {
         if let Some((k, v)) = line.split_once(':') {
-            headers.insert(k.trim().to_ascii_lowercase(), v.trim().to_string());
+            let key = k.trim().to_ascii_lowercase();
+            if key == "content-length" {
+                if seen_len {
+                    return Err("duplicate content-length".into());
+                }
+                seen_len = true;
+                len = v
+                    .trim()
+                    .parse::<usize>()
+                    .map_err(|_| "bad content-length".to_string())?;
+            }
+            headers.insert(key, v.trim().to_string());
         }
     }
-    let len = headers.get("content-length").and_then(|v| v.parse::<usize>().ok()).unwrap_or(0);
+    if len > MAX_BODY {
+        return Err("body too large".into());
+    }
     let mut body = buf[header_end..].to_vec();
     while body.len() < len {
         let n = stream.read(&mut tmp).map_err(|e| e.to_string())?;
-        if n == 0 { break; }
+        if n == 0 {
+            break;
+        }
         body.extend_from_slice(&tmp[..n]);
     }
     body.truncate(len);
-    Ok(Request { method, path, headers, body })
+    Ok(Request {
+        method,
+        path,
+        headers,
+        body,
+    })
 }
 
 fn find_header_end(buf: &[u8]) -> Option<usize> {
@@ -302,7 +456,12 @@ fn write_response(stream: &mut impl Write, res: &Response) -> Result<(), String>
         409 => "Conflict",
         _ => "Error",
     };
-    let mut head = format!("HTTP/1.1 {} {}\r\nContent-Length: {}\r\nConnection: close\r\n", res.status, reason, res.body.len());
+    let mut head = format!(
+        "HTTP/1.1 {} {}\r\nContent-Length: {}\r\nConnection: close\r\n",
+        res.status,
+        reason,
+        res.body.len()
+    );
     for (k, v) in &res.headers {
         head.push_str(k);
         head.push_str(": ");
@@ -310,7 +469,9 @@ fn write_response(stream: &mut impl Write, res: &Response) -> Result<(), String>
         head.push_str("\r\n");
     }
     head.push_str("\r\n");
-    stream.write_all(head.as_bytes()).map_err(|e| e.to_string())?;
+    stream
+        .write_all(head.as_bytes())
+        .map_err(|e| e.to_string())?;
     stream.write_all(&res.body).map_err(|e| e.to_string())?;
     Ok(())
 }
@@ -326,11 +487,19 @@ fn base64_decode(text: &str) -> Result<Vec<u8>, String> {
             _ => Err("bad base64".into()),
         }
     }
-    let bytes = text.as_bytes().iter().copied().filter(|c| !c.is_ascii_whitespace() && *c != b'=').collect::<Vec<_>>();
+    let bytes = text
+        .as_bytes()
+        .iter()
+        .copied()
+        .filter(|c| !c.is_ascii_whitespace() && *c != b'=')
+        .collect::<Vec<_>>();
     let mut out = Vec::new();
     let mut i = 0;
     while i + 4 <= bytes.len() {
-        let n = ((val(bytes[i])? as u32) << 18) | ((val(bytes[i + 1])? as u32) << 12) | ((val(bytes[i + 2])? as u32) << 6) | (val(bytes[i + 3])? as u32);
+        let n = ((val(bytes[i])? as u32) << 18)
+            | ((val(bytes[i + 1])? as u32) << 12)
+            | ((val(bytes[i + 2])? as u32) << 6)
+            | (val(bytes[i + 3])? as u32);
         out.push((n >> 16) as u8);
         out.push((n >> 8) as u8);
         out.push(n as u8);
@@ -340,7 +509,9 @@ fn base64_decode(text: &str) -> Result<Vec<u8>, String> {
         let n = ((val(bytes[i])? as u32) << 18) | ((val(bytes[i + 1])? as u32) << 12);
         out.push((n >> 16) as u8);
     } else if bytes.len() - i == 3 {
-        let n = ((val(bytes[i])? as u32) << 18) | ((val(bytes[i + 1])? as u32) << 12) | ((val(bytes[i + 2])? as u32) << 6);
+        let n = ((val(bytes[i])? as u32) << 18)
+            | ((val(bytes[i + 1])? as u32) << 12)
+            | ((val(bytes[i + 2])? as u32) << 6);
         out.push((n >> 16) as u8);
         out.push((n >> 8) as u8);
     }
@@ -368,7 +539,11 @@ mod tests {
     use crate::util;
 
     fn boot() -> App {
-        let dir = std::env::temp_dir().join(format!("ymzz-http-{}-{}", std::process::id(), util::random_id("h")));
+        let dir = std::env::temp_dir().join(format!(
+            "ymzz-http-{}-{}",
+            std::process::id(),
+            util::random_id("h")
+        ));
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
         let app = App::open(&dir, &util::repo_root()).unwrap();
@@ -376,7 +551,17 @@ mod tests {
         app
     }
 
-    fn call(app: &App, method: &str, path: &str, body: Value, session: &str, csrf: &str, host: &str, origin: Option<&str>) -> Response {
+    #[allow(clippy::too_many_arguments)]
+    fn call(
+        app: &App,
+        method: &str,
+        path: &str,
+        body: Value,
+        session: &str,
+        csrf: &str,
+        host: &str,
+        origin: Option<&str>,
+    ) -> Response {
         let mut headers = HashMap::new();
         headers.insert("host".into(), host.into());
         headers.insert("x-ymzz-session".into(), session.into());
@@ -384,45 +569,223 @@ mod tests {
         if let Some(origin) = origin {
             headers.insert("origin".into(), origin.into());
         }
-        dispatch(app, &Request { method: method.into(), path: path.into(), headers, body: body.to_string().into_bytes() })
+        dispatch(
+            app,
+            &Request {
+                method: method.into(),
+                path: path.into(),
+                headers,
+                body: body.to_string().into_bytes(),
+            },
+        )
     }
 
     #[test]
     fn pages_and_auth() {
         let app = boot();
         let cfg = app.cfg.lock().unwrap().clone();
-        let page = dispatch(&app, &Request {
-            method: "GET".into(), path: "/".into(), headers: HashMap::from([("host".into(), "127.0.0.1:1413".into())]), body: vec![],
-        });
+        let page = dispatch(
+            &app,
+            &Request {
+                method: "GET".into(),
+                path: "/".into(),
+                headers: HashMap::from([("host".into(), "127.0.0.1:1413".into())]),
+                body: vec![],
+            },
+        );
         assert_eq!(page.status, 200);
         let html = String::from_utf8_lossy(&page.body);
         assert!(html.contains("雲箋"));
         assert!(html.contains("沙箱"));
         assert!(!html.contains("75589D"));
         assert!(!page.headers.iter().any(|(_, v)| v.contains('*')));
-        let bad = call(&app, "POST", "/api/panel1/draft", json!({"today":"2026-11-07","preset":3}), "nope", &cfg.csrf, "127.0.0.1:1413", None);
+        assert!(page
+            .headers
+            .iter()
+            .any(|(k, v)| k == "set-cookie" && v.contains("ymzz_session=")));
+        let evil = dispatch(
+            &app,
+            &Request {
+                method: "GET".into(),
+                path: "/".into(),
+                headers: HashMap::from([("host".into(), "evil.example".into())]),
+                body: vec![],
+            },
+        );
+        assert_eq!(evil.status, 403);
+        assert!(!evil
+            .headers
+            .iter()
+            .any(|(k, _)| k.eq_ignore_ascii_case("set-cookie")));
+        let rebind = dispatch(
+            &app,
+            &Request {
+                method: "GET".into(),
+                path: "/".into(),
+                headers: HashMap::from([("host".into(), "127.0.0.1.evil.com:1413".into())]),
+                body: vec![],
+            },
+        );
+        assert_eq!(rebind.status, 403);
+        assert!(!rebind
+            .headers
+            .iter()
+            .any(|(k, _)| k.eq_ignore_ascii_case("set-cookie")));
+        let missing = dispatch(
+            &app,
+            &Request {
+                method: "GET".into(),
+                path: "/".into(),
+                headers: HashMap::new(),
+                body: vec![],
+            },
+        );
+        assert_eq!(missing.status, 403);
+        assert!(!missing
+            .headers
+            .iter()
+            .any(|(k, _)| k.eq_ignore_ascii_case("set-cookie")));
+        let bad = call(
+            &app,
+            "POST",
+            "/api/panel1/draft",
+            json!({"today":"2026-11-07","preset":3}),
+            "nope",
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(bad.status, 401);
-        let csrf = call(&app, "POST", "/api/fixtures/synthetic", json!({}), &cfg.session_token, "wrong", "127.0.0.1:1413", None);
+        let csrf = call(
+            &app,
+            "POST",
+            "/api/fixtures/synthetic",
+            json!({}),
+            &cfg.session_token,
+            "wrong",
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(csrf.status, 403);
-        let origin = call(&app, "POST", "/api/fixtures/synthetic", json!({}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", Some("http://evil.example"));
+        let origin = call(
+            &app,
+            "POST",
+            "/api/fixtures/synthetic",
+            json!({}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            Some("http://evil.example"),
+        );
         assert_eq!(origin.status, 403);
-        let host = call(&app, "GET", "/api/health", json!({}), &cfg.session_token, &cfg.csrf, "evil.example:1413", None);
+        let host = call(
+            &app,
+            "GET",
+            "/api/health",
+            json!({}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "evil.example:1413",
+            None,
+        );
         assert_eq!(host.status, 403);
-        let ok = call(&app, "POST", "/api/fixtures/synthetic", json!({"role":"admin"}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", Some("http://127.0.0.1:1413"));
+        let ok = call(
+            &app,
+            "POST",
+            "/api/fixtures/synthetic",
+            json!({"role":"admin"}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            Some("http://127.0.0.1:1413"),
+        );
         assert_eq!(ok.status, 200);
-        let denied = call(&app, "POST", "/api/admin/policy", json!({"terminal": false, "role": "admin"}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", None);
+        let denied = call(
+            &app,
+            "POST",
+            "/api/admin/policy",
+            json!({"terminal": false, "role": "admin"}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(denied.status, 403);
-        let allowed = call(&app, "POST", "/api/admin/policy", json!({"terminal": false}), &cfg.admin_token, &cfg.csrf, "127.0.0.1:1413", None);
+        let allowed = call(
+            &app,
+            "POST",
+            "/api/admin/policy",
+            json!({"terminal": false}),
+            &cfg.admin_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(allowed.status, 200);
-        let sample = call(&app, "POST", "/api/ocr/sample", json!({}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", None);
+        let sample = call(
+            &app,
+            "POST",
+            "/api/ocr/sample",
+            json!({}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(sample.status, 200);
         let sample_body = String::from_utf8_lossy(&sample.body);
         assert!(sample_body.contains("USD 123.45"));
         assert!(sample_body.contains("合成"));
-        let refused = call(&app, "POST", "/api/ocr/download", json!({}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", None);
-        assert_eq!(refused.status, 400);
-        assert!(String::from_utf8_lossy(&refused.body).contains("checksum_not_pinned"));
-        let api = call(&app, "POST", "/api/ocr/api", json!({"opt_in": true, "endpoint": "https://ocr.example/v1", "secret_ref": "env:OCR_KEY", "key": "super-secret-ocr"}), &cfg.session_token, &cfg.csrf, "127.0.0.1:1413", None);
+        let catalog = call(
+            &app,
+            "GET",
+            "/api/ocr/catalog",
+            json!({}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
+        assert_eq!(catalog.status, 200);
+        let catalog_body = String::from_utf8_lossy(&catalog.body);
+        assert!(catalog_body
+            .contains("e740eb522521827cc83da3ba33e1c70ccfd9b3cf7d9a24a420ce4ca5ebb8794f"));
+        assert!(!catalog_body.contains("checksum_not_pinned"));
+        let malformed = dispatch(
+            &app,
+            &Request {
+                method: "POST".into(),
+                path: "/api/fixtures/synthetic".into(),
+                headers: HashMap::from([
+                    ("host".into(), "127.0.0.1:1413".into()),
+                    ("x-ymzz-session".into(), cfg.session_token.clone()),
+                    ("x-ymzz-csrf".into(), cfg.csrf.clone()),
+                ]),
+                body: b"{".to_vec(),
+            },
+        );
+        assert_eq!(malformed.status, 400);
+        assert!(String::from_utf8_lossy(&malformed.body).contains("malformed json"));
+        let huge = format!("POST /api/fixtures/synthetic HTTP/1.1\r\nHost: 127.0.0.1:1413\r\nContent-Length: {}\r\n\r\n", MAX_BODY + 1);
+        match read_request(&mut huge.as_bytes()) {
+            Err(err) => assert!(err.contains("body too large"), "{err}"),
+            Ok(_) => panic!("oversized body was accepted"),
+        }
+        let dup = "POST /api/fixtures/synthetic HTTP/1.1\r\nHost: 127.0.0.1:1413\r\nContent-Length: 2\r\nContent-Length: 2\r\n\r\n{}";
+        match read_request(&mut dup.as_bytes()) {
+            Err(err) => assert!(err.contains("duplicate content-length"), "{err}"),
+            Ok(_) => panic!("duplicate content-length was accepted"),
+        }
+        let api = call(
+            &app,
+            "POST",
+            "/api/ocr/api",
+            json!({"opt_in": true, "endpoint": "https://ocr.example/v1", "secret_ref": "env:OCR_KEY", "key": "super-secret-ocr"}),
+            &cfg.session_token,
+            &cfg.csrf,
+            "127.0.0.1:1413",
+            None,
+        );
         assert_eq!(api.status, 200);
         let api_body = String::from_utf8_lossy(&api.body);
         assert!(api_body.contains("\"called\":false"));

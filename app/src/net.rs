@@ -27,7 +27,9 @@ pub fn bind_loopback(port: u16) -> Result<TcpListener, String> {
 }
 
 pub fn explain_bind_error(port: u16, err: &std::io::Error) -> String {
-    if port < 1024 && (err.kind() == std::io::ErrorKind::PermissionDenied || err.raw_os_error() == Some(13)) {
+    if port < 1024
+        && (err.kind() == std::io::ErrorKind::PermissionDenied || err.raw_os_error() == Some(13))
+    {
         format!(
             "Port {port} is decimal (0413 is not octal). Binding {port} failed: {err}. On Unix, ports below 1024 are privileged. This app will not use sudo or raise capabilities by itself. Choose an unprivileged loopback port explicitly, for example: ymzz-vibe serve --port 1413"
         )
@@ -46,7 +48,8 @@ ExecStart=/usr/local/bin/ymzz-vibe serve --port 1413\n\
 NoNewPrivileges=true\n\
 PrivateNetwork=false\n\
 # does not run as root and does not sudo\n\
-".to_string()
+"
+    .to_string()
 }
 
 #[cfg(test)]

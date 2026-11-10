@@ -1,4 +1,4 @@
-const state = { csrf: "", thread: "", connector: "", order: "", preset: 7, today: "", plan: "", checkpoint: "" };
+const state = { csrf: "", thread: "", connector: "", order: "", eventId: "", preset: 7, today: "", plan: "", checkpoint: "", items: [] };
 
 const $ = (id) => document.getElementById(id);
 const text = (id, value) => { $(id).textContent = value == null ? "" : String(value); };
@@ -21,6 +21,24 @@ function onPreset(days) {
   $("draftState").textContent = `已選 ${days} 日。尚未查詢。`;
 }
 
+async function loadGroups() {
+  const data = await api("/api/panel1/groups");
+  const sel = $("typeGroup");
+  const current = sel.value;
+  sel.replaceChildren();
+  const all = document.createElement("option");
+  all.value = "";
+  all.textContent = "全部類型";
+  sel.appendChild(all);
+  Object.keys(data.groups || {}).sort().forEach((key) => {
+    const opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = `${key}（${data.groups[key]}）`;
+    sel.appendChild(opt);
+  });
+  if ([...sel.options].some((opt) => opt.value === current)) sel.value = current;
+}
+
 async function runQuery() {
   const today = state.today || new Date().toISOString().slice(0, 10);
   await api("/api/panel1/draft", {
@@ -30,8 +48,7 @@ async function runQuery() {
       preset: state.preset,
       start: $("start").value,
       end: $("end").value,
-      drive: $("drive").value,
-      ext: $("ext").value,
+      group: $("typeGroup").value,
       more_enabled: false,
     },
   });
@@ -45,6 +62,7 @@ async function runQuery() {
 function draw(full, cmp, sem, snap) {
   text("draftState", snap.select_all_label || "");
   text("semantic", sem.reason || "");
+  state.items = full.items || [];
   const graph = $("graph");
   graph.replaceChildren();
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -68,8 +86,10 @@ function draw(full, cmp, sem, snap) {
     label.setAttribute("x", 16 + col * 160);
     label.setAttribute("y", 18 + row * 72);
     label.setAttribute("fill", "currentColor");
+    label.setAttribute("class", "graph-hit");
     const short = name.length > 22 ? `${name.slice(0, 20)}…` : name;
     label.textContent = short;
+    label.addEventListener("click", () => showDrawer(name));
     svg.appendChild(label);
   });
   graph.appendChild(svg);
@@ -81,6 +101,7 @@ function draw(full, cmp, sem, snap) {
     list.appendChild(row);
   });
   graph.appendChild(list);
+  showDrawer("");
   const heat = $("heat");
   heat.replaceChildren();
   const days = full.per_day || {};
@@ -116,6 +137,29 @@ function draw(full, cmp, sem, snap) {
   note.setAttribute("fill", "currentColor");
   note.textContent = cmp.formula || "";
   chart.appendChild(note);
+}
+
+function showDrawer(group) {
+  const drawer = $("drawer");
+  drawer.replaceChildren();
+  const title = document.createElement("p");
+  title.textContent = group ? `這一組：${group}` : "查詢結果裡的檔案。點圖上的類型可只看那一組。";
+  drawer.appendChild(title);
+  const rows = state.items.filter((item) => !group || item.group === group);
+  if (!rows.length) {
+    const empty = document.createElement("p");
+    empty.className = "quiet";
+    empty.textContent = "這組沒有檔案。";
+    drawer.appendChild(empty);
+    return;
+  }
+  rows.forEach((item) => {
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "drawer-row";
+    row.textContent = `${item.modified || ""}  ${item.path}`;
+    drawer.appendChild(row);
+  });
 }
 
 function setSurface(id) {
@@ -176,7 +220,7 @@ async function loadReport() {
 
 async function loadOcr() {
   const data = await api("/api/ocr/catalog");
-  text("ocrRuntime", `Python 後端狀態：${data.runtime && data.runtime.status ? data.runtime.status : "未知"}。推論：${data.runtime && data.runtime.inference ? data.runtime.inference : "未跑"}。`);
+  text("ocrStatus", `Python 後端狀態：${data.runtime && data.runtime.status ? data.runtime.status : "未知"}。推論：${data.runtime && data.runtime.inference ? data.runtime.inference : "未跑"}。`);
   text("ocrCatalog", JSON.stringify(data.models || [], null, 2));
 }
 
@@ -188,6 +232,7 @@ async function boot() {
   text("deviceOut", JSON.stringify(await api("/api/inventory"), null, 2));
   await loadReport();
   text("semantic", "尚未查詢。");
+  await loadGroups();
 }
 
 document.querySelectorAll("[data-panel]").forEach((button) => {
@@ -201,8 +246,10 @@ $("surface").addEventListener("change", () => setSurface($("surface").value));
 $("loadSample").addEventListener("click", async () => {
   await api("/api/fixtures/synthetic", { method: "POST", body: {} });
   $("sampleBanner").hidden = false;
+  await loadGroups();
   text("draftState", "合成樣本已載入。按查詢才會出結果。");
 });
+$("browseRoot").addEventListener("click", () => browse($("rootPath").value).catch((err) => text("draftState", err.message)));
 $("useRoot").addEventListener("click", async () => {
   try {
     await api("/api/root", { method: "POST", body: { path: $("rootPath").value } });
@@ -214,6 +261,7 @@ $("scanRoot").addEventListener("click", async () => {
   try {
     const data = await api("/api/scan", { method: "POST", body: { timezone: "Asia/Seoul" } });
     $("sampleBanner").hidden = true;
+    await loadGroups();
     text("draftState", `掃描 ${data.count} 筆中繼資料，略過 ${data.skipped}。按查詢才篩選。`);
   } catch (err) { text("draftState", err.message); }
 });
@@ -231,11 +279,19 @@ $("mdSave").addEventListener("click", async () => {
 });
 $("saveLink").addEventListener("click", async () => {
   try {
+    let secretRef = $("secretRef").value;
+    if ($("secretValue").value) {
+      const stored = await api("/api/secrets", { method: "POST", body: { value: $("secretValue").value } });
+      secretRef = stored.secret_ref;
+      $("secretValue").value = "";
+    }
     const data = await api("/api/connectors", { method: "POST", body: {
       kind: $("kind").value,
       label: "我的連接",
       resource_id: $("resource").value || "synthetic-resource",
-      secret_ref: $("secretRef").value || "env:NOT_SET",
+      secret_ref: secretRef || "env:NOT_SET",
+      consent: $("linkConsent").checked,
+      base_url: $("baseUrl").value,
       mapping: { mapping: [
         { logical_field: "title", source_type: "title", required: true },
         { logical_field: "date", source_type: "date", required: true },
@@ -318,9 +374,17 @@ $("undoMove").addEventListener("click", async () => {
 $("ocrRefresh").addEventListener("click", () => loadOcr().catch((err) => text("ocrResult", err.message)));
 $("ocrDownload").addEventListener("click", async () => {
   try {
-    await api("/api/ocr/download", { method: "POST", body: {} });
-    text("ocrResult", "下載不該成功。");
-  } catch (err) { text("ocrResult", `已拒絕下載：${err.message}`); }
+    text("ocrResult", "正在下載並核對校驗碼。");
+    const data = await api("/api/ocr/download", { method: "POST", body: {} });
+    text("ocrResult", `已核對 ${ (data.files || []).length } 個檔。權重不在 git 裡。`);
+  } catch (err) { text("ocrResult", err.message); }
+});
+$("ocrRecognize").addEventListener("click", async () => {
+  try {
+    text("ocrResult", "正在辨識合成掃描圖。");
+    const data = await api("/api/ocr/recognize", { method: "POST", body: {} });
+    text("ocrResult", `掃描辨識：${data.text || ""}（信心 ${data.confidence}，未審核）`);
+  } catch (err) { text("ocrResult", err.message); }
 });
 $("ocrSample").addEventListener("click", async () => {
   try {
@@ -328,14 +392,32 @@ $("ocrSample").addEventListener("click", async () => {
     text("ocrResult", `${data.label || ""} 文字層：${data.text || ""}`);
   } catch (err) { text("ocrResult", err.message); }
 });
+$("ocrRuntime").addEventListener("click", async () => {
+  try {
+    text("ocrResult", "正在準備獨立 Python 環境。這一步會下載套件，權重仍分開。");
+    const data = await api("/api/ocr/runtime", { method: "POST", body: {} });
+    text("ocrResult", `環境在 ${data.installed_into}。尚未把套件算進 git。`);
+  } catch (err) { text("ocrResult", err.message); }
+});
 $("ocrSaveApi").addEventListener("click", async () => {
   try {
     const data = await api("/api/ocr/api", { method: "POST", body: {
-      opt_in: $("ocrOpt").checked,
+      opt_in: true,
+      invoke: false,
       endpoint: $("ocrEndpoint").value,
-      secret_ref: $("ocrRef").value,
     } });
-    text("ocrResult", data.called ? "不該發出請求。" : "已登記或未勾選。沒有呼叫 API。");
+    text("ocrResult", data.called ? "不該發出請求。" : "已登記。沒有呼叫 API。");
+  } catch (err) { text("ocrResult", err.message); }
+});
+$("ocrInvoke").addEventListener("click", async () => {
+  try {
+    const data = await api("/api/ocr/api", { method: "POST", body: {
+      opt_in: $("ocrOpt").checked,
+      invoke: true,
+      endpoint: $("ocrEndpoint").value,
+      text: $("ocrText").value,
+    } });
+    text("ocrResult", data.called ? "已送到本機位址。" : "沒有呼叫。");
   } catch (err) { text("ocrResult", err.message); }
 });
 $("ocrRemove").addEventListener("click", async () => {
@@ -360,10 +442,51 @@ async function pay(path, body) {
 $("newOrder").addEventListener("click", async () => {
   const data = await pay("/api/pay/orders", { sku: "connector-automation-sandbox" });
   state.order = data.id;
+  state.eventId = "";
 });
-$("settleOrder").addEventListener("click", () => pay("/api/pay/settle", { id: state.order }));
+$("pageReturn").addEventListener("click", () => pay("/api/pay/page-return", { id: state.order, claimed: "paid" }));
+$("settleOrder").addEventListener("click", async () => {
+  const data = await pay("/api/pay/settle", { id: state.order });
+  state.eventId = data.event_id || "";
+});
+$("repeatNotify").addEventListener("click", () => pay("/api/pay/notify", { id: state.order, event_id: state.eventId, status: "paid" }));
+$("queryOrder").addEventListener("click", () => pay("/api/pay/query", { id: state.order }));
+$("failDeliver").addEventListener("click", () => pay("/api/pay/deliver", { id: state.order, fail_next: true }));
 $("deliverOrder").addEventListener("click", () => pay("/api/pay/deliver", { id: state.order, fail_next: false }));
 $("refundOrder").addEventListener("click", () => pay("/api/pay/refund", { id: state.order, amount_cents: 40 }));
+$("failPay").addEventListener("click", () => pay("/api/pay/notify", { id: state.order, event_id: `fail-${Date.now()}`, status: "failed" }));
+$("modelSend").addEventListener("click", async () => {
+  try {
+    const data = await api("/api/provider", { method: "POST", body: {
+      opt_in: $("modelOpt").checked,
+      base_url: $("modelBase").value,
+      prompt: $("utterance").value || "hello",
+    } });
+    text("talkOut", JSON.stringify(data, null, 2));
+  } catch (err) { text("talkOut", err.message); }
+});
+
+async function browse(path) {
+  const data = await api("/api/browse", { method: "POST", body: { path } });
+  const box = $("browser");
+  box.hidden = false;
+  box.replaceChildren();
+  const here = document.createElement("p");
+  here.textContent = data.path;
+  box.appendChild(here);
+  const use = document.createElement("button");
+  use.type = "button";
+  use.textContent = "用這個資料夾";
+  use.addEventListener("click", () => { $("rootPath").value = data.path; });
+  box.appendChild(use);
+  (data.directories || []).forEach((dir) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = dir.name;
+    button.addEventListener("click", () => browse(dir.path).catch((err) => text("draftState", err.message)));
+    box.appendChild(button);
+  });
+}
 
 document.addEventListener("keydown", (event) => {
   if (event.target.matches("input, textarea")) return;

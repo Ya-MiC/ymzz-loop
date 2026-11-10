@@ -41,6 +41,13 @@ pub fn mask_secret(value: &str) -> String {
     if value.is_empty() {
         return String::new();
     }
-    let tail: String = value.chars().rev().take(2).collect::<String>().chars().rev().collect();
+    let tail: String = value
+        .chars()
+        .rev()
+        .take(2)
+        .collect::<String>()
+        .chars()
+        .rev()
+        .collect();
     format!("••••{tail}")
 }

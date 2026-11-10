@@ -112,13 +112,21 @@ impl App {
         })
     }
 
-    pub fn capabilities(&self) -> Value { matrix() }
+    pub fn capabilities(&self) -> Value {
+        matrix()
+    }
 
     pub fn set_root(&self, path: &str) -> Result<Value, String> {
         let p = PathBuf::from(path);
-        let canon = p.canonicalize().map_err(|e| format!("root not found: {e}"))?;
-        if !canon.is_dir() { return Err("root is not a directory".into()); }
-        if canon == Path::new("/") { return Err("refusing filesystem root".into()); }
+        let canon = p
+            .canonicalize()
+            .map_err(|e| format!("root not found: {e}"))?;
+        if !canon.is_dir() {
+            return Err("root is not a directory".into());
+        }
+        if canon == Path::new("/") {
+            return Err("refusing filesystem root".into());
+        }
         self.mem.lock().expect("mem").root = Some(canon.clone());
         self.audit("root", &canon.to_string_lossy());
         Ok(json!({"root": canon, "markdown_enabled": true}))
@@ -130,18 +138,27 @@ impl App {
     }
 
     pub fn scan(&self, tz: &str) -> Result<Value, String> {
-        let root = self.mem.lock().expect("mem").root.clone().ok_or("select a root first")?;
+        let root = self
+            .mem
+            .lock()
+            .expect("mem")
+            .root
+            .clone()
+            .ok_or("select a root first")?;
         let records = scan::scan_root(&root, tz)?;
         let n = records.len();
         let skipped = records.iter().filter(|r| !r.readable).count();
         let mut mem = self.mem.lock().expect("mem");
         mem.records = records;
         mem.source = "filesystem".into();
-        Ok(json!({"count": n, "skipped": skipped, "source": "filesystem", "time_basis": "mtime", "timezone": tz}))
+        Ok(
+            json!({"count": n, "skipped": skipped, "source": "filesystem", "time_basis": "mtime", "timezone": tz}),
+        )
     }
 
     pub fn load_synthetic(&self) -> Result<Value, String> {
-        let v: Value = serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json")).map_err(|e| e.to_string())?;
+        let v: Value = serde_json::from_str(include_str!("../fixtures/metadata.synthetic.json"))
+            .map_err(|e| e.to_string())?;
         let records = query::records_from_synthetic(&v);
         let n = records.len();
         let mut mem = self.mem.lock().expect("mem");
@@ -153,18 +170,42 @@ impl App {
     pub fn set_draft(&self, body: &Value) -> Result<Value, String> {
         let today = body.get("today").and_then(|v| v.as_str()).unwrap_or("");
         let preset = body.get("preset").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
+        let group = empty_to_none(body.get("group").and_then(|v| v.as_str()));
+        let drive = empty_to_none(body.get("drive").and_then(|v| v.as_str()));
+        let ext = empty_to_none(body.get("ext").and_then(|v| v.as_str()));
+        if group.is_some() && (drive.is_some() || ext.is_some()) {
+            return Err("type filter is one group; do not also send drive and extension".into());
+        }
         let mut spec = QuerySpec {
-            start: body.get("start").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-            end: body.get("end").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-            drive: empty_to_none(body.get("drive").and_then(|v| v.as_str())),
-            ext: empty_to_none(body.get("ext").and_then(|v| v.as_str())),
-            more_enabled: body.get("more_enabled").and_then(|v| v.as_bool()).unwrap_or(false),
+            start: body
+                .get("start")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string(),
+            end: body
+                .get("end")
+                .and_then(|v| v.as_str())
+                .unwrap_or("")
+                .to_string(),
+            drive,
+            ext,
+            group: group.clone(),
+            more_enabled: body
+                .get("more_enabled")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false),
             name_contains: empty_to_none(body.get("name_contains").and_then(|v| v.as_str())),
         };
         if preset > 0 {
-            if today.is_empty() { return Err("preset needs today".into()); }
-            spec = query::spec_from_preset(today, preset, spec.drive, spec.ext)?;
-            spec.more_enabled = body.get("more_enabled").and_then(|v| v.as_bool()).unwrap_or(false);
+            if today.is_empty() {
+                return Err("preset needs today".into());
+            }
+            spec = query::spec_from_preset(today, preset, spec.drive.clone(), spec.ext.clone())?;
+            spec.group = group;
+            spec.more_enabled = body
+                .get("more_enabled")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false);
             spec.name_contains = empty_to_none(body.get("name_contains").and_then(|v| v.as_str()));
         }
         if !spec.start.is_empty() && !spec.end.is_empty() {
@@ -201,6 +242,8 @@ impl App {
             "end": snap.end,
             "drive": snap.drive,
             "ext": snap.ext,
+            "group": snap.group,
+            "items": snap.items.len(),
             "skipped": snap.skipped,
             "unknown_mtime": snap.unknown_mtime,
             "groups": snap.groups,
@@ -216,7 +259,9 @@ impl App {
         let mem = self.mem.lock().expect("mem");
         match &mem.snapshot {
             None => json!({"snapshot": null}),
-            Some(s) => json!({"ids": s.ids, "groups": s.groups, "per_day": s.per_day, "start": s.start, "end": s.end, "formula": s.formula, "source": mem.source}),
+            Some(s) => {
+                json!({"ids": s.ids, "groups": s.groups, "per_day": s.per_day, "items": s.items, "start": s.start, "end": s.end, "formula": s.formula, "source": mem.source})
+            }
         }
     }
 
@@ -233,12 +278,16 @@ impl App {
         if dynamic {
             let spec = mem.draft.clone();
             let snap = query::apply_query(&mem.records, &spec)?;
-            return Ok(json!({"dynamic": true, "ids": snap.ids, "label": "動態規則，會包含之後符合的檔案"}));
+            return Ok(
+                json!({"dynamic": true, "ids": snap.ids, "label": "動態規則，會包含之後符合的檔案"}),
+            );
         }
         let snap = mem.snapshot.as_ref().ok_or("query first")?;
         let ids = snap.ids.clone();
         mem.dynamic_select = false;
-        Ok(json!({"dynamic": false, "ids": ids, "label": format!("本次結果 {} 份，不含以後新增", ids.len())}))
+        Ok(
+            json!({"dynamic": false, "ids": ids, "label": format!("本次結果 {} 份，不含以後新增", ids.len())}),
+        )
     }
 
     pub fn persist_snapshot(&self) -> Result<Value, String> {
@@ -255,7 +304,9 @@ impl App {
 
     pub fn restore_snapshot(&self) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT payload FROM snapshots WHERE id='current'").map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare("SELECT payload FROM snapshots WHERE id='current'")
+            .map_err(|e| e.to_string())?;
         let mut rows = stmt.query([]).map_err(|e| e.to_string())?;
         let payload: String = if let Some(row) = rows.next().map_err(|e| e.to_string())? {
             row.get(0).map_err(|e| e.to_string())?
@@ -271,7 +322,11 @@ impl App {
     }
 
     pub fn clear_persisted(&self) -> Result<Value, String> {
-        self.db.lock().expect("db").execute("DELETE FROM snapshots", []).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute("DELETE FROM snapshots", [])
+            .map_err(|e| e.to_string())?;
         Ok(json!({"cleared": true}))
     }
 
@@ -286,17 +341,31 @@ impl App {
 
     pub fn write_md(&self, rel: &str, body: &str, dry: bool) -> Result<Value, String> {
         self.ensure_write()?;
-        let root = self.mem.lock().expect("mem").root.clone().ok_or("select a root before writing markdown")?;
-        if !rel.ends_with(".md") { return Err("markdown sidebar only writes .md files".into()); }
+        let root = self
+            .mem
+            .lock()
+            .expect("mem")
+            .root
+            .clone()
+            .ok_or("select a root before writing markdown")?;
+        if !rel.ends_with(".md") {
+            return Err("markdown sidebar only writes .md files".into());
+        }
         let dest = paths::resolve_inside(&root, rel)?;
         let root_s = root.canonicalize().map_err(|e| e.to_string())?;
         let abs = dest.to_string_lossy().to_string();
         if t3bridge::relative_path(&abs, &root_s.to_string_lossy())?.is_none() {
             return Err("path rejected by vendored T3 workspace check".into());
         }
-        if dest.exists() { return Err("refusing overwrite".into()); }
-        if dry { return Ok(json!({"dry_run": true, "path": rel})); }
-        if let Some(parent) = dest.parent() { fs::create_dir_all(parent).map_err(|e| e.to_string())?; }
+        if dest.exists() {
+            return Err("refusing overwrite".into());
+        }
+        if dry {
+            return Ok(json!({"dry_run": true, "path": rel}));
+        }
+        if let Some(parent) = dest.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
         fs::write(&dest, body).map_err(|e| e.to_string())?;
         self.audit("write_md", rel);
         Ok(json!({"wrote": rel}))
@@ -304,7 +373,13 @@ impl App {
 
     pub fn plan_move(&self, from_rel: &str, to_rel: &str) -> Result<Value, String> {
         self.ensure_write()?;
-        let root = self.mem.lock().expect("mem").root.clone().ok_or("select a root first")?;
+        let root = self
+            .mem
+            .lock()
+            .expect("mem")
+            .root
+            .clone()
+            .ok_or("select a root first")?;
         let plan = paths::plan_move(&root, from_rel, to_rel)?;
         let id = random_id("plan");
         let body = json!({"id": id, "from": from_rel, "to": to_rel, "sha256": plan.sha256, "dry_run": true, "confirm": "CONFIRM"});
@@ -314,26 +389,67 @@ impl App {
 
     pub fn confirm_move(&self, id: &str, phrase: &str) -> Result<Value, String> {
         self.ensure_write()?;
-        if phrase != "CONFIRM" { return Err("confirmation phrase must be CONFIRM".into()); }
-        let root = self.mem.lock().expect("mem").root.clone().ok_or("select a root first")?;
-        let plan = self.mem.lock().expect("mem").plans.get(id).cloned().ok_or("unknown plan")?;
-        let backup = self.cfg.lock().expect("cfg").data_dir.join("backups").join(id);
+        if phrase != "CONFIRM" {
+            return Err("confirmation phrase must be CONFIRM".into());
+        }
+        let root = self
+            .mem
+            .lock()
+            .expect("mem")
+            .root
+            .clone()
+            .ok_or("select a root first")?;
+        let plan = self
+            .mem
+            .lock()
+            .expect("mem")
+            .plans
+            .get(id)
+            .cloned()
+            .ok_or("unknown plan")?;
+        let backup = self
+            .cfg
+            .lock()
+            .expect("cfg")
+            .data_dir
+            .join("backups")
+            .join(id);
         paths::execute_move(&root, &plan, &backup)?;
         self.mem.lock().expect("mem").plans.remove(id);
         let db = self.db.lock().expect("db");
-        let payload = serde_json::to_string(&json!({"from": plan.from_rel, "to": plan.to_rel, "sha256": plan.sha256})).unwrap_or_default();
+        let payload = serde_json::to_string(
+            &json!({"from": plan.from_rel, "to": plan.to_rel, "sha256": plan.sha256}),
+        )
+        .unwrap_or_default();
         store::kv_put(&db, &format!("manifest:{id}"), &payload)?;
         drop(db);
-        self.mem.lock().expect("mem").plans.insert(format!("done:{id}"), plan);
+        self.mem
+            .lock()
+            .expect("mem")
+            .plans
+            .insert(format!("done:{id}"), plan);
         self.audit("move", id);
         Ok(json!({"moved": id}))
     }
 
     pub fn undo_move(&self, id: &str) -> Result<Value, String> {
         self.ensure_write()?;
-        let root = self.mem.lock().expect("mem").root.clone().ok_or("select a root first")?;
+        let root = self
+            .mem
+            .lock()
+            .expect("mem")
+            .root
+            .clone()
+            .ok_or("select a root first")?;
         let key = format!("done:{id}");
-        let plan = self.mem.lock().expect("mem").plans.get(&key).cloned().ok_or("unknown manifest")?;
+        let plan = self
+            .mem
+            .lock()
+            .expect("mem")
+            .plans
+            .get(&key)
+            .cloned()
+            .ok_or("unknown manifest")?;
         paths::undo_move(&root, &plan)?;
         self.audit("undo", id);
         Ok(json!({"undone": id}))
@@ -341,7 +457,9 @@ impl App {
 
     fn ensure_write(&self) -> Result<(), String> {
         let mem = self.mem.lock().expect("mem");
-        if mem.permission == "read-only" { return Err("forbidden by permission mode read-only".into()); }
+        if mem.permission == "read-only" {
+            return Err("forbidden by permission mode read-only".into());
+        }
         Ok(())
     }
 
@@ -371,7 +489,9 @@ impl App {
             Ok(json!({"id": row.get::<_, String>(0)?, "title": row.get::<_, String>(1)?, "archived": row.get::<_, i64>(2)? == 1, "updated_at": row.get::<_, String>(3)?}))
         }).map_err(|e| e.to_string())?;
         let mut items = Vec::new();
-        for row in rows { items.push(row.map_err(|e| e.to_string())?); }
+        for row in rows {
+            items.push(row.map_err(|e| e.to_string())?);
+        }
         Ok(json!({"threads": items}))
     }
 
@@ -382,32 +502,56 @@ impl App {
         db.execute(
             "INSERT INTO messages(id,thread_id,role,content,created_at) VALUES(?1,?2,?3,?4,?5)",
             params![id, thread, role, content, at],
-        ).map_err(|e| e.to_string())?;
-        db.execute("UPDATE threads SET updated_at=?1 WHERE id=?2", params![at, thread]).map_err(|e| e.to_string())?;
+        )
+        .map_err(|e| e.to_string())?;
+        db.execute(
+            "UPDATE threads SET updated_at=?1 WHERE id=?2",
+            params![at, thread],
+        )
+        .map_err(|e| e.to_string())?;
         Ok(json!({"id": id, "untrusted": true}))
     }
 
     pub fn attach(&self, thread: &str, name: &str, bytes: &[u8]) -> Result<Value, String> {
-        if bytes.len() > 1_000_000 { return Err("attachment too large".into()); }
+        if bytes.len() > 1_000_000 {
+            return Err("attachment too large".into());
+        }
         let id = random_id("att");
-        self.db.lock().expect("db").execute(
-            "INSERT INTO attachments(id,thread_id,name,bytes) VALUES(?1,?2,?3,?4)",
-            params![id, thread, name, bytes],
-        ).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "INSERT INTO attachments(id,thread_id,name,bytes) VALUES(?1,?2,?3,?4)",
+                params![id, thread, name, bytes],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(json!({"id": id, "name": name, "bytes": bytes.len()}))
     }
 
     pub fn archive_thread(&self, thread: &str, archived: bool) -> Result<Value, String> {
-        self.db.lock().expect("db").execute("UPDATE threads SET archived=?1 WHERE id=?2", params![archived as i64, thread]).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "UPDATE threads SET archived=?1 WHERE id=?2",
+                params![archived as i64, thread],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(json!({"id": thread, "archived": archived}))
     }
 
     pub fn delete_thread(&self, thread: &str) -> Result<Value, String> {
         {
             let db = self.db.lock().expect("db");
-            db.execute("DELETE FROM messages WHERE thread_id=?1", params![thread]).map_err(|e| e.to_string())?;
-            db.execute("DELETE FROM attachments WHERE thread_id=?1", params![thread]).map_err(|e| e.to_string())?;
-            db.execute("DELETE FROM threads WHERE id=?1", params![thread]).map_err(|e| e.to_string())?;
+            db.execute("DELETE FROM messages WHERE thread_id=?1", params![thread])
+                .map_err(|e| e.to_string())?;
+            db.execute(
+                "DELETE FROM attachments WHERE thread_id=?1",
+                params![thread],
+            )
+            .map_err(|e| e.to_string())?;
+            db.execute("DELETE FROM threads WHERE id=?1", params![thread])
+                .map_err(|e| e.to_string())?;
         }
         self.audit("delete_thread", thread);
         Ok(json!({"deleted": thread}))
@@ -415,119 +559,210 @@ impl App {
 
     pub fn export_thread(&self, thread: &str) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let title: String = db.query_row("SELECT title FROM threads WHERE id=?1", params![thread], |r| r.get(0)).map_err(|_| "thread not found".to_string())?;
+        let title: String = db
+            .query_row(
+                "SELECT title FROM threads WHERE id=?1",
+                params![thread],
+                |r| r.get(0),
+            )
+            .map_err(|_| "thread not found".to_string())?;
         let mut stmt = db.prepare("SELECT id,role,content,created_at FROM messages WHERE thread_id=?1 ORDER BY created_at").map_err(|e| e.to_string())?;
         let rows = stmt.query_map(params![thread], |row| {
             Ok(json!({"id": row.get::<_, String>(0)?, "role": row.get::<_, String>(1)?, "content": row.get::<_, String>(2)?, "created_at": row.get::<_, String>(3)?}))
         }).map_err(|e| e.to_string())?;
         let mut messages = Vec::new();
-        for row in rows { messages.push(row.map_err(|e| e.to_string())?); }
+        for row in rows {
+            messages.push(row.map_err(|e| e.to_string())?);
+        }
         Ok(json!({"synthetic_export": true, "id": thread, "title": title, "messages": messages}))
     }
 
     pub fn import_thread(&self, body: &Value) -> Result<Value, String> {
-        let title = body.get("title").and_then(|v| v.as_str()).unwrap_or("imported");
+        let title = body
+            .get("title")
+            .and_then(|v| v.as_str())
+            .unwrap_or("imported");
         let created = self.threads_create(title)?;
         let id = created["id"].as_str().unwrap().to_string();
+        let mut model_short = Vec::new();
         if let Some(messages) = body.get("messages").and_then(|v| v.as_array()) {
             for msg in messages {
                 let role = msg.get("role").and_then(|v| v.as_str()).unwrap_or("user");
-                let content = msg.get("content").and_then(|v| v.as_str()).unwrap_or("");
-                self.message(&id, role, content)?;
+                let mut content = msg
+                    .get("content")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string();
+                if role == "assistant" {
+                    if let Ok(cleaned) = t3bridge::clean_commit_message(&content) {
+                        content = cleaned;
+                    }
+                }
+                if let Some(model) = msg.get("model").and_then(|v| v.as_str()) {
+                    if let Ok(Some(short)) = t3bridge::model_short(model, &["Claude ", "GPT-"]) {
+                        model_short.push(short);
+                    }
+                }
+                self.message(&id, role, &content)?;
             }
         }
-        Ok(json!({"id": id}))
+        Ok(
+            json!({"id": id, "model_short": model_short, "t3": "merge-message and model-short-name executed on import"}),
+        )
     }
 
     pub fn search(&self, q: &str) -> Result<Value, String> {
         let chars = q.chars().count();
-        if !(2..=200).contains(&chars) { return Err("query length must be 2..=200".into()); }
+        if !(2..=200).contains(&chars) {
+            return Err("query length must be 2..=200".into());
+        }
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT id,thread_id,content,created_at FROM messages").map_err(|e| e.to_string())?;
-        let rows = stmt.query_map([], |row| {
-            Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?, row.get::<_, String>(2)?, row.get::<_, String>(3)?))
-        }).map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare("SELECT id,thread_id,content,created_at FROM messages")
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(3)?,
+                ))
+            })
+            .map_err(|e| e.to_string())?;
         let mut loaded = Vec::new();
-        for row in rows { loaded.push(row.map_err(|e| e.to_string())?); }
+        for row in rows {
+            loaded.push(row.map_err(|e| e.to_string())?);
+        }
         drop(stmt);
         drop(db);
         let mut hits = Vec::new();
         for (id, thread, content, at) in loaded.into_iter().take(200) {
             let offsets = t3bridge::thread_offsets(&content, q)?;
-            if offsets.is_empty() { continue; }
+            if offsets.is_empty() {
+                continue;
+            }
             let score = t3bridge::rank(&content, q)?.unwrap_or(0.0);
             let snippet: String = content.chars().take(240).collect();
             hits.push(json!({"message_id": id, "thread_id": thread, "score": score, "offsets": offsets, "snippet": snippet, "created_at": at}));
         }
-        Ok(json!({"query": q, "engine": "t3 shared/threadSearch.ts + searchRanking.ts", "hits": hits}))
+        Ok(
+            json!({"query": q, "engine": "t3 shared/threadSearch.ts + searchRanking.ts", "hits": hits}),
+        )
     }
 
     pub fn checkpoint(&self, thread: &str) -> Result<Value, String> {
         let exported = self.export_thread(thread)?;
         let id = random_id("ck");
-        self.db.lock().expect("db").execute(
-            "INSERT INTO checkpoints(id,thread_id,payload,created_at) VALUES(?1,?2,?3,?4)",
-            params![id, thread, exported.to_string(), util::now_rfc3339()],
-        ).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "INSERT INTO checkpoints(id,thread_id,payload,created_at) VALUES(?1,?2,?3,?4)",
+                params![id, thread, exported.to_string(), util::now_rfc3339()],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(json!({"id": id}))
     }
 
     pub fn restore_checkpoint(&self, id: &str) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let (thread, payload): (String, String) = db.query_row(
-            "SELECT thread_id,payload FROM checkpoints WHERE id=?1",
-            params![id],
-            |r| Ok((r.get(0)?, r.get(1)?)),
-        ).map_err(|_| "checkpoint not found".to_string())?;
+        let (thread, payload): (String, String) = db
+            .query_row(
+                "SELECT thread_id,payload FROM checkpoints WHERE id=?1",
+                params![id],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .map_err(|_| "checkpoint not found".to_string())?;
         drop(db);
         let value: Value = serde_json::from_str(&payload).map_err(|e| e.to_string())?;
-        self.db.lock().expect("db").execute("DELETE FROM messages WHERE thread_id=?1", params![thread]).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute("DELETE FROM messages WHERE thread_id=?1", params![thread])
+            .map_err(|e| e.to_string())?;
         if let Some(messages) = value.get("messages").and_then(|v| v.as_array()) {
             for msg in messages {
-                self.message(&thread, msg["role"].as_str().unwrap_or("user"), msg["content"].as_str().unwrap_or(""))?;
+                self.message(
+                    &thread,
+                    msg["role"].as_str().unwrap_or("user"),
+                    msg["content"].as_str().unwrap_or(""),
+                )?;
             }
         }
         Ok(json!({"restored": id, "thread": thread}))
     }
 
     pub fn retention(&self, days: i64) -> Result<Value, String> {
-        if days < 0 { return Err("retention days must be >= 0".into()); }
-        let cutoff = (chrono::Utc::now() - chrono::Duration::days(days)).format("%Y-%m-%dT%H:%M:%SZ").to_string();
-        let n = self.db.lock().expect("db").execute("DELETE FROM messages WHERE created_at < ?1", params![cutoff]).map_err(|e| e.to_string())?;
+        if days < 0 {
+            return Err("retention days must be >= 0".into());
+        }
+        let cutoff = (chrono::Utc::now() - chrono::Duration::days(days))
+            .format("%Y-%m-%dT%H:%M:%SZ")
+            .to_string();
+        let n = self
+            .db
+            .lock()
+            .expect("db")
+            .execute(
+                "DELETE FROM messages WHERE created_at < ?1",
+                params![cutoff],
+            )
+            .map_err(|e| e.to_string())?;
         self.audit("retention", &format!("{n}"));
         Ok(json!({"deleted_messages": n, "older_than": cutoff}))
     }
 
     pub fn guest(&self, thread: &str) -> Result<Value, String> {
         let token = random_id("guest");
-        let exp = (chrono::Utc::now() + chrono::Duration::hours(1)).format("%Y-%m-%dT%H:%M:%SZ").to_string();
-        self.db.lock().expect("db").execute(
-            "INSERT INTO guests(token,thread_id,exp) VALUES(?1,?2,?3)",
-            params![token, thread, exp],
-        ).map_err(|e| e.to_string())?;
+        let exp = (chrono::Utc::now() + chrono::Duration::hours(1))
+            .format("%Y-%m-%dT%H:%M:%SZ")
+            .to_string();
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "INSERT INTO guests(token,thread_id,exp) VALUES(?1,?2,?3)",
+                params![token, thread, exp],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(json!({"token": token, "exp": exp, "scope": "loopback"}))
     }
 
     pub fn guest_read(&self, token: &str) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let (thread, exp): (String, String) = db.query_row(
-            "SELECT thread_id,exp FROM guests WHERE token=?1",
-            params![token],
-            |r| Ok((r.get(0)?, r.get(1)?)),
-        ).map_err(|_| "guest link not found".to_string())?;
+        let (thread, exp): (String, String) = db
+            .query_row(
+                "SELECT thread_id,exp FROM guests WHERE token=?1",
+                params![token],
+                |r| Ok((r.get(0)?, r.get(1)?)),
+            )
+            .map_err(|_| "guest link not found".to_string())?;
         drop(db);
-        if exp < util::now_rfc3339() { return Err("guest link expired".into()); }
+        if exp < util::now_rfc3339() {
+            return Err("guest link expired".into());
+        }
         self.export_thread(&thread)
     }
 
     pub fn connector_save(&self, body: &Value) -> Result<Value, String> {
-        if body.get("secret").is_some() || body.get("token").is_some() || body.get("password").is_some() {
+        if body.get("secret").is_some()
+            || body.get("token").is_some()
+            || body.get("password").is_some()
+        {
             return Err("do not send secret values; send secret_ref only".into());
         }
-        let id = body.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or_else(|| random_id("con"));
+        let id = body
+            .get("id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| random_id("con"));
         let mut stored = body.clone();
         stored["id"] = json!(id);
-        stored["status"] = json!(body.get("status").and_then(|v| v.as_str()).unwrap_or("configured_unverified"));
+        stored["status"] = json!(body
+            .get("status")
+            .and_then(|v| v.as_str())
+            .unwrap_or("configured_unverified"));
         self.db.lock().expect("db").execute(
             "INSERT INTO connectors(id,payload) VALUES(?1,?2) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload",
             params![id, stored.to_string()],
@@ -541,14 +776,23 @@ impl App {
 
     fn connector_rows(&self) -> Result<Vec<Value>, String> {
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT payload FROM connectors").map_err(|e| e.to_string())?;
-        let rows = stmt.query_map([], |row| row.get::<_, String>(0)).map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare("SELECT payload FROM connectors")
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |row| row.get::<_, String>(0))
+            .map_err(|e| e.to_string())?;
         let mut out = Vec::new();
         for row in rows {
             let text = row.map_err(|e| e.to_string())?;
             if let Ok(mut v) = serde_json::from_str::<Value>(&text) {
                 if let Some(obj) = v.as_object_mut() {
-                    obj.insert("secret_ref_masked".into(), json!(mask_secret(obj.get("secret_ref").and_then(|s| s.as_str()).unwrap_or(""))));
+                    obj.insert(
+                        "secret_ref_masked".into(),
+                        json!(mask_secret(
+                            obj.get("secret_ref").and_then(|s| s.as_str()).unwrap_or("")
+                        )),
+                    );
                 }
                 out.push(v);
             }
@@ -558,18 +802,44 @@ impl App {
 
     pub fn connector_sync(&self, id: &str, body: &Value) -> Result<Value, String> {
         let rows = self.connector_rows()?;
-        let connector = rows.into_iter().find(|c| c["id"] == id).ok_or("connector not found")?;
-        let kind = connector.get("kind").and_then(|v| v.as_str()).unwrap_or("");
-        let transport = body.get("transport").and_then(|v| v.as_str()).unwrap_or("inproc");
-        let mapping = connector.get("mapping").cloned().unwrap_or(json!({"mapping": []}));
-        let records = body.get("records").and_then(|v| v.as_array()).cloned().unwrap_or_default();
+        let connector = rows
+            .into_iter()
+            .find(|c| c["id"] == id)
+            .ok_or("connector not found")?;
+        let kind = connector
+            .get("kind")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
+        let transport = body
+            .get("transport")
+            .and_then(|v| v.as_str())
+            .unwrap_or("inproc");
+        let mapping = connector
+            .get("mapping")
+            .cloned()
+            .unwrap_or(json!({"mapping": []}));
+        let records = body
+            .get("records")
+            .and_then(|v| v.as_array())
+            .cloned()
+            .unwrap_or_default();
+        if transport == "live" {
+            return self.sync_live(id, &kind, &connector, &mapping, &records);
+        }
         let mut applied = 0;
         let mut duplicates = 0;
         let db = self.db.lock().expect("db");
         for rec in records {
-            let doc = rec.get("record_id").and_then(|v| v.as_str()).or_else(|| rec.get("doc_id").and_then(|v| v.as_str())).unwrap_or("");
+            let doc = rec
+                .get("record_id")
+                .and_then(|v| v.as_str())
+                .or_else(|| rec.get("doc_id").and_then(|v| v.as_str()))
+                .unwrap_or("");
             let ver = rec.get("version").and_then(|v| v.as_str()).unwrap_or("1");
-            if doc.is_empty() { return Err("record_id required".into()); }
+            if doc.is_empty() {
+                return Err("record_id required".into());
+            }
             let checked = connectors::validate_record(&mapping, &rec)?;
             let key = format!("sync:{id}:{doc}:{ver}");
             if store::kv_get(&db, &key)?.is_some() {
@@ -578,29 +848,237 @@ impl App {
                 db.execute("INSERT INTO sync_log(id,connector_id,ok,detail,created_at) VALUES(?1,?2,1,?3,?4)", params![random_id("log"), id, detail, util::now_rfc3339()]).map_err(|e| e.to_string())?;
                 continue;
             }
-            if transport == "live" {
-                let built = preview_request(kind, &connector, &checked)?;
-                drop(db);
-                let result = connectors::exchange(&built);
-                let db = self.db.lock().expect("db");
-                let err = result.err().unwrap_or_else(|| "unexpected live success".into());
-                let detail = redact(&err, &[]);
-                db.execute("INSERT INTO sync_log(id,connector_id,ok,detail,created_at) VALUES(?1,?2,0,?3,?4)", params![random_id("log"), id, detail, util::now_rfc3339()]).map_err(|e| e.to_string())?;
-                return Err(err);
-            }
+            let _ = checked;
             store::kv_put(&db, &key, "1")?;
             applied += 1;
             db.execute(
                 "INSERT INTO sync_log(id,connector_id,ok,detail,created_at) VALUES(?1,?2,1,?3,?4)",
-                params![random_id("log"), id, format!("inproc {doc} {ver}"), util::now_rfc3339()],
-            ).map_err(|e| e.to_string())?;
+                params![
+                    random_id("log"),
+                    id,
+                    format!("inproc {doc} {ver}"),
+                    util::now_rfc3339()
+                ],
+            )
+            .map_err(|e| e.to_string())?;
         }
-        Ok(json!({"applied": applied, "duplicates": duplicates, "transport": transport, "live_called": false}))
+        Ok(
+            json!({"applied": applied, "duplicates": duplicates, "transport": transport, "live_called": false}),
+        )
+    }
+
+    fn sync_live(
+        &self,
+        id: &str,
+        kind: &str,
+        connector: &Value,
+        mapping: &Value,
+        records: &[Value],
+    ) -> Result<Value, String> {
+        let base = connector
+            .get("base_url")
+            .and_then(|v| v.as_str())
+            .unwrap_or("");
+        let loopback =
+            base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:");
+        if !loopback {
+            let sample = records.first().cloned().unwrap_or(json!({}));
+            let checked = if records.is_empty() {
+                json!({})
+            } else {
+                connectors::validate_record(mapping, &sample)?
+            };
+            let built = preview_request(kind, connector, &checked)?;
+            let err = connectors::exchange(&built)
+                .err()
+                .unwrap_or_else(|| "unexpected live success".into());
+            self.log_sync(id, false, &redact(&err, &[]))?;
+            return Err(err);
+        }
+        if connector.get("consent").and_then(|v| v.as_bool()) != Some(true) {
+            return Err("consent required for a live connector call".into());
+        }
+        let secret = self.load_local_secret(
+            connector
+                .get("secret_ref")
+                .and_then(|v| v.as_str())
+                .unwrap_or(""),
+        )?;
+        let mut applied = 0;
+        let mut duplicates = 0;
+        for rec in records {
+            let doc = rec
+                .get("record_id")
+                .and_then(|v| v.as_str())
+                .or_else(|| rec.get("doc_id").and_then(|v| v.as_str()))
+                .unwrap_or("");
+            let ver = rec.get("version").and_then(|v| v.as_str()).unwrap_or("1");
+            if doc.is_empty() {
+                return Err("record_id required".into());
+            }
+            let checked = connectors::validate_record(mapping, rec)?;
+            let key = format!("sync:{id}:{doc}:{ver}");
+            if store::kv_get(&self.db.lock().expect("db"), &key)?.is_some() {
+                duplicates += 1;
+                self.log_sync(id, true, &format!("duplicate {doc} {ver}"))?;
+                continue;
+            }
+            let mut built = preview_request(kind, connector, &checked)?;
+            let path = built
+                .url
+                .split("://")
+                .nth(1)
+                .and_then(|rest| rest.find('/').map(|i| rest[i..].to_string()))
+                .unwrap_or_else(|| "/".into());
+            built.url = format!("{base}{path}");
+            for header in &mut built.headers {
+                if header.0.eq_ignore_ascii_case("authorization") {
+                    header.1 = format!("Bearer {secret}");
+                }
+            }
+            let raw = connectors::exchange_with(
+                &built,
+                connectors::ExchangePolicy {
+                    allow_loopback: true,
+                    allow_public: false,
+                },
+                3,
+            )
+            .map_err(|err| redact(&err, &[secret.as_str()]))?;
+            if !raw.contains("HTTP/1.1 2") && !raw.contains("HTTP/1.0 2") {
+                self.log_sync(id, false, "loopback mock rejected the record")?;
+                return Err("connector mock did not accept the record".into());
+            }
+            store::kv_put(&self.db.lock().expect("db"), &key, "1")?;
+            applied += 1;
+            self.log_sync(id, true, "loopback mock accepted; not production auth")?;
+        }
+        Ok(
+            json!({"applied": applied, "duplicates": duplicates, "transport": "live", "live_called": true, "auth": "loopback_mock_not_production"}),
+        )
+    }
+
+    fn log_sync(&self, id: &str, ok: bool, detail: &str) -> Result<(), String> {
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "INSERT INTO sync_log(id,connector_id,ok,detail,created_at) VALUES(?1,?2,?3,?4,?5)",
+                params![
+                    random_id("log"),
+                    id,
+                    if ok { 1 } else { 0 },
+                    detail,
+                    util::now_rfc3339()
+                ],
+            )
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+
+    pub fn secret_put(&self, value: &str) -> Result<Value, String> {
+        if value.is_empty() || value.len() > 4096 {
+            return Err("secret length".into());
+        }
+        if value.contains('\0') {
+            return Err("secret rejected".into());
+        }
+        let id = random_id("sec");
+        let dir = self.cfg.lock().expect("cfg").data_dir.join("secrets");
+        fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+        let path = dir.join(&id);
+        let mut file = fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .mode(0o600)
+            .open(&path)
+            .map_err(|e| e.to_string())?;
+        file.write_all(value.as_bytes())
+            .map_err(|e| e.to_string())?;
+        Ok(json!({"secret_ref": format!("local:{id}"), "stored": true}))
+    }
+
+    fn load_local_secret(&self, secret_ref: &str) -> Result<String, String> {
+        let id = secret_ref
+            .strip_prefix("local:")
+            .ok_or("live loopback sync needs a local: secret_ref")?;
+        if id.is_empty() || id.contains('/') || id.contains("..") {
+            return Err("bad secret ref".into());
+        }
+        let path = self
+            .cfg
+            .lock()
+            .expect("cfg")
+            .data_dir
+            .join("secrets")
+            .join(id);
+        let meta = fs::symlink_metadata(&path).map_err(|_| "secret not found".to_string())?;
+        if meta.file_type().is_symlink() {
+            return Err("secret symlink rejected".into());
+        }
+        use std::os::unix::fs::PermissionsExt;
+        if meta.permissions().mode() & 0o077 != 0 {
+            return Err("secret file is not mode 0600".into());
+        }
+        let text = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+        Ok(text.trim().to_string())
+    }
+
+    pub fn browse(&self, path: &str) -> Result<Value, String> {
+        let chosen = if path.is_empty() {
+            std::env::var("HOME").unwrap_or_else(|_| "/tmp".into())
+        } else {
+            path.to_string()
+        };
+        let dir = PathBuf::from(&chosen);
+        let meta = fs::symlink_metadata(&dir).map_err(|e| e.to_string())?;
+        if meta.file_type().is_symlink() {
+            return Err("symlink rejected".into());
+        }
+        if !meta.is_dir() {
+            return Err("not a directory".into());
+        }
+        let mut directories = Vec::new();
+        for entry in fs::read_dir(&dir).map_err(|e| e.to_string())? {
+            let entry = entry.map_err(|e| e.to_string())?;
+            let name = entry.file_name().to_string_lossy().to_string();
+            if name.starts_with('.') {
+                continue;
+            }
+            let meta = entry.metadata().map_err(|e| e.to_string())?;
+            if meta.file_type().is_symlink() || !meta.is_dir() {
+                continue;
+            }
+            directories.push(json!({"name": name, "path": entry.path()}));
+        }
+        directories.sort_by(|a, b| {
+            a["name"]
+                .as_str()
+                .unwrap_or("")
+                .cmp(b["name"].as_str().unwrap_or(""))
+        });
+        Ok(json!({"path": dir, "directories": directories}))
+    }
+
+    pub fn file_groups(&self) -> Value {
+        let mem = self.mem.lock().expect("mem");
+        let mut groups = BTreeMap::new();
+        for rec in &mem.records {
+            if rec.readable && !rec.escapes {
+                *groups
+                    .entry(query::group_key(&rec.drive, &rec.ext))
+                    .or_insert(0usize) += 1;
+            }
+        }
+        json!({"groups": groups, "filters": ["calendar-day range", "drive x file type"]})
     }
 
     pub fn connector_disconnect(&self, id: &str) -> Result<Value, String> {
         let rows = self.connector_rows()?;
-        let mut connector = rows.into_iter().find(|c| c["id"] == id).ok_or("connector not found")?;
+        let mut connector = rows
+            .into_iter()
+            .find(|c| c["id"] == id)
+            .ok_or("connector not found")?;
         if let Some(obj) = connector.as_object_mut() {
             obj.insert("secret_ref".into(), json!(""));
             obj.insert("team".into(), json!(""));
@@ -608,14 +1086,24 @@ impl App {
             obj.insert("status".into(), json!("disconnected"));
             obj.remove("session");
         }
-        self.db.lock().expect("db").execute("UPDATE connectors SET payload=?1 WHERE id=?2", params![connector.to_string(), id]).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "UPDATE connectors SET payload=?1 WHERE id=?2",
+                params![connector.to_string(), id],
+            )
+            .map_err(|e| e.to_string())?;
         self.audit("disconnect", id);
         Ok(connector)
     }
 
     pub fn connector_export(&self, id: &str) -> Result<Value, String> {
         let rows = self.connector_rows()?;
-        let mut connector = rows.into_iter().find(|c| c["id"] == id).ok_or("connector not found")?;
+        let mut connector = rows
+            .into_iter()
+            .find(|c| c["id"] == id)
+            .ok_or("connector not found")?;
         if let Some(obj) = connector.as_object_mut() {
             obj.insert("secret_ref".into(), json!("«redacted»"));
             obj.remove("session");
@@ -630,17 +1118,25 @@ impl App {
             Ok(json!({"ok": row.get::<_, i64>(0)? == 1, "detail": row.get::<_, String>(1)?, "created_at": row.get::<_, String>(2)?}))
         }).map_err(|e| e.to_string())?;
         let mut logs = Vec::new();
-        for row in rows { logs.push(row.map_err(|e| e.to_string())?); }
+        for row in rows {
+            logs.push(row.map_err(|e| e.to_string())?);
+        }
         Ok(json!({"logs": logs}))
     }
 
-    pub fn inventory(&self) -> Value { inventory::sample() }
+    pub fn inventory(&self) -> Value {
+        inventory::sample()
+    }
 
     pub fn detectors(&self) -> Result<Value, String> {
         let mut rows = inventory::builtin_detectors();
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT payload FROM detectors").map_err(|e| e.to_string())?;
-        let extra = stmt.query_map([], |row| row.get::<_, String>(0)).map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare("SELECT payload FROM detectors")
+            .map_err(|e| e.to_string())?;
+        let extra = stmt
+            .query_map([], |row| row.get::<_, String>(0))
+            .map_err(|e| e.to_string())?;
         for row in extra {
             if let Ok(v) = serde_json::from_str::<Value>(&row.map_err(|e| e.to_string())?) {
                 rows.push(v);
@@ -651,7 +1147,9 @@ impl App {
 
     pub fn detector_save(&self, body: &Value) -> Result<Value, String> {
         let id = body.get("id").and_then(|v| v.as_str()).ok_or("id")?;
-        if body.get("shell").is_some() { return Err("shell detectors are rejected".into()); }
+        if body.get("shell").is_some() {
+            return Err("shell detectors are rejected".into());
+        }
         self.db.lock().expect("db").execute(
             "INSERT INTO detectors(id,payload) VALUES(?1,?2) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload",
             params![id, body.to_string()],
@@ -660,27 +1158,44 @@ impl App {
     }
 
     pub fn detector_run(&self, id: &str, confirm: &str) -> Result<Value, String> {
-        if confirm != "CONFIRM" { return Err("confirmation required".into()); }
-        if id == "hermes" { return Err("hermes version command is not verified and was not started".into()); }
+        if confirm != "CONFIRM" {
+            return Err("confirmation required".into());
+        }
+        if id == "hermes" {
+            return Err("hermes version command is not verified and was not started".into());
+        }
         let builtins = inventory::builtin_detectors();
         if let Some(row) = builtins.into_iter().find(|d| d["id"] == id) {
-            if row["version_command_trusted"] != true { return Err("version command is not trusted".into()); }
+            if row["version_command_trusted"] != true {
+                return Err("version command is not trusted".into());
+            }
             let argv0 = row["argv0"].as_str().unwrap_or("");
             let output = inventory::run_version(argv0)?;
-            return Ok(json!({"id": id, "installed": true, "operable": true, "authorized": false, "output": output}));
+            return Ok(
+                json!({"id": id, "installed": true, "operable": true, "authorized": false, "output": output}),
+            );
         }
-        Err("custom detectors are stored but this build only runs trusted builtin version commands".into())
+        Err(
+            "custom detectors are stored but this build only runs trusted builtin version commands"
+                .into(),
+        )
     }
 
     pub fn ocr_bytes(&self, bytes: &[u8]) -> Result<Value, String> {
         let text = pdf::extract_text_layer(bytes);
+        let paddle = if text.has_text_layer {
+            json!({"status": "not_needed", "inference": "not_run"})
+        } else {
+            let data = self.cfg.lock().expect("cfg").data_dir.clone();
+            paddle_probe(&data)?
+        };
         Ok(json!({
             "source": text.source,
             "text": text.text,
             "has_text_layer": text.has_text_layer,
             "needs_ocr": !text.has_text_layer,
             "ocr_untrusted": true,
-            "paddle": paddle_probe()?,
+            "paddle": paddle,
         }))
     }
 
@@ -693,47 +1208,186 @@ impl App {
     }
 
     pub fn ocr_catalog(&self) -> Value {
-        let runtime = paddle_probe().unwrap_or(json!({"status": "probe_failed"}));
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        let runtime = paddle_probe(&data).unwrap_or(json!({"status": "probe_failed"}));
+        let spec = crate::ocrflow::pins();
         json!({
-            "downloadable": false,
+            "downloadable": true,
             "tokens_json": false,
             "runtime": runtime,
             "api_called": false,
-            "models": [{
-                "id": "PP-OCRv5_mobile",
-                "origin": "https://github.com/PaddlePaddle/PaddleOCR",
-                "engine_license": "Apache-2.0",
-                "model_license": "not pinned in this build; read the official artifact before download",
-                "version": "PP-OCRv5",
-                "size_bytes": null,
-                "sha256": null,
-                "downloadable": false,
-                "reason": "checksum is not verified here, so download is refused"
-            }]
+            "provenance": spec.get("provenance").cloned().unwrap_or(Value::Null),
+            "engine": spec.get("engine").cloned().unwrap_or(Value::Null),
+            "engine_version": spec.get("engine_version").cloned().unwrap_or(Value::Null),
+            "models": spec.get("files").cloned().unwrap_or(json!([])),
         })
     }
 
     pub fn ocr_download(&self) -> Result<Value, String> {
-        Err("checksum_not_pinned; download refused".into())
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::ensure(&data)
+    }
+
+    pub fn ocr_recognize_sample(&self) -> Result<Value, String> {
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::recognize_sample(&data)
+    }
+
+    pub fn ocr_cancel(&self) -> Result<Value, String> {
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::cancel(&data)
+    }
+
+    pub fn ocr_runtime(&self) -> Result<Value, String> {
+        let data = self.cfg.lock().expect("cfg").data_dir.clone();
+        crate::ocrflow::install_runtime(&data)
     }
 
     pub fn ocr_api(&self, body: &Value) -> Result<Value, String> {
-        let opt_in = body.get("opt_in").and_then(|v| v.as_bool()).unwrap_or(false);
-        if !opt_in { return Ok(json!({"opt_in": false, "stored": false, "called": false})); }
-        if body.get("password").is_some() { return Err("do not send a password".into()); }
+        let opt_in = body
+            .get("opt_in")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        if !opt_in {
+            return Ok(json!({"opt_in": false, "stored": false, "called": false}));
+        }
+        if body.get("password").is_some() {
+            return Err("do not send a password".into());
+        }
         let key = body.get("key").and_then(|v| v.as_str()).unwrap_or("");
-        let secret_ref = body.get("secret_ref").and_then(|v| v.as_str()).unwrap_or("");
+        let mut secret_ref = body
+            .get("secret_ref")
+            .and_then(|v| v.as_str())
+            .unwrap_or("")
+            .to_string();
         let endpoint = body.get("endpoint").and_then(|v| v.as_str()).unwrap_or("");
-        let loopback = endpoint.starts_with("http://127.0.0.1:") || endpoint.starts_with("http://localhost:");
+        if blocked_provider_host(endpoint) {
+            return Err("nvidia nim is not called".into());
+        }
+        let loopback =
+            endpoint.starts_with("http://127.0.0.1:") || endpoint.starts_with("http://localhost:");
         if !endpoint.starts_with("https://") && !loopback {
             return Err("api endpoint must be https, or an explicit loopback http url".into());
         }
         let masked = mask_secret(key);
-        store::kv_put(&self.db.lock().expect("db"), "ocr_api", &json!({
-            "endpoint": endpoint, "key": masked, "secret_ref": secret_ref, "opt_in": true
-        }).to_string())?;
+        let invoke = body
+            .get("invoke")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
+        if invoke && !key.is_empty() && secret_ref.is_empty() {
+            secret_ref = self.secret_put(key)?["secret_ref"]
+                .as_str()
+                .unwrap_or("")
+                .to_string();
+        }
+        store::kv_put(
+            &self.db.lock().expect("db"),
+            "ocr_api",
+            &json!({
+                "endpoint": endpoint, "key": masked, "secret_ref": secret_ref, "opt_in": true
+            })
+            .to_string(),
+        )?;
         self.audit("ocr_api", "masked");
-        Ok(json!({"opt_in": true, "key": masked, "secret_ref": secret_ref, "called": false, "inference": "not_run"}))
+        if !invoke {
+            return Ok(
+                json!({"opt_in": true, "key": masked, "secret_ref": secret_ref, "called": false, "inference": "not_run"}),
+            );
+        }
+        if !loopback {
+            return Err("this build invokes only an explicit loopback OCR endpoint".into());
+        }
+        let text = body.get("text").and_then(|v| v.as_str()).unwrap_or("");
+        if text.is_empty() {
+            return Err("nothing to send".into());
+        }
+        let bearer = if secret_ref.starts_with("local:") {
+            self.load_local_secret(&secret_ref)?
+        } else if !key.is_empty() {
+            key.to_string()
+        } else {
+            return Err("invoke needs a local secret".into());
+        };
+        let req = BuiltRequest {
+            method: "POST".into(),
+            url: endpoint.trim_end_matches('/').to_string(),
+            headers: vec![
+                ("Authorization".into(), format!("Bearer {bearer}")),
+                ("Content-Type".into(), "application/json".into()),
+            ],
+            body: json!({"text": text}).to_string(),
+        };
+        let raw = connectors::exchange_with(
+            &req,
+            connectors::ExchangePolicy {
+                allow_loopback: true,
+                allow_public: false,
+            },
+            1,
+        )
+        .map_err(|err| redact(&err, &[bearer.as_str(), key]))?;
+        Ok(json!({
+            "opt_in": true,
+            "key": masked,
+            "called": true,
+            "inference": "remote_loopback",
+            "file_operation": "none",
+            "response": redact(&raw, &[bearer.as_str(), key]),
+        }))
+    }
+
+    pub fn provider_chat(&self, body: &Value) -> Result<Value, String> {
+        if body.get("opt_in").and_then(|v| v.as_bool()) != Some(true) {
+            return Ok(
+                json!({"called": false, "reason": "opt_in required", "file_operation": "none"}),
+            );
+        }
+        let base = body.get("base_url").and_then(|v| v.as_str()).unwrap_or("");
+        if blocked_provider_host(base) {
+            return Err("nvidia nim is not called".into());
+        }
+        if !(base.starts_with("http://127.0.0.1:") || base.starts_with("http://localhost:")) {
+            return Err(
+                "this build only calls an explicit loopback OpenAI-compatible server".into(),
+            );
+        }
+        let prompt = body.get("prompt").and_then(|v| v.as_str()).unwrap_or("");
+        if prompt.is_empty() {
+            return Err("prompt required".into());
+        }
+        let mut content = prompt.to_string();
+        if body
+            .get("include_document")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false)
+        {
+            if let Some(doc) = body.get("document_text").and_then(|v| v.as_str()) {
+                content.push('\n');
+                content.push_str(doc);
+            }
+        }
+        let req = BuiltRequest {
+            method: "POST".into(),
+            url: format!("{}/v1/chat/completions", base.trim_end_matches('/')),
+            headers: vec![
+                ("Authorization".into(), "Bearer local-mock".into()),
+                ("Content-Type".into(), "application/json".into()),
+            ],
+            body: json!({"model": "local", "messages": [{"role": "user", "content": content}]})
+                .to_string(),
+        };
+        let raw = connectors::exchange_with(
+            &req,
+            connectors::ExchangePolicy {
+                allow_loopback: true,
+                allow_public: false,
+            },
+            1,
+        )?;
+        let reply = raw.split("\r\n\r\n").nth(1).unwrap_or("").to_string();
+        Ok(
+            json!({"called": true, "file_operation": "none", "auto_apply": false, "host": "loopback", "reply": reply}),
+        )
     }
 
     pub fn ocr_remove(&self) -> Result<Value, String> {
@@ -744,28 +1398,54 @@ impl App {
     }
 
     pub fn decide(&self, body: &Value) -> Result<Value, String> {
-        let rows = body.get("evidence").and_then(|v| v.as_array()).ok_or("evidence array required")?;
-        let evidence = rows.iter().map(|row| Evidence {
-            id: row.get("id").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-            kind: row.get("kind").and_then(|v| v.as_str()).unwrap_or("file").to_string(),
-            quote: row.get("quote").and_then(|v| v.as_str()).unwrap_or("").to_string(),
-            confidence: row.get("confidence").and_then(|v| v.as_f64()),
-        }).collect::<Vec<_>>();
+        let rows = body
+            .get("evidence")
+            .and_then(|v| v.as_array())
+            .ok_or("evidence array required")?;
+        let evidence = rows
+            .iter()
+            .map(|row| Evidence {
+                id: row
+                    .get("id")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string(),
+                kind: row
+                    .get("kind")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("file")
+                    .to_string(),
+                quote: row
+                    .get("quote")
+                    .and_then(|v| v.as_str())
+                    .unwrap_or("")
+                    .to_string(),
+                confidence: row.get("confidence").and_then(|v| v.as_f64()),
+            })
+            .collect::<Vec<_>>();
         let decision = decisions::decide(&evidence)?;
-        self.db.lock().expect("db").execute(
-            "INSERT INTO decisions(id,payload,created_at) VALUES(?1,?2,?3)",
-            params![random_id("dec"), decision.to_string(), util::now_rfc3339()],
-        ).map_err(|e| e.to_string())?;
+        self.db
+            .lock()
+            .expect("db")
+            .execute(
+                "INSERT INTO decisions(id,payload,created_at) VALUES(?1,?2,?3)",
+                params![random_id("dec"), decision.to_string(), util::now_rfc3339()],
+            )
+            .map_err(|e| e.to_string())?;
         Ok(decision)
     }
 
-    pub fn pay_catalog(&self) -> Value { pay::catalog() }
+    pub fn pay_catalog(&self) -> Value {
+        pay::catalog()
+    }
 
     pub fn pay_order(&self, sku: &str) -> Result<Value, String> {
         let id = random_id("ord");
         let order = pay::new_order(&id, sku)?;
         self.store_order(&order)?;
-        Ok(json!({"id": id, "status": "Pending", "sandbox": true, "amount_cents": order.amount_cents, "currency": order.currency}))
+        Ok(
+            json!({"id": id, "status": "Pending", "sandbox": true, "amount_cents": order.amount_cents, "currency": order.currency}),
+        )
     }
 
     pub fn pay_settle(&self, id: &str) -> Result<Value, String> {
@@ -775,12 +1455,96 @@ impl App {
         let amount = order.amount_cents;
         let currency = order.currency.clone();
         let sig = pay::sign(&secret, &event_id, id, amount, &currency, "paid");
-        let status = pay::apply_event(&mut order, &PayEvent {
-            event_id, order_id: id.to_string(), amount_cents: amount,
-            currency, status: "paid".into(), sig,
-        }, &secret)?;
+        let status = pay::apply_event(
+            &mut order,
+            &PayEvent {
+                event_id: event_id.clone(),
+                order_id: id.to_string(),
+                amount_cents: amount,
+                currency,
+                status: "paid".into(),
+                sig,
+            },
+            &secret,
+        )?;
+        let via = order.verified_via.clone();
         self.store_order(&order)?;
-        Ok(json!({"status": status, "sandbox": true}))
+        Ok(
+            json!({"status": status, "sandbox": true, "event_id": event_id, "verified_via": via, "credential_class": "sandbox"}),
+        )
+    }
+
+    pub fn pay_page_return(&self, id: &str, claimed: &str) -> Result<Value, String> {
+        let mut order = self.load_order(id)?;
+        let before = format!("{:?}", order.status);
+        let note = pay::note_page_return(&mut order, claimed);
+        self.store_order(&order)?;
+        Ok(
+            json!({"note": note, "claimed": claimed, "order_status": before, "page_return_is_final": false, "sandbox": true}),
+        )
+    }
+
+    pub fn pay_query(&self, id: &str) -> Result<Value, String> {
+        let mut order = self.load_order(id)?;
+        let status_word = match order.status {
+            pay::PayStatus::Pending => "pending",
+            pay::PayStatus::Failed => "failed",
+            _ => "paid",
+        };
+        let secret = self.mem.lock().expect("mem").pay_secret.clone();
+        let event_id = random_id("qry");
+        let amount = if status_word == "paid" {
+            order.amount_cents
+        } else {
+            0
+        };
+        let currency = order.currency.clone();
+        let sig = pay::sign(&secret, &event_id, id, amount, &currency, status_word);
+        let word = pay::apply_query(
+            &mut order,
+            &PayEvent {
+                event_id,
+                order_id: id.to_string(),
+                amount_cents: amount,
+                currency,
+                status: status_word.into(),
+                sig,
+            },
+            &secret,
+        )?;
+        let via = order.verified_via.clone();
+        let page = order.page_return.clone();
+        let shown = format!("{:?}", order.status);
+        self.store_order(&order)?;
+        Ok(
+            json!({"query_result": word, "order_status": shown, "verified_via": via, "page_return": page, "page_return_is_final": false, "sandbox": true}),
+        )
+    }
+
+    pub fn pay_notify(&self, id: &str, event_id: &str, status: &str) -> Result<Value, String> {
+        let mut order = self.load_order(id)?;
+        let secret = self.mem.lock().expect("mem").pay_secret.clone();
+        let amount = order.amount_cents;
+        let currency = order.currency.clone();
+        let sig = pay::sign(&secret, event_id, id, amount, &currency, status);
+        let word = pay::apply_event(
+            &mut order,
+            &PayEvent {
+                event_id: event_id.to_string(),
+                order_id: id.to_string(),
+                amount_cents: amount,
+                currency,
+                status: status.into(),
+                sig,
+            },
+            &secret,
+        )?;
+        let via = order.verified_via.clone();
+        let shown = format!("{:?}", order.status);
+        self.store_order(&order)?;
+        Ok(
+            json!({"status": word, "order_status": shown, "verified_via": via, "event_id": event_id, "sandbox": true, "credential_class": "sandbox"}),
+        )
     }
 
     pub fn pay_event(&self, event: PayEvent) -> Result<Value, String> {
@@ -793,7 +1557,9 @@ impl App {
 
     pub fn pay_deliver(&self, id: &str, fail_next: bool) -> Result<Value, String> {
         let mut order = self.load_order(id)?;
-        if fail_next { order.fail_next_delivery = true; }
+        if fail_next {
+            order.fail_next_delivery = true;
+        }
         let status = pay::deliver(&mut order);
         self.store_order(&order)?;
         let status = status?;
@@ -804,7 +1570,9 @@ impl App {
         let mut order = self.load_order(id)?;
         let status = pay::refund(&mut order, amount)?;
         self.store_order(&order)?;
-        Ok(json!({"status": status, "entitlement_qty": order.entitlement_qty, "refunded_cents": order.refunded_cents}))
+        Ok(
+            json!({"status": status, "entitlement_qty": order.entitlement_qty, "refunded_cents": order.refunded_cents}),
+        )
     }
 
     pub fn pay_reconcile(&self) -> Value {
@@ -812,10 +1580,18 @@ impl App {
         pay::reconcile(&orders)
     }
 
-    pub fn pay_production(&self) -> Value { pay::production_blocked() }
+    pub fn pay_production(&self) -> Value {
+        pay::production_blocked()
+    }
 
     fn load_order(&self, id: &str) -> Result<pay::Order, String> {
-        self.mem.lock().expect("mem").orders.get(id).cloned().ok_or_else(|| "order not found".into())
+        self.mem
+            .lock()
+            .expect("mem")
+            .orders
+            .get(id)
+            .cloned()
+            .ok_or_else(|| "order not found".into())
     }
 
     fn store_order(&self, order: &pay::Order) -> Result<(), String> {
@@ -824,27 +1600,45 @@ impl App {
             "INSERT INTO orders(id,payload) VALUES(?1,?2) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload",
             params![order.id, payload],
         ).map_err(|e| e.to_string())?;
-        self.mem.lock().expect("mem").orders.insert(order.id.clone(), order.clone());
+        self.mem
+            .lock()
+            .expect("mem")
+            .orders
+            .insert(order.id.clone(), order.clone());
         Ok(())
     }
 
     pub fn providers(&self) -> Value {
-        let names = ["claude", "codex", "agent", "grok", "opencode", "fx", "kiro", "pi", "muse"];
+        let names = [
+            "claude", "codex", "agent", "grok", "opencode", "fx", "kiro", "pi", "muse",
+        ];
         let found: Vec<Value> = names.iter().map(|n| json!({"argv0": n, "installed": which(n).is_some(), "path": which(n), "invoked": false})).collect();
         json!({"providers": found, "antigravity": "no_cli_in_this_build", "live_calls": 0})
     }
 
     pub fn provider_run(&self, argv: &[String], confirm: &str) -> Result<Value, String> {
-        if confirm != "CONFIRM" { return Err("confirmation required".into()); }
+        if confirm != "CONFIRM" {
+            return Err("confirmation required".into());
+        }
         self.ensure_write()?;
-        run_argv(argv, &self.cfg.lock().expect("cfg").data_dir, Duration::from_secs(3))
+        run_argv(
+            argv,
+            &self.cfg.lock().expect("cfg").data_dir,
+            Duration::from_secs(3),
+        )
     }
 
     pub fn terminal(&self, argv: &[String], cwd: &str, confirm: &str) -> Result<Value, String> {
-        if confirm != "CONFIRM" { return Err("confirmation required".into()); }
+        if confirm != "CONFIRM" {
+            return Err("confirmation required".into());
+        }
         let mem = self.mem.lock().expect("mem");
-        if !mem.terminal_allowed { return Err("forbidden by admin policy".into()); }
-        if mem.permission == "read-only" { return Err("forbidden by permission mode read-only".into()); }
+        if !mem.terminal_allowed {
+            return Err("forbidden by admin policy".into());
+        }
+        if mem.permission == "read-only" {
+            return Err("forbidden by permission mode read-only".into());
+        }
         let root = mem.root.clone().ok_or("select a root first")?;
         drop(mem);
         let cwd_path = if cwd == "." || cwd.is_empty() {
@@ -852,11 +1646,17 @@ impl App {
         } else {
             paths::resolve_inside(&root, cwd)?
         };
-        if argv.iter().any(|a| a.contains('\n') || a.contains(';') || a.contains('|')) {
+        if argv
+            .iter()
+            .any(|a| a.contains('\n') || a.contains(';') || a.contains('|'))
+        {
             return Err("shell metacharacters rejected".into());
         }
         let mut cmd = Command::new(&argv[0]);
-        cmd.args(&argv[1..]).current_dir(&cwd_path).stdout(Stdio::piped()).stderr(Stdio::piped());
+        cmd.args(&argv[1..])
+            .current_dir(&cwd_path)
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
         let out = cmd.output().map_err(|e| e.to_string())?;
         Ok(json!({
             "code": out.status.code(),
@@ -872,20 +1672,56 @@ impl App {
     }
 
     pub fn git_status(&self, repo: &Path) -> Result<Value, String> {
-        let out = Command::new("git").arg("-C").arg(repo).arg("status").arg("--short").output().map_err(|e| e.to_string())?;
-        Ok(json!({"status": String::from_utf8_lossy(&out.stdout).to_string(), "code": out.status.code()}))
+        let out = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .arg("status")
+            .arg("--short")
+            .output()
+            .map_err(|e| e.to_string())?;
+        Ok(
+            json!({"status": String::from_utf8_lossy(&out.stdout).to_string(), "code": out.status.code()}),
+        )
     }
 
     pub fn git_worktree(&self, repo: &Path, name: &str) -> Result<Value, String> {
-        if name.contains('/') || name.contains("..") { return Err("bad worktree name".into()); }
-        let dest = self.cfg.lock().expect("cfg").data_dir.join("worktrees").join(name);
-        fs::create_dir_all(dest.parent().unwrap()).map_err(|e| e.to_string())?;
-        let add = Command::new("git").arg("-C").arg(repo).args(["worktree", "add", "--detach"]).arg(&dest).output().map_err(|e| e.to_string())?;
-        if !add.status.success() {
-            return Err(format!("worktree add failed: {}", String::from_utf8_lossy(&add.stderr)));
+        if name.contains('/') || name.contains("..") {
+            return Err("bad worktree name".into());
         }
-        let list = Command::new("git").arg("-C").arg(repo).args(["worktree", "list", "--porcelain"]).output().map_err(|e| e.to_string())?;
-        let remove = Command::new("git").arg("-C").arg(repo).args(["worktree", "remove", "--force"]).arg(&dest).output().map_err(|e| e.to_string())?;
+        let dest = self
+            .cfg
+            .lock()
+            .expect("cfg")
+            .data_dir
+            .join("worktrees")
+            .join(name);
+        fs::create_dir_all(dest.parent().unwrap()).map_err(|e| e.to_string())?;
+        let add = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .args(["worktree", "add", "--detach"])
+            .arg(&dest)
+            .output()
+            .map_err(|e| e.to_string())?;
+        if !add.status.success() {
+            return Err(format!(
+                "worktree add failed: {}",
+                String::from_utf8_lossy(&add.stderr)
+            ));
+        }
+        let list = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .args(["worktree", "list", "--porcelain"])
+            .output()
+            .map_err(|e| e.to_string())?;
+        let remove = Command::new("git")
+            .arg("-C")
+            .arg(repo)
+            .args(["worktree", "remove", "--force"])
+            .arg(&dest)
+            .output()
+            .map_err(|e| e.to_string())?;
         Ok(json!({
             "created": dest,
             "list": String::from_utf8_lossy(&list.stdout).to_string(),
@@ -894,13 +1730,22 @@ impl App {
     }
 
     pub fn textgen(&self, files: &[String]) -> Result<Value, String> {
-        let draft = format!("ymzz: note {} local path(s)\n\nGenerated by Claude.\n", files.len());
+        let draft = format!(
+            "ymzz: note {} local path(s)\n\nGenerated by Claude.\n",
+            files.len()
+        );
         let cleaned = t3bridge::clean_commit_message(&draft)?;
-        Ok(json!({"engine": "local_template_plus_t3_mergeMessage", "model": false, "message": cleaned}))
+        Ok(
+            json!({"engine": "local_template_plus_t3_mergeMessage", "model": false, "message": cleaned}),
+        )
     }
 
     pub fn task_save(&self, body: &Value) -> Result<Value, String> {
-        let id = body.get("id").and_then(|v| v.as_str()).map(|s| s.to_string()).unwrap_or_else(|| random_id("task"));
+        let id = body
+            .get("id")
+            .and_then(|v| v.as_str())
+            .map(|s| s.to_string())
+            .unwrap_or_else(|| random_id("task"));
         self.db.lock().expect("db").execute(
             "INSERT INTO tasks(id,payload) VALUES(?1,?2) ON CONFLICT(id) DO UPDATE SET payload=excluded.payload",
             params![id, body.to_string()],
@@ -910,8 +1755,14 @@ impl App {
 
     pub fn task_tick(&self) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT id,payload FROM tasks").map_err(|e| e.to_string())?;
-        let rows = stmt.query_map([], |row| Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))).map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare("SELECT id,payload FROM tasks")
+            .map_err(|e| e.to_string())?;
+        let rows = stmt
+            .query_map([], |row| {
+                Ok((row.get::<_, String>(0)?, row.get::<_, String>(1)?))
+            })
+            .map_err(|e| e.to_string())?;
         let mut n = 0;
         let mut ids = Vec::new();
         for row in rows {
@@ -924,17 +1775,27 @@ impl App {
         }
         drop(stmt);
         drop(db);
-        for id in ids { self.audit("task", &id); }
+        for id in ids {
+            self.audit("task", &id);
+        }
         Ok(json!({"ran": n, "outbound": false}))
     }
 
     pub fn hook(&self, id: &str, secret: &str, event_id: &str) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let payload: String = db.query_row("SELECT payload FROM tasks WHERE id=?1", params![id], |r| r.get(0)).map_err(|_| "hook not found".to_string())?;
+        let payload: String = db
+            .query_row("SELECT payload FROM tasks WHERE id=?1", params![id], |r| {
+                r.get(0)
+            })
+            .map_err(|_| "hook not found".to_string())?;
         let v: Value = serde_json::from_str(&payload).map_err(|e| e.to_string())?;
-        if v.get("secret").and_then(|s| s.as_str()) != Some(secret) { return Err("bad hook secret".into()); }
+        if v.get("secret").and_then(|s| s.as_str()) != Some(secret) {
+            return Err("bad hook secret".into());
+        }
         let key = format!("hook:{id}:{event_id}");
-        if store::kv_get(&db, &key)?.is_some() { return Ok(json!({"duplicate": true})); }
+        if store::kv_get(&db, &key)?.is_some() {
+            return Ok(json!({"duplicate": true}));
+        }
         store::kv_put(&db, &key, "1")?;
         drop(db);
         self.audit("hook", event_id);
@@ -943,17 +1804,26 @@ impl App {
 
     pub fn activity(&self) -> Result<Value, String> {
         let db = self.db.lock().expect("db");
-        let mut stmt = db.prepare("SELECT action,detail,created_at FROM audit ORDER BY created_at DESC LIMIT 100").map_err(|e| e.to_string())?;
+        let mut stmt = db
+            .prepare(
+                "SELECT action,detail,created_at FROM audit ORDER BY created_at DESC LIMIT 100",
+            )
+            .map_err(|e| e.to_string())?;
         let rows = stmt.query_map([], |row| Ok(json!({"action": row.get::<_, String>(0)?, "detail": row.get::<_, String>(1)?, "created_at": row.get::<_, String>(2)?}))).map_err(|e| e.to_string())?;
         let mut items = Vec::new();
-        for row in rows { items.push(row.map_err(|e| e.to_string())?); }
+        for row in rows {
+            items.push(row.map_err(|e| e.to_string())?);
+        }
         Ok(json!({"events": items}))
     }
 
     pub fn v020(&self) -> Result<Value, String> {
         let repo = self.cfg.lock().expect("cfg").repo_root.clone();
         let cfg_path = repo.join("sync.config.json");
-        let cfg: Value = fs::read_to_string(&cfg_path).ok().and_then(|t| serde_json::from_str(&t).ok()).unwrap_or(json!({}));
+        let cfg: Value = fs::read_to_string(&cfg_path)
+            .ok()
+            .and_then(|t| serde_json::from_str(&t).ok())
+            .unwrap_or(json!({}));
         let mut notes = Vec::new();
         if let Ok(rd) = fs::read_dir(repo.join("notion")) {
             for year in rd.flatten() {
@@ -961,15 +1831,25 @@ impl App {
                     if let Ok(files) = fs::read_dir(year.path()) {
                         for f in files.flatten() {
                             if f.path().extension().and_then(|e| e.to_str()) == Some("md") {
-                                notes.push(f.path().strip_prefix(&repo).unwrap_or(f.path().as_path()).to_string_lossy().to_string());
+                                notes.push(
+                                    f.path()
+                                        .strip_prefix(&repo)
+                                        .unwrap_or(f.path().as_path())
+                                        .to_string_lossy()
+                                        .to_string(),
+                                );
                             }
                         }
                     }
                 }
             }
         }
-        let started = fs::read_to_string(repo.join(".ymzz/started")).ok().map(|s| s.trim().to_string());
-        let last = fs::read_to_string(repo.join(".ymzz/last-run")).ok().map(|s| s.trim().to_string());
+        let started = fs::read_to_string(repo.join(".ymzz/started"))
+            .ok()
+            .map(|s| s.trim().to_string());
+        let last = fs::read_to_string(repo.join(".ymzz/last-run"))
+            .ok()
+            .map(|s| s.trim().to_string());
         Ok(json!({
             "package": "node automation remains the writer",
             "timezone": cfg.get("timezone").cloned().unwrap_or(json!("")),
@@ -1001,8 +1881,12 @@ impl App {
     }
 
     pub fn prompt_link(url: &str) -> Result<String, String> {
-        let rest = url.strip_prefix("ymzz://thread/").ok_or("not an ymzz thread link")?;
-        if rest.is_empty() || rest.contains('/') || rest.contains('?') { return Err("bad thread link".into()); }
+        let rest = url
+            .strip_prefix("ymzz://thread/")
+            .ok_or("not an ymzz thread link")?;
+        if rest.is_empty() || rest.contains('/') || rest.contains('?') {
+            return Err("bad thread link".into());
+        }
         Ok(rest.to_string())
     }
 
@@ -1018,6 +1902,7 @@ fn draft_json(spec: &QuerySpec) -> Value {
         "end": spec.end,
         "drive": spec.drive,
         "ext": spec.ext,
+        "group": spec.group,
         "more_enabled": spec.more_enabled,
         "name_contains": spec.name_contains,
     })
@@ -1030,17 +1915,30 @@ fn empty_to_none(v: Option<&str>) -> Option<String> {
 fn load_or_create(path: &Path) -> Result<String, String> {
     if let Ok(text) = fs::read_to_string(path) {
         let trimmed = text.trim().to_string();
-        if !trimmed.is_empty() { return Ok(trimmed); }
+        if !trimmed.is_empty() {
+            return Ok(trimmed);
+        }
     }
     let value = random_id("tok");
-    let mut file = fs::OpenOptions::new().create(true).write(true).truncate(true).mode(0o600).open(path).map_err(|e| e.to_string())?;
-    file.write_all(value.as_bytes()).map_err(|e| e.to_string())?;
+    let mut file = fs::OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .mode(0o600)
+        .open(path)
+        .map_err(|e| e.to_string())?;
+    file.write_all(value.as_bytes())
+        .map_err(|e| e.to_string())?;
     Ok(value)
 }
 
 fn load_orders(conn: &Connection) -> Result<BTreeMap<String, pay::Order>, String> {
-    let mut stmt = conn.prepare("SELECT payload FROM orders").map_err(|e| e.to_string())?;
-    let rows = stmt.query_map([], |row| row.get::<_, String>(0)).map_err(|e| e.to_string())?;
+    let mut stmt = conn
+        .prepare("SELECT payload FROM orders")
+        .map_err(|e| e.to_string())?;
+    let rows = stmt
+        .query_map([], |row| row.get::<_, String>(0))
+        .map_err(|e| e.to_string())?;
     let mut map = BTreeMap::new();
     for row in rows {
         let text = row.map_err(|e| e.to_string())?;
@@ -1054,40 +1952,117 @@ fn load_orders(conn: &Connection) -> Result<BTreeMap<String, pay::Order>, String
 fn preview_request(kind: &str, connector: &Value, record: &Value) -> Result<BuiltRequest, String> {
     let token = "secret-from-env-not-logged";
     match kind {
-        "notion" => Ok(connectors::notion_upsert(token, connector.get("resource_id").and_then(|v| v.as_str()).unwrap_or("db"), record)),
-        "google_sheets" => Ok(connectors::sheets_append(token, connector.get("resource_id").and_then(|v| v.as_str()).unwrap_or("sheet"), "A1", &json!([[record]]))),
-        "google_docs" => Ok(connectors::docs_batch(token, connector.get("resource_id").and_then(|v| v.as_str()).unwrap_or("doc"), &record.to_string())),
-        "github" => Ok(connectors::github_comment(token, connector.get("resource_id").and_then(|v| v.as_str()).unwrap_or("owner/repo"), 1, "synthetic")),
-        "feishu" => Ok(connectors::feishu_or_lark(false, token, "app", "tbl", record)),
-        "lark" => Ok(connectors::feishu_or_lark(true, token, "app", "tbl", record)),
-        "oomol_hosted" => Ok(connectors::oomol_hosted(token, connector.get("team").and_then(|v| v.as_str()).unwrap_or("team"), record)),
+        "notion" => Ok(connectors::notion_upsert(
+            token,
+            connector
+                .get("resource_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("db"),
+            record,
+        )),
+        "google_sheets" => Ok(connectors::sheets_append(
+            token,
+            connector
+                .get("resource_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("sheet"),
+            "A1",
+            &json!([[record]]),
+        )),
+        "google_docs" => Ok(connectors::docs_batch(
+            token,
+            connector
+                .get("resource_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("doc"),
+            &record.to_string(),
+        )),
+        "github" => Ok(connectors::github_comment(
+            token,
+            connector
+                .get("resource_id")
+                .and_then(|v| v.as_str())
+                .unwrap_or("owner/repo"),
+            1,
+            "synthetic",
+        )),
+        "feishu" => Ok(connectors::feishu_or_lark(
+            false, token, "app", "tbl", record,
+        )),
+        "lark" => Ok(connectors::feishu_or_lark(
+            true, token, "app", "tbl", record,
+        )),
+        "oomol_hosted" => Ok(connectors::oomol_hosted(
+            token,
+            connector
+                .get("team")
+                .and_then(|v| v.as_str())
+                .unwrap_or("team"),
+            record,
+        )),
         other => Err(format!("unsupported connector {other}")),
     }
 }
 
-fn paddle_probe() -> Result<Value, String> {
+fn blocked_provider_host(url: &str) -> bool {
+    let host = url
+        .split("://")
+        .nth(1)
+        .unwrap_or(url)
+        .split('/')
+        .next()
+        .unwrap_or("");
+    let host = host.split(':').next().unwrap_or(host).to_ascii_lowercase();
+    host == "nvidia.com" || host.ends_with(".nvidia.com")
+}
+
+fn paddle_probe(data_dir: &Path) -> Result<Value, String> {
     let script = util::repo_root().join("app/ocr/paddle_worker.py");
-    let out = Command::new("python3").arg(&script).output().map_err(|e| e.to_string())?;
+    let python = crate::ocrflow::python_for(data_dir);
+    let out = Command::new(python)
+        .arg(&script)
+        .output()
+        .map_err(|e| e.to_string())?;
     let text = String::from_utf8_lossy(&out.stdout);
-    let v: Value = serde_json::from_str(text.trim()).unwrap_or(json!({"status": "probe_failed", "raw": text.to_string()}));
+    let v: Value = serde_json::from_str(text.trim())
+        .unwrap_or(json!({"status": "probe_failed", "raw": text.to_string()}));
     Ok(v)
 }
 
 fn run_argv(argv: &[String], cwd: &Path, timeout: Duration) -> Result<Value, String> {
-    if argv.is_empty() { return Err("empty argv".into()); }
-    if argv.iter().any(|a| a.contains('|') || a.contains(';') || a.contains('\n')) {
+    if argv.is_empty() {
+        return Err("empty argv".into());
+    }
+    if argv
+        .iter()
+        .any(|a| a.contains('|') || a.contains(';') || a.contains('\n'))
+    {
         return Err("shell metacharacters rejected".into());
     }
-    let mut child = Command::new(&argv[0]).args(&argv[1..]).current_dir(cwd).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn().map_err(|e| e.to_string())?;
+    let mut child = Command::new(&argv[0])
+        .args(&argv[1..])
+        .current_dir(cwd)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped())
+        .spawn()
+        .map_err(|e| e.to_string())?;
     let start = Instant::now();
     loop {
         match child.try_wait().map_err(|e| e.to_string())? {
             Some(status) => {
                 let mut stdout = String::new();
                 let mut stderr = String::new();
-                if let Some(mut out) = child.stdout.take() { use std::io::Read; out.read_to_string(&mut stdout).ok(); }
-                if let Some(mut err) = child.stderr.take() { use std::io::Read; err.read_to_string(&mut stderr).ok(); }
-                return Ok(json!({"code": status.code(), "stdout": stdout, "stderr": stderr, "shell": false}));
+                if let Some(mut out) = child.stdout.take() {
+                    use std::io::Read;
+                    out.read_to_string(&mut stdout).ok();
+                }
+                if let Some(mut err) = child.stderr.take() {
+                    use std::io::Read;
+                    err.read_to_string(&mut stderr).ok();
+                }
+                return Ok(
+                    json!({"code": status.code(), "stdout": stdout, "stderr": stderr, "shell": false}),
+                );
             }
             None if start.elapsed() > timeout => {
                 let _ = child.kill();
@@ -1105,7 +2080,11 @@ mod tests {
     use std::os::unix::fs::symlink;
 
     fn app() -> (App, PathBuf) {
-        let dir = std::env::temp_dir().join(format!("ymzz-engine-{}-{}", std::process::id(), random_id("d")));
+        let dir = std::env::temp_dir().join(format!(
+            "ymzz-engine-{}-{}",
+            std::process::id(),
+            random_id("d")
+        ));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         let app = App::open(&dir, &util::repo_root()).unwrap();
@@ -1116,22 +2095,36 @@ mod tests {
     fn panel_query_selects_frozen_snapshot() {
         let (app, dir) = app();
         app.load_synthetic().unwrap();
-        let before = app.set_draft(&json!({"today":"2026-11-07","preset":3,"drive":"","ext":""})).unwrap();
+        let before = app
+            .set_draft(&json!({"today":"2026-11-07","preset":3,"drive":"","ext":""}))
+            .unwrap();
         assert_eq!(before["queried"], false);
         assert!(app.snapshot()["snapshot"].is_null() || app.snapshot().get("ids").is_none());
         let q = app.query().unwrap();
         assert_eq!(q["count"], 5);
-        let ids = app.select_all(false).unwrap()["ids"].as_array().unwrap().clone();
+        let ids = app.select_all(false).unwrap()["ids"]
+            .as_array()
+            .unwrap()
+            .clone();
         app.mem.lock().unwrap().records.push(Rec {
-            id: "SYN-FUTURE".into(), drive: "C:".into(), path: "C:/new.py".into(), ext: ".py".into(),
-            modified: Some("2026-11-07".into()), readable: true, version: "2".into(), bytes: 1,
-            skip_reason: None, escapes: false, kind: "synthetic".into(),
+            id: "SYN-FUTURE".into(),
+            drive: "C:".into(),
+            path: "C:/new.py".into(),
+            ext: ".py".into(),
+            modified: Some("2026-11-07".into()),
+            readable: true,
+            version: "2".into(),
+            bytes: 1,
+            skip_reason: None,
+            escapes: false,
+            kind: "synthetic".into(),
         });
         let again = app.select_all(false).unwrap();
         assert_eq!(again["ids"].as_array().unwrap(), &ids);
         assert!(!again["ids"].to_string().contains("SYN-FUTURE"));
         assert!(again["label"].as_str().unwrap().contains("不含以後新增"));
-        app.set_draft(&json!({"today":"2026-11-07","preset":7})).unwrap();
+        app.set_draft(&json!({"today":"2026-11-07","preset":7}))
+            .unwrap();
         app.query().unwrap();
         let cmp = app.compare();
         assert_eq!(cmp["formula"], "y = day_count / period_total");
@@ -1160,9 +2153,16 @@ mod tests {
         let recs = app.mem.lock().unwrap().records.clone();
         let env = recs.iter().find(|r| r.path.ends_with(".env")).unwrap();
         assert!(!env.readable);
-        assert_eq!(env.skip_reason.as_deref(), Some("secret_name_content_not_read"));
+        assert_eq!(
+            env.skip_reason.as_deref(),
+            Some("secret_name_content_not_read")
+        );
         let link = recs.iter().find(|r| r.path.ends_with("leak")).unwrap();
-        assert!(link.escapes || link.skip_reason.as_deref() == Some("symlink_not_followed") || link.skip_reason.as_deref() == Some("symlink_escapes_root"));
+        assert!(
+            link.escapes
+                || link.skip_reason.as_deref() == Some("symlink_not_followed")
+                || link.skip_reason.as_deref() == Some("symlink_escapes_root")
+        );
         assert!(!link.readable);
         let _ = fs::remove_dir_all(&dir);
     }
@@ -1177,13 +2177,16 @@ mod tests {
         fs::write(root.join("a.md"), b"one").unwrap();
         app.set_root(&root.to_string_lossy()).unwrap();
         assert!(app.write_md("../x.md", "no", false).is_err());
-        app.write_md("nested/new.md", "# synthetic\n", false).unwrap();
+        app.write_md("nested/new.md", "# synthetic\n", false)
+            .unwrap();
         assert!(root.join("nested/new.md").is_file());
         assert!(app.write_md("nested/new.md", "again", false).is_err());
         let plan = app.plan_move("a.md", "b.md").unwrap();
         assert_eq!(plan["dry_run"], true);
-        app.confirm_move(plan["id"].as_str().unwrap(), "NO").unwrap_err();
-        app.confirm_move(plan["id"].as_str().unwrap(), "CONFIRM").unwrap();
+        app.confirm_move(plan["id"].as_str().unwrap(), "NO")
+            .unwrap_err();
+        app.confirm_move(plan["id"].as_str().unwrap(), "CONFIRM")
+            .unwrap();
         assert!(root.join("b.md").is_file());
         app.undo_move(plan["id"].as_str().unwrap()).unwrap();
         assert!(root.join("a.md").is_file());
@@ -1193,12 +2196,18 @@ mod tests {
     #[test]
     fn threads_roundtrip_and_search() {
         let (app, dir) = app();
-        let id = app.threads_create("合成對話").unwrap()["id"].as_str().unwrap().to_string();
+        let id = app.threads_create("合成對話").unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
         app.message(&id, "user", "Deploy the Deployment").unwrap();
         app.attach(&id, "note.txt", b"synthetic").unwrap();
         let found = app.search("deploy").unwrap();
         assert_eq!(found["hits"].as_array().unwrap().len(), 1);
-        let ck = app.checkpoint(&id).unwrap()["id"].as_str().unwrap().to_string();
+        let ck = app.checkpoint(&id).unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
         app.message(&id, "user", "later").unwrap();
         app.restore_checkpoint(&ck).unwrap();
         let exported = app.export_thread(&id).unwrap();
@@ -1206,12 +2215,24 @@ mod tests {
         let guest = app.guest(&id).unwrap();
         assert!(app.guest_read(guest["token"].as_str().unwrap()).is_ok());
         app.archive_thread(&id, true).unwrap();
-        assert_eq!(app.threads_list(true).unwrap()["threads"].as_array().unwrap().len(), 1);
-        let imported = app.import_thread(&json!({"title":"in","messages":[{"role":"user","content":"keep"}]})).unwrap();
+        assert_eq!(
+            app.threads_list(true).unwrap()["threads"]
+                .as_array()
+                .unwrap()
+                .len(),
+            1
+        );
+        let imported = app
+            .import_thread(&json!({"title":"in","messages":[{"role":"user","content":"keep"}]}))
+            .unwrap();
         assert!(imported["id"].is_string());
         app.retention(0).unwrap();
-        let html_id = app.threads_create("html").unwrap()["id"].as_str().unwrap().to_string();
-        app.message(&html_id, "assistant", "<script>alert(1)</script>").unwrap();
+        let html_id = app.threads_create("html").unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        app.message(&html_id, "assistant", "<script>alert(1)</script>")
+            .unwrap();
         app.delete_thread(&html_id).unwrap();
         let _ = fs::remove_dir_all(&dir);
     }
@@ -1228,11 +2249,17 @@ mod tests {
             "kind":"notion","label":"synthetic","resource_id":"db","secret_ref":"env:NOTION_TOKEN","mapping": mapping,
             "team":"should-clear","oauth_issuer":"https://example.invalid"
         })).unwrap()["id"].as_str().unwrap().to_string();
-        assert!(app.connector_save(&json!({"secret":"super-secret-value"})).is_err());
+        assert!(app
+            .connector_save(&json!({"secret":"super-secret-value"}))
+            .is_err());
         let rec = json!({"title":"t","date":"2026-11-07","record_id":"SYN-1","version":"1"});
-        let first = app.connector_sync(&id, &json!({"transport":"inproc","records":[rec.clone()]})).unwrap();
+        let first = app
+            .connector_sync(&id, &json!({"transport":"inproc","records":[rec.clone()]}))
+            .unwrap();
         assert_eq!(first["applied"], 1);
-        let second = app.connector_sync(&id, &json!({"transport":"inproc","records":[rec]})).unwrap();
+        let second = app
+            .connector_sync(&id, &json!({"transport":"inproc","records":[rec]}))
+            .unwrap();
         assert_eq!(second["duplicates"], 1);
         let logs = app.connector_logs(&id).unwrap().to_string();
         assert!(!logs.contains("super-secret-value"));
@@ -1243,7 +2270,11 @@ mod tests {
         let _guard = crate::connectors::ENV_LOCK.lock().expect("env");
         std::env::remove_var("YMZZ_CONNECTOR_NET");
         let live = app.connector_sync(&id, &json!({"transport":"live","records":[{"title":"t","date":"2026-11-07","record_id":"SYN-2","version":"1"}]})).unwrap_err();
-        assert!(live.contains("live_network_disabled") || live.contains("blocked") || live.contains("public"));
+        assert!(
+            live.contains("live_network_disabled")
+                || live.contains("blocked")
+                || live.contains("public")
+        );
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -1256,9 +2287,13 @@ mod tests {
         use std::os::unix::fs::PermissionsExt;
         perms.set_mode(0o755);
         fs::set_permissions(&bin, perms).unwrap();
-        let ran = app.provider_run(&[bin.to_string_lossy().to_string()], "CONFIRM").unwrap();
+        let ran = app
+            .provider_run(&[bin.to_string_lossy().to_string()], "CONFIRM")
+            .unwrap();
         assert!(ran["stdout"].as_str().unwrap().contains("synthetic-ok"));
-        assert!(app.provider_run(&[bin.to_string_lossy().to_string()], "no").is_err());
+        assert!(app
+            .provider_run(&[bin.to_string_lossy().to_string()], "no")
+            .is_err());
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -1269,12 +2304,19 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         app.set_root(&root.to_string_lossy()).unwrap();
         app.set_permission("read-only").unwrap();
-        assert!(app.terminal(&["/bin/echo".into(), "hi".into()], ".", "CONFIRM").is_err());
+        assert!(app
+            .terminal(&["/bin/echo".into(), "hi".into()], ".", "CONFIRM")
+            .is_err());
         app.set_permission("workspace-write").unwrap();
-        let out = app.terminal(&["/bin/echo".into(), "synthetic-ok".into()], ".", "CONFIRM").unwrap();
+        let out = app
+            .terminal(&["/bin/echo".into(), "synthetic-ok".into()], ".", "CONFIRM")
+            .unwrap();
         assert!(out["stdout"].as_str().unwrap().contains("synthetic-ok"));
         app.set_policy(false);
-        assert!(app.terminal(&["/bin/echo".into(), "x".into()], ".", "CONFIRM").unwrap_err().contains("policy"));
+        assert!(app
+            .terminal(&["/bin/echo".into(), "x".into()], ".", "CONFIRM")
+            .unwrap_err()
+            .contains("policy"));
         let _ = fs::remove_dir_all(&dir);
     }
 
@@ -1283,17 +2325,48 @@ mod tests {
         let (app, dir) = app();
         let repo = dir.join("repo");
         fs::create_dir_all(&repo).unwrap();
-        assert!(Command::new("git").arg("-C").arg(&repo).args(["init"]).status().unwrap().success());
-        Command::new("git").arg("-C").arg(&repo).args(["config", "user.email", "synthetic@example.com"]).status().unwrap();
-        Command::new("git").arg("-C").arg(&repo).args(["config", "user.name", "synthetic"]).status().unwrap();
+        assert!(Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(["init"])
+            .status()
+            .unwrap()
+            .success());
+        Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(["config", "user.email", "synthetic@example.com"])
+            .status()
+            .unwrap();
+        Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(["config", "user.name", "synthetic"])
+            .status()
+            .unwrap();
         fs::write(repo.join("README"), b"synthetic\n").unwrap();
-        Command::new("git").arg("-C").arg(&repo).args(["add", "README"]).status().unwrap();
-        assert!(Command::new("git").arg("-C").arg(&repo).args(["commit", "-m", "init"]).status().unwrap().success());
+        Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(["add", "README"])
+            .status()
+            .unwrap();
+        assert!(Command::new("git")
+            .arg("-C")
+            .arg(&repo)
+            .args(["commit", "-m", "init"])
+            .status()
+            .unwrap()
+            .success());
         let wt = app.git_worktree(&repo, "slice").unwrap();
         assert_eq!(wt["removed"], true);
         assert!(wt["list"].as_str().unwrap().contains("worktrees"));
         let text = app.textgen(&["README".into()]).unwrap();
-        assert!(!text["message"].as_str().unwrap().to_lowercase().contains("generated by claude"));
+        assert!(!text["message"]
+            .as_str()
+            .unwrap()
+            .to_lowercase()
+            .contains("generated by claude"));
         assert_eq!(text["model"], false);
         let _ = fs::remove_dir_all(&dir);
     }
@@ -1310,7 +2383,10 @@ mod tests {
 
     #[test]
     fn prompt_link() {
-        assert_eq!(App::prompt_link("ymzz://thread/thr_abc").unwrap(), "thr_abc");
+        assert_eq!(
+            App::prompt_link("ymzz://thread/thr_abc").unwrap(),
+            "thr_abc"
+        );
         assert!(App::prompt_link("https://example.com/thr_abc").is_err());
         let _ = parse_ymd("2026-11-07").unwrap();
         let _ = preset_days(3).unwrap();
@@ -1319,18 +2395,32 @@ mod tests {
     #[test]
     fn task_and_hook() {
         let (app, dir) = app();
-        app.task_save(&json!({"id":"t1","kind":"note","secret":"hook-secret"})).unwrap();
+        app.task_save(&json!({"id":"t1","kind":"note","secret":"hook-secret"}))
+            .unwrap();
         assert_eq!(app.task_tick().unwrap()["outbound"], false);
         let ok = app.hook("t1", "hook-secret", "evt").unwrap();
         assert_eq!(ok["duplicate"], false);
-        assert_eq!(app.hook("t1", "hook-secret", "evt").unwrap()["duplicate"], true);
+        assert_eq!(
+            app.hook("t1", "hook-secret", "evt").unwrap()["duplicate"],
+            true
+        );
         assert!(app.hook("t1", "nope", "evt2").is_err());
-        let ocr = app.ocr_bytes(&pdf::digital_pdf("USD 123.45 synthetic")).unwrap();
+        let ocr = app
+            .ocr_bytes(&pdf::digital_pdf("USD 123.45 synthetic"))
+            .unwrap();
         assert!(ocr["text"].as_str().unwrap().contains("USD 123.45"));
         let scan = app.ocr_bytes(&pdf::scanned_pdf()).unwrap();
         assert_eq!(scan["needs_ocr"], true);
-        assert!(scan["paddle"]["status"].as_str().unwrap().contains("not_bundled") || scan["paddle"]["inference"] == "not_run");
-        assert!(app.ocr_download().is_err());
+        assert!(
+            scan["paddle"]["status"]
+                .as_str()
+                .unwrap()
+                .contains("not_bundled")
+                || scan["paddle"]["inference"] == "not_run"
+        );
+        let catalog = app.ocr_catalog();
+        assert_eq!(catalog["downloadable"], true);
+        assert!(catalog["models"][0]["sha256"].as_str().unwrap().len() == 64);
         let decision = app.decide(&json!({"evidence":[{"id":"e","kind":"ocr","quote":"USD 123.45","confidence":0.2}]})).unwrap();
         assert_eq!(decision["auto_apply"], false);
         let _ = fs::remove_dir_all(&dir);
@@ -1339,12 +2429,193 @@ mod tests {
     #[test]
     fn payments_roundtrip() {
         let (app, dir) = app();
-        let id = app.pay_order("connector-automation-sandbox").unwrap()["id"].as_str().unwrap().to_string();
+        let id = app.pay_order("connector-automation-sandbox").unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
         app.pay_settle(&id).unwrap();
         assert!(app.pay_deliver(&id, true).is_err());
         assert_eq!(app.pay_deliver(&id, false).unwrap()["entitlement_qty"], 1);
         assert_eq!(app.pay_refund(&id, 40).unwrap()["entitlement_qty"], 1);
         assert_eq!(app.pay_production()["error"], "blocked_owner_input");
+        let page = app.pay_page_return(&id, "paid").unwrap();
+        assert_eq!(page["page_return_is_final"], false);
+        assert_eq!(page["order_status"], "PartiallyRefunded");
+        let pending = app.pay_order("connector-automation-sandbox").unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        app.pay_page_return(&pending, "paid").unwrap();
+        let queried = app.pay_query(&pending).unwrap();
+        assert_eq!(queried["order_status"], "Pending");
+        assert_eq!(queried["verified_via"], "signed_query");
+        let paid = app.pay_settle(&pending).unwrap();
+        let event = paid["event_id"].as_str().unwrap();
+        assert_eq!(
+            app.pay_notify(&pending, event, "paid").unwrap()["status"],
+            "duplicate_ignored"
+        );
+        let failed = app.pay_order("connector-automation-sandbox").unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        assert_eq!(
+            app.pay_notify(&failed, "evt-fail", "failed").unwrap()["order_status"],
+            "Failed"
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn loopback_connector_is_a_mock_not_production_auth() {
+        let _guard = connectors::ENV_LOCK.lock().expect("env");
+        std::env::remove_var("YMZZ_CONNECTOR_NET");
+        std::env::remove_var("YMZZ_CONNECTOR_ALLOW_PUBLIC");
+        let (app, dir) = app();
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            if let Ok((sock, _)) = listener.accept() {
+                drop(sock);
+            }
+            if let Ok((mut sock, _)) = listener.accept() {
+                use std::io::{Read, Write};
+                let mut buf = Vec::new();
+                let mut tmp = [0u8; 1024];
+                loop {
+                    let n = sock.read(&mut tmp).unwrap_or(0);
+                    if n == 0 {
+                        break;
+                    }
+                    buf.extend_from_slice(&tmp[..n]);
+                    if buf.windows(4).any(|w| w == b"\r\n\r\n") {
+                        break;
+                    }
+                }
+                let got = String::from_utf8_lossy(&buf);
+                let body: &[u8] = if got.contains("Bearer mock-token-not-real") {
+                    b"{\"ok\":true}"
+                } else {
+                    b"{\"ok\":false}"
+                };
+                let resp = format!(
+                    "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                    body.len()
+                );
+                sock.write_all(resp.as_bytes()).unwrap();
+                sock.write_all(body).unwrap();
+            }
+        });
+        let secret = app.secret_put("mock-token-not-real").unwrap();
+        assert!(!secret.to_string().contains("mock-token-not-real"));
+        let mapping = json!({"mapping":[{"logical_field":"title","source_type":"title","required":true},{"logical_field":"date","source_type":"date","required":true},{"logical_field":"record_id","source_type":"rich_text","required":true}]});
+        let id = app
+            .connector_save(&json!({
+                "kind": "notion",
+                "consent": true,
+                "base_url": format!("http://127.0.0.1:{port}"),
+                "secret_ref": secret["secret_ref"],
+                "resource_id": "db",
+                "mapping": mapping,
+            }))
+            .unwrap()["id"]
+            .as_str()
+            .unwrap()
+            .to_string();
+        let synced = app.connector_sync(&id, &json!({"transport":"live","records":[{"title":"合成","date":"2026-11-07","record_id":"SYN-NET","version":"1"}]})).unwrap();
+        assert_eq!(synced["live_called"], true);
+        assert_eq!(synced["auth"], "loopback_mock_not_production");
+        assert_eq!(synced["applied"], 1);
+        let logs = app.connector_logs(&id).unwrap().to_string();
+        assert!(!logs.contains("mock-token-not-real"));
+        let blocked = app.connector_save(&json!({
+            "kind": "notion", "consent": true, "secret_ref": "env:NOT_SET", "resource_id": "db",
+            "mapping": {"mapping":[{"logical_field":"title","source_type":"title","required":true},{"logical_field":"date","source_type":"date","required":true},{"logical_field":"record_id","source_type":"rich_text","required":true}]}
+        })).unwrap()["id"].as_str().unwrap().to_string();
+        let err = app.connector_sync(&blocked, &json!({"transport":"live","records":[{"title":"x","date":"2026-11-07","record_id":"NO","version":"1"}]})).unwrap_err();
+        assert!(
+            err.contains("live_network_disabled")
+                || err.contains("blocked")
+                || err.contains("public")
+        );
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn provider_and_ocr_call_only_an_opted_in_loopback() {
+        let (app, dir) = app();
+        assert!(app.provider_chat(&json!({"opt_in": true, "base_url": "https://integrate.api.nvidia.com/v1", "prompt": "hi"})).unwrap_err().contains("nvidia"));
+        assert_eq!(
+            app.provider_chat(
+                &json!({"opt_in": false, "base_url": "http://127.0.0.1:9", "prompt": "hi"})
+            )
+            .unwrap()["called"],
+            false
+        );
+        let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+        let port = listener.local_addr().unwrap().port();
+        std::thread::spawn(move || {
+            use std::io::{Read, Write};
+            let (mut sock, _) = listener.accept().unwrap();
+            let mut buf = [0u8; 4096];
+            let _ = sock.read(&mut buf);
+            let body = b"{\"choices\":[{\"message\":{\"content\":\"local-reply\"}}]}";
+            let resp = format!(
+                "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n",
+                body.len()
+            );
+            sock.write_all(resp.as_bytes()).unwrap();
+            sock.write_all(body).unwrap();
+        });
+        let chat = app.provider_chat(&json!({"opt_in": true, "base_url": format!("http://127.0.0.1:{port}"), "prompt": "hello"})).unwrap();
+        assert_eq!(chat["called"], true);
+        assert_eq!(chat["file_operation"], "none");
+        assert!(chat["reply"].as_str().unwrap().contains("local-reply"));
+        let saved = app.ocr_api(&json!({"opt_in": true, "endpoint": "https://ocr.example/v1", "key": "super-secret-ocr"})).unwrap();
+        assert_eq!(saved["called"], false);
+        assert!(!saved.to_string().contains("super-secret-ocr"));
+        let _ = fs::remove_dir_all(&dir);
+    }
+
+    #[test]
+    fn paddle_sample_is_separate_from_the_digital_text_layer() {
+        let _guard = crate::ocrflow::OCR_LOCK.lock().expect("ocr");
+        let (app, dir) = app();
+        let digital = app.ocr_sample().unwrap();
+        assert!(digital["text"].as_str().unwrap().contains("USD 123.45"));
+        let python = std::env::var("YMZZ_OCR_PYTHON")
+            .ok()
+            .filter(|p| !p.is_empty())
+            .or_else(|| {
+                let known = "/tmp/ymzz-ocr-venv/bin/python";
+                if std::path::Path::new(known).is_file() {
+                    Some(known.to_string())
+                } else {
+                    None
+                }
+            });
+        if let Some(python) = python {
+            std::env::set_var("YMZZ_OCR_PYTHON", &python);
+            std::env::set_var("YMZZ_OCR_CACHE", "/tmp/ymzz-ocr-cache-pinned");
+            let seen = app
+                .ocr_recognize_sample()
+                .expect("pinned paddle recognition");
+            assert_eq!(seen["text"].as_str().unwrap().trim(), "HELLO");
+            assert!(seen["confidence"].as_f64().unwrap() > 0.9);
+            assert_eq!(seen["untrusted"], true);
+            assert_ne!(
+                seen["text"].as_str().unwrap(),
+                digital["text"].as_str().unwrap()
+            );
+            std::env::remove_var("YMZZ_OCR_PYTHON");
+        } else {
+            let probe = app.ocr_bytes(&pdf::scanned_pdf()).unwrap();
+            assert_eq!(probe["needs_ocr"], true);
+            assert!(probe["paddle"]["status"]
+                .as_str()
+                .unwrap()
+                .contains("not_bundled"));
+        }
         let _ = fs::remove_dir_all(&dir);
     }
 }

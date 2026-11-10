@@ -56,7 +56,10 @@ pub fn resolve_inside(root: &Path, rel: &str) -> Result<PathBuf, String> {
     if rel.is_empty() || rel.len() > 240 {
         return Err("path length rejected".into());
     }
-    if rel.chars().any(|c| c == '\0' || c == '\n' || c == '\r' || c == '\u{202e}') {
+    if rel
+        .chars()
+        .any(|c| c == '\0' || c == '\n' || c == '\r' || c == '\u{202e}')
+    {
         return Err("path contains a forbidden character".into());
     }
     if rel.starts_with('/') || rel.starts_with('\\') || rel.starts_with('~') {
@@ -66,7 +69,9 @@ pub fn resolve_inside(root: &Path, rel: &str) -> Result<PathBuf, String> {
         return Err("drive path rejected inside a root".into());
     }
     let canon_root = root.canonicalize().map_err(|e| format!("root: {e}"))?;
-    if canon_root == Path::new("/") && std::env::var("YMZZ_ALLOW_ROOT_FS").ok().as_deref() != Some("1") {
+    if canon_root == Path::new("/")
+        && std::env::var("YMZZ_ALLOW_ROOT_FS").ok().as_deref() != Some("1")
+    {
         return Err("refusing filesystem root; pick a folder".into());
     }
     let mut acc = canon_root.clone();
