@@ -110,6 +110,25 @@ fn python_bin() -> String {
     .clone()
 }
 
+/// Hours east of UTC for zones that do not observe daylight saving.
+/// Windows Python has no IANA data until `tzdata` is installed, so these
+/// zones still resolve.
+fn fixed_offset_secs(tz: &str) -> Option<i32> {
+    match tz {
+        "Asia/Seoul" | "Asia/Tokyo" => Some(9 * 3600),
+        "Asia/Taipei" | "Asia/Shanghai" | "Asia/Hong_Kong" => Some(8 * 3600),
+        "UTC" | "Etc/UTC" => Some(0),
+        _ => None,
+    }
+}
+
+fn civil_date_at(stamp: i64, offset_secs: i32) -> String {
+    let shifted = stamp + offset_secs as i64;
+    chrono::DateTime::from_timestamp(shifted, 0)
+        .map(|dt| dt.format("%Y-%m-%d").to_string())
+        .unwrap_or_else(|| "1970-01-01".to_string())
+}
+
 pub fn today_in_zone(tz: &str) -> Result<String, String> {
     if !zone_name_ok(tz) {
         return Err("rejected timezone name".into());
@@ -119,17 +138,25 @@ pub fn today_in_zone(tz: &str) -> Result<String, String> {
         .arg("-c")
         .arg(script)
         .arg(tz)
-        .output()
-        .map_err(|e| format!("zoneinfo helper unavailable: {e}"))?;
-    if !out.status.success() {
+        .output();
+    if let Ok(out) = out {
+        if out.status.success() {
+            let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
+            parse_ymd(&s)?;
+            return Ok(s);
+        }
+        if let Some(offset) = fixed_offset_secs(tz) {
+            return Ok(civil_date_at(chrono::Utc::now().timestamp(), offset));
+        }
         return Err(format!(
             "unknown timezone {tz}: {}",
             String::from_utf8_lossy(&out.stderr).trim()
         ));
     }
-    let s = String::from_utf8_lossy(&out.stdout).trim().to_string();
-    parse_ymd(&s)?;
-    Ok(s)
+    if let Some(offset) = fixed_offset_secs(tz) {
+        return Ok(civil_date_at(chrono::Utc::now().timestamp(), offset));
+    }
+    Err(format!("zoneinfo helper unavailable: {}", out.err().unwrap()))
 }
 
 pub fn local_dates_for_unix(tz: &str, stamps: &[i64]) -> Result<Vec<Option<String>>, String> {
@@ -148,7 +175,7 @@ for s in stamps:
         out.append(datetime.datetime.fromtimestamp(s, tz).date().isoformat())
 print(json.dumps(out))
 "#;
-    let mut child = std::process::Command::new(python_bin())
+    let mut child = match std::process::Command::new(python_bin())
         .arg("-c")
         .arg(script)
         .arg(tz)
@@ -156,7 +183,18 @@ print(json.dumps(out))
         .stdout(std::process::Stdio::piped())
         .stderr(std::process::Stdio::piped())
         .spawn()
-        .map_err(|e| e.to_string())?;
+    {
+        Ok(child) => child,
+        Err(err) => {
+            if let Some(offset) = fixed_offset_secs(tz) {
+                return Ok(stamps
+                    .iter()
+                    .map(|stamp| Some(civil_date_at(*stamp, offset)))
+                    .collect());
+            }
+            return Err(err.to_string());
+        }
+    };
     {
         use std::io::Write;
         let stdin = child.stdin.as_mut().ok_or("stdin")?;
@@ -166,6 +204,12 @@ print(json.dumps(out))
     }
     let out = child.wait_with_output().map_err(|e| e.to_string())?;
     if !out.status.success() {
+        if let Some(offset) = fixed_offset_secs(tz) {
+            return Ok(stamps
+                .iter()
+                .map(|stamp| Some(civil_date_at(*stamp, offset)))
+                .collect());
+        }
         return Err(format!(
             "zone conversion failed: {}",
             String::from_utf8_lossy(&out.stderr)

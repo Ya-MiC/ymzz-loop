@@ -32,5 +32,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Windows time zone data
+        if: runner.os == 'Windows'
+        run: python -m pip install tzdata
       - run: npm install --prefix third_party/t3code --omit=dev
       - run: cargo test --manifest-path app/Cargo.toml

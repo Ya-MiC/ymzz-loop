@@ -2980,17 +2980,20 @@ mod tests {
         fs::create_dir_all(&root).unwrap();
         app.set_root(&root.to_string_lossy()).unwrap();
         app.set_permission("read-only").unwrap();
-        assert!(app
-            .terminal(&["/bin/echo".into(), "hi".into()], ".", "CONFIRM")
-            .is_err());
+        let echo = |word: &str| -> Vec<String> {
+            if cfg!(windows) {
+                vec!["cmd".into(), "/C".into(), format!("echo {word}")]
+            } else {
+                vec!["/bin/echo".into(), word.into()]
+            }
+        };
+        assert!(app.terminal(&echo("hi"), ".", "CONFIRM").is_err());
         app.set_permission("workspace-write").unwrap();
-        let out = app
-            .terminal(&["/bin/echo".into(), "synthetic-ok".into()], ".", "CONFIRM")
-            .unwrap();
+        let out = app.terminal(&echo("synthetic-ok"), ".", "CONFIRM").unwrap();
         assert!(out["stdout"].as_str().unwrap().contains("synthetic-ok"));
         app.set_policy(false);
         assert!(app
-            .terminal(&["/bin/echo".into(), "x".into()], ".", "CONFIRM")
+            .terminal(&echo("x"), ".", "CONFIRM")
             .unwrap_err()
             .contains("policy"));
         let _ = fs::remove_dir_all(&dir);
