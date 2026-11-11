@@ -43,4 +43,12 @@
 
 手機版改為把核心編進同一個程式，頁面用 `core_http` 讀寫，不再另開 `ymzz-vibe` 行程。桌面版仍走旁邊的核心和 `127.0.0.1:1413`。辨識下載失敗、取消、逾時，以及打不開的資料夾，畫面上改成中文，不再把網址或系統原文丟出來。
 
-還沒有在這份紀錄裡寫模擬器或 tauri-driver 的結果。那些以 GitHub Actions 的日誌和 `docs/mobile/` 的圖為準。沒有扣款，沒有上架。
+2026-11-11 的安裝檔工作流程 [42964829122](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42964829122) 有這些結果：
+
+- Windows：`.msi` 安靜安裝後，程式回了含「怎麼稱呼你」的頁面。tauri-driver 沒有跑，Edge 驅動的下載位址在那台機器上解析不到。
+- macOS：從 `.dmg` 取出 `.app` 後，`127.0.0.1:1413` 回了稱呼頁。
+- Linux：裝上 `.deb` 後同樣回了稱呼頁。
+- Android：模擬器從稱呼走到彙報。圖在 `docs/mobile/01-nickname.png` 與 `02-dashboard.png`。
+- iOS：模擬器打開了稱呼頁（`docs/mobile/03-ios-nickname.png`）。沒有再往下走到彙報。
+
+沒有扣款，沒有上架。
