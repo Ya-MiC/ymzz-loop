@@ -2,10 +2,12 @@
 // Proof is the page text plus docs/mobile/01-nickname.png and 02-dashboard.png.
 import { execFileSync } from "node:child_process";
 import { mkdirSync, readdirSync, statSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const root = process.argv[2] || "src-tauri/gen/android";
-const outDir = "docs/mobile";
+const repo = join(dirname(fileURLToPath(import.meta.url)), "..");
+const outDir = join(repo, "docs", "mobile");
 
 function adb(args, timeout = 30000) {
   return execFileSync("adb", args, { encoding: "utf8", timeout });
@@ -38,7 +40,8 @@ function walk(dir, found = []) {
 
 function apk() {
   const files = walk(root).filter((path) => path.endsWith(".apk"));
-  const debug = files.find((path) => /x86_64/.test(path) && /debug/i.test(path));
+  const debug = files.find((path) => /x86_64/.test(path) && /debug/i.test(path))
+    || files.find((path) => /debug/i.test(path) && !/aarch64|arm64/i.test(path));
   if (!debug) {
     throw new Error(`no x86_64 debug apk under ${root}:\n${files.join("\n")}`);
   }
@@ -163,15 +166,31 @@ ws.addEventListener("message", (event) => {
 await cdpSend(ws, "Runtime.enable");
 await cdpSend(ws, "Page.enable");
 mkdirSync(outDir, { recursive: true });
-await waitFor(ws, "怎麼稱呼你", 30000);
-await shot(ws, join(outDir, "01-nickname.png"));
-for (const label of ["先不填電話", "先跳過", "我知道了", "先跳過", "先跳過", "看彙報"]) {
-  await click(ws, label);
-  await sleep(700);
+try {
+  await waitFor(ws, "怎麼稱呼你", 30000);
+  await shot(ws, join(outDir, "01-nickname.png"));
+  const steps = [
+    ["先不填電話", "選一個位置"],
+    ["先跳過", "東西留在這台電腦"],
+    ["我知道了", "文件辨識可以以後再裝"],
+    ["先跳過", "連接可以以後再設"],
+    ["先跳過", "準備好了"],
+    ["看彙報", "檔案"],
+  ];
+  for (const [label, next] of steps) {
+    await click(ws, label);
+    await waitFor(ws, next, 20000);
+  }
+  const home = await bodyText(ws);
+  if (home.includes("怎麼稱呼你")) throw new Error("still on the nickname screen");
+  await shot(ws, join(outDir, "02-dashboard.png"));
+  console.log("YMZZ_SMOKE android onboarding and dashboard");
+  ws.close();
+} catch (err) {
+  try {
+    writeFileSync(join(repo, "android-logcat.txt"), adb(["logcat", "-d", "-t", "400"]));
+  } catch (logErr) {
+    writeFileSync(join(repo, "android-logcat.txt"), String(logErr));
+  }
+  throw err;
 }
-await waitFor(ws, "彙報", 30000);
-const home = await bodyText(ws);
-if (home.includes("怎麼稱呼你")) throw new Error("still on the nickname screen");
-await shot(ws, join(outDir, "02-dashboard.png"));
-console.log("YMZZ_SMOKE android onboarding and dashboard");
-ws.close();

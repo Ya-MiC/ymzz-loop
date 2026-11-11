@@ -77,6 +77,10 @@ jobs:
       - name: Launch the packaged macOS app
         if: matrix.os == 'macos-latest'
         run: sh scripts/macos-launch-smoke.sh
+      - name: Install the MSI and read the page
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: ./scripts/windows-install-smoke.ps1
       - name: Install the deb and read the page
         if: matrix.os == 'ubuntu-22.04'
         run: sh scripts/linux-launch-smoke.sh
@@ -131,6 +135,7 @@ jobs:
           path: |
             src-tauri/gen/android/**/*.apk
             docs/mobile/*.png
+            android-logcat.txt
           if-no-files-found: error
   ios:
     continue-on-error: true
@@ -156,10 +161,17 @@ jobs:
             echo "no simulator app"
             exit 1
           fi
-          xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15"
-          xcrun simctl bootstatus booted -b
-          xcrun simctl install booted "$APP"
-          xcrun simctl launch booted dev.ymzz.bingce
+          DEVICE=$(xcrun simctl list devices available | sed -n 's/.*iPhone[^(]*(\([A-Fa-f0-9-]\{36\}\)).*/\1/p' | head -1)
+          if [ -z "$DEVICE" ]; then
+            echo "no iPhone simulator"
+            xcrun simctl list devices available
+            exit 1
+          fi
+          echo "boot $DEVICE"
+          xcrun simctl boot "$DEVICE" || true
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" "$APP"
+          xcrun simctl launch "$DEVICE" dev.ymzz.bingce
           sleep 8
           mkdir -p docs/mobile
           xcrun simctl io booted screenshot docs/mobile/ios-simulator.png
