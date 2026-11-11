@@ -10,19 +10,21 @@
 
 ## 下載
 
-這些檔案由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v021-integrated-app-e023` 上產生。最新一次成功是 [42803995058](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058)，檔案在 GitHub 的**草稿預發行** `v0.21.0-preview`（不公開，不收費）。草稿要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。同一次執行也會把檔案留在 Actions 的 artifacts。
+0.21.1 的安裝檔由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v0211-mobile-core-e023` 上產生，掛到**新的草稿預發行** `v0.21.1-preview`。那份草稿要等工作流程成功才會出現，而且不會公開、不會收費。0.21.0 的草稿還在，沒有被這次改掉。兩份都要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。
+
+GitHub 這個儲存庫的預設分支仍是 `main`，所以儲存庫首頁看到的不是這份說明。產品說明在 `product` 分支。
 
 | 系統 | 你要下載的檔 | 現況 |
 | --- | --- | --- |
-| Windows | [`.msi`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64_en-US.msi) 與 [`.exe`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_x64-setup.exe) | 已在草稿裡 |
-| macOS | [`.dmg`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_aarch64.dmg)（未簽名，Apple 晶片） | 已在草稿裡 |
-| Linux | [`.deb`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.deb) 與 [`.AppImage`](https://github.com/Ya-MiC/ymzz-loop/releases/download/untagged-4bf6ff0326917ba02f0e/ymzz-bingce_0.21.0_amd64.AppImage) | 已在草稿裡 |
-| Android | 未簽名的 `.apk`（側載）。上架要用 `.aab` | [這次的 artifact](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058) 裡有未簽名的 apk。裡面沒有本機核心，不能打開彙報。沒有 `.aab`，沒有上架 Google Play |
-| iOS | 模擬器 `.app` | 同一次 artifact 裡有 `ymzz-bingce.app`（Apple 晶片模擬器）。沒有 `.ipa`，沒有簽給真機，沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號 |
+| Windows | `.msi` 與 `.exe` | 0.21.0 草稿裡已有。0.21.1 要等新草稿。裝好之後，核心在視窗旁邊，頁面走 `127.0.0.1` |
+| macOS | 未簽名的 Apple 晶片 `.dmg` | 同上。被系統擋住時，對檔案按右鍵選「打開」 |
+| Linux | `.deb` 與 `.AppImage` | 同上 |
+| Android | 未簽名的側載 `.apk`。上架要用 `.aab` | 0.21.1 把本機核心編進同一個程式，不再只是空殼。模擬器有沒有打開稱呼和彙報，以工作流程的截圖為準，截圖會放在 `docs/mobile/`。沒有 `.aab`，沒有上架 Google Play |
+| iOS | 模擬器 `.app` | 同一支核心會編進模擬器目標。沒有 `.ipa`，沒有簽給真機，沒有 TestFlight 或 App Store。那需要你自己的 Apple 開發者帳號。模擬器有沒有真的打開，以工作流程為準 |
 
-草稿頁（要登入）：https://github.com/Ya-MiC/ymzz-loop/releases/tag/untagged-4bf6ff0326917ba02f0e
+上一版草稿（0.21.0，要登入）：https://github.com/Ya-MiC/ymzz-loop/releases/tag/untagged-4bf6ff0326917ba02f0e
 
-同一批檔也在這次成功的工作流程裡：https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058
+上一版成功的工作流程：https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058
 
 ### macOS 被系統擋住時
 
@@ -42,7 +44,7 @@ Google Play 要你自己的開發者帳號，這份儲存庫沒有代為註冊�
 - 隱私說明：檔案、稱呼、電話和金鑰留在裝置上；沙箱收款不會扣款
 - 內容分級、商店截圖、以及你自己的開發者帳號
 
-側載時要在裝置上允許未知來源。現在還沒有一份可以這樣裝、而且打得開彙報的 Android 檔。
+側載時要在裝置上允許未知來源。0.21.0 的 apk 沒有核心，打不開彙報。0.21.1 的 apk 把核心編進去；能不能在模擬器上從稱呼走到彙報，看 `docs/mobile/` 裡這次工作流程留下的圖。
 
 ## 第一次打開
 
@@ -77,7 +79,7 @@ Google Play 要你自己的開發者帳號，這份儲存庫沒有代為註冊�
 
 跳過資料夾時，彙報會先放進合成樣本和一則對話，所以數字不是空的。點數字就到那一頁。側欄、底部（窄螢幕）和「跳到」都能換頁。窄螢幕的側欄收成抽屜，不會蓋住彙報。
 
-下面是 Linux 上用核心和瀏覽器點過的畫面。1100 寬是桌面，390 寬是手機寬度。還沒在裝好的 Windows `.exe`、Linux AppImage，或手機殼裡點過。
+下面是 Linux 上用核心和瀏覽器點過的畫面。1100 寬是桌面，390 寬是手機寬度。手機上的圖要等 Android 模擬器工作流程把 `docs/mobile/` 交出來。
 
 ![彙報，數字可以點](docs/clickthrough/03-home.png)
 
@@ -133,10 +135,10 @@ cargo tauri build --bundles deb,appimage
 | --- | --- |
 | 本機核心、彙報、檔案整理、沙箱收款 | 有測試，在這台電腦上跑過 |
 | 第一次開啟的六個畫面 | Linux 上點過，截圖在上面 |
-| 頁面跳轉、不用打路徑、窄螢幕選單 | Linux 上用核心點過 88 個控制項，含 390 寬的抽屜。截圖在上面。裝好的 Windows `.exe`、AppImage、手機殼還沒這樣點過 |
-| Tauri 2 視窗 | 原始碼在 `src-tauri`。核心是旁邊的程式，因為核心還用 Rust 1.83，Tauri 2.12 需要更新的套件，不能編成同一個程式 |
-| Linux / Windows / macOS 安裝檔 | 草稿裡已有 `.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg` |
-| Android、iOS | 有未簽名的殼，沒有本機核心，不能打開彙報。沒有上架 |
+| 頁面跳轉、不用打路徑、窄螢幕選單 | Linux 上用核心點過 88 個控制項，含 390 寬的抽屜。截圖在上面。沒有要自己打的路徑欄 |
+| Tauri 2 視窗 | 桌面版的核心仍在視窗旁邊，頁面走 `127.0.0.1`。手機版把同一個核心編成函式庫，頁面用一條指令跟它說話。核心改用穩定版 Rust，因為要和 Tauri 2.12 用同一套套件 |
+| Linux / Windows / macOS 安裝檔 | 0.21.0 草稿裡已有。0.21.1 由這次工作流程做成新草稿。Windows 另有 tauri-driver 檢查，macOS 與 Linux 是把打好的包打開，看 `127.0.0.1:1413` 有沒有回稱呼頁。結果以工作流程日誌為準 |
+| Android、iOS | Android 會在免費的 GitHub 模擬器裡安裝 x86_64 除錯包，看稱呼和彙報。給人側載的是 aarch64 的 apk。iOS 只試模擬器，失敗不會擋下桌面草稿。沒有上架 |
 | 辨識模型 | 要另外準備。有文字的 PDF 不需要它 |
 | 連接 Notion、試算表、文件、GitHub、飛書、Lark | 可以預覽和保存金鑰。沒有用你的帳號真的呼叫 |
 | 對話和 Claude / Codex 帳號 | 沒有把句子送出去。不能說已經和那些產品對等 |
@@ -155,15 +157,15 @@ The product is the briefing brought to its owner, and the local record that brie
 
 ## Downloads
 
-The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) builds on branch `cursor/v021-integrated-app-e023`. A successful run attaches files to the private GitHub draft pre-release `v0.21.0-preview` and to Actions artifacts. Drafts are free and visible only after you sign in: [Releases](https://github.com/Ya-MiC/ymzz-loop/releases).
+The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) on branch `cursor/v0211-mobile-core-e023` attaches 0.21.1 files to a new private draft pre-release, `v0.21.1-preview`, after that run succeeds. It does not replace the 0.21.0 draft. Drafts are free and visible only after you sign in: [Releases](https://github.com/Ya-MiC/ymzz-loop/releases). The repository default branch is still `main`, so the landing page is not this product README. The product README is on `product`.
 
 | System | File | Status |
 | --- | --- | --- |
-| Windows | `.msi` and `.exe` | On the draft now |
-| macOS | unsigned Apple silicon `.dmg` | On the draft now |
-| Linux | `.deb` and `.AppImage` | On the draft now |
-| Android | unsigned sideload `.apk`; Play needs an `.aab` | An unsigned universal APK is in the installer artifacts. It does not contain the local core, so it does not open the briefing. No `.aab`, nothing uploaded to Google Play |
-| iOS | simulator `.app` | An Apple silicon simulator app is in those artifacts. No `.ipa`, no device signature, no TestFlight, no App Store. Those need your Apple developer account |
+| Windows | `.msi` and `.exe` | On the 0.21.0 draft. 0.21.1 waits for the new draft. The core stays beside the window |
+| macOS | unsigned Apple silicon `.dmg` | Same. Right-click and choose Open if Gatekeeper blocks it |
+| Linux | `.deb` and `.AppImage` | Same |
+| Android | unsigned sideload `.apk`; Play needs an `.aab` | 0.21.1 links the local core into the app. An x86_64 debug build is what the emulator opens. The sideload file is aarch64. Screenshots land in `docs/mobile/` when that job passes. No `.aab`, nothing uploaded to Google Play |
+| iOS | simulator `.app` | The same core is linked into the simulator target. No `.ipa`, no device signature, no TestFlight, no App Store |
 
 If macOS blocks the unsigned app: right-click it, choose Open, then Open again. Or use System Settings → Privacy & Security → Open Anyway.
 
@@ -185,15 +187,14 @@ To publish: set the Actions secret `NPM_TOKEN`, configure PyPI trusted publishin
 
 ## Status
 
-The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. A Linux click-through drove 88 controls, including the 390px drawer, against the core in a browser. The installed Windows `.exe`, the AppImage, and the phone shells were not click-tested that way. The draft pre-release now has the Windows, macOS, and Linux installers from that run. Android and iOS artifacts are shells without the local core, so they do not open the briefing. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT. The approved palette is unchanged.
+The local core, the six-step first run on Linux, and the Tauri 2 window are in this branch. A Linux click-through drove 88 controls, including the 390px drawer, against the core in a browser. Desktop builds still start the core beside the window. Phone builds call that core in-process. The 0.21.0 draft still has the previous installers. The 0.21.1 draft is created only when the new installer run is green. Windows proof is a tauri-driver session against the debug window. macOS and Linux proof is the packaged app serving `127.0.0.1:1413`. Android proof is the emulator job. Those results are whatever the workflow logs say, not a claim made in advance. Connectors are previews. Conversation tools do not send text to Claude or Codex accounts. The license is still MIT. The approved palette is unchanged.
 
 Adversarial notes: `docs/v021-adversarial.md`.
 
-## This run
+## 0.21.0 那一次
 
 - 檢查（`ci`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803997216)
-- 核心測試（`v021`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995214)。Linux 點擊測試、Windows 與 macOS 核心測試都過了。
-- 桌面安裝檔已換上這一版，在草稿裡。五個系統的檔案在 [42803995058](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058)：`.deb`、`.AppImage`、`.msi`、`.exe`、`.dmg`，加上未簽名的 Android `.apk` 和 iOS 模擬器 `.app`。
-- Linux 上用核心和瀏覽器點過 88 個控制項，含 390 寬的抽屜。還沒打開這一版的 `.exe` 或 AppImage 來點。
+- 核心測試（`v021`）：[成功](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995214)
+- 桌面安裝檔在 0.21.0 草稿：[42803995058](https://github.com/Ya-MiC/ymzz-loop/actions/runs/42803995058)。那次的 Android 與 iOS 檔沒有本機核心。
 
-手機上的兩個檔是視窗殼，沒有本機核心，不能打開彙報。沒有上架。
+0.21.1 的草稿、模擬器截圖和 Windows 的 tauri-driver 結果，等這次分支上的工作流程跑完再記。沒有上架。

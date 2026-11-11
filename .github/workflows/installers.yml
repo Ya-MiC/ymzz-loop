@@ -1,7 +1,7 @@
 name: installers
 on:
   push:
-    branches: [cursor/v021-integrated-app-e023]
+    branches: [cursor/v0211-mobile-core-e023]
     paths-ignore:
       - "README.md"
       - "docs/**"
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - uses: dtolnay/rust-toolchain@1.83.0
+      - uses: dtolnay/rust-toolchain@stable
       - name: Linux libraries
         if: matrix.os == 'ubuntu-22.04'
         run: |
@@ -53,12 +53,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: src-tauri
-          tagName: v0.21.0-preview
-          releaseName: 稟冊 0.21.0 預覽
+          tagName: v0.21.1-preview
+          releaseName: 稟冊 0.21.1 預覽
           releaseDraft: true
           prerelease: true
           releaseBody: |
-            未簽名的預覽安裝檔。沙箱收款不會扣款。還沒上架 Google Play、App Store 或 TestFlight。
+            稟冊 0.21.1 預覽。這是草稿，尚未正式發布。沙箱收款不會扣款。
+            桌面安裝檔的核心在視窗旁邊。手機版把同一個核心編進程式裡。
+            沒有上架 Google Play、App Store 或 TestFlight。0.21.0 的草稿沒有被這份取代。
             macOS 若被 Gatekeeper 擋住：系統設定 → 隱私權與安全性 → 仍要打開。
           args: ${{ matrix.args }}
       - uses: actions/upload-artifact@v4
@@ -72,12 +74,20 @@ jobs:
             src-tauri/target/release/bundle/**/*.exe
             src-tauri/target/release/bundle/**/*.dmg
           if-no-files-found: warn
+      - name: Launch the packaged macOS app
+        if: matrix.os == 'macos-latest'
+        run: sh scripts/macos-launch-smoke.sh
+      - name: Install the deb and read the page
+        if: matrix.os == 'ubuntu-22.04'
+        run: sh scripts/linux-launch-smoke.sh
   android:
-    continue-on-error: true
     runs-on: ubuntu-22.04
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -85,11 +95,11 @@ jobs:
       - uses: android-actions/setup-android@v4
       - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: aarch64-linux-android
+          targets: aarch64-linux-android,x86_64-linux-android
       - name: Android SDK pieces
         run: |
           yes | sdkmanager --licenses >/dev/null || true
-          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;28.0.12433566"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;28.0.12433566" "emulator" "platform-tools"
       - name: Tauri CLI
         run: cargo install tauri-cli --version 2.12.4 --locked
       - name: Init and build a sideload APK
@@ -98,10 +108,29 @@ jobs:
           mkdir -p binaries/core
           cargo tauri android init --ci
           cargo tauri android build --apk --target aarch64
+          cargo tauri android build --debug --apk --target x86_64
+      - name: Let the emulator use KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm || true
+          sudo chmod 666 /dev/kvm || true
+      - name: Emulator opens onboarding and the briefing
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          emulator-boot-timeout: 600
+          script: node ${{ github.workspace }}/scripts/android-smoke.mjs ${{ github.workspace }}/src-tauri/gen/android
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ymzz-bingce-android-apk
-          path: src-tauri/gen/android/**/*.apk
+          path: |
+            src-tauri/gen/android/**/*.apk
+            docs/mobile/*.png
           if-no-files-found: error
   ios:
     continue-on-error: true
@@ -120,8 +149,26 @@ jobs:
           mkdir -p binaries/core
           cargo tauri ios init --ci
           cargo tauri ios build --target aarch64-sim
+      - name: Boot the simulator when the app exists
+        run: |
+          APP=$(find src-tauri/gen/apple -name '*.app' -type d | head -1)
+          if [ -z "$APP" ]; then
+            echo "no simulator app"
+            exit 1
+          fi
+          xcrun simctl boot "iPhone 16" || xcrun simctl boot "iPhone 15"
+          xcrun simctl bootstatus booted -b
+          xcrun simctl install booted "$APP"
+          xcrun simctl launch booted dev.ymzz.bingce
+          sleep 8
+          mkdir -p docs/mobile
+          xcrun simctl io booted screenshot docs/mobile/ios-simulator.png
+          echo "YMZZ_SMOKE ios simulator launched"
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ymzz-bingce-ios-simulator
-          path: src-tauri/gen/apple/**/*.app
+          path: |
+            src-tauri/gen/apple/**/*.app
+            docs/mobile/ios-simulator.png
           if-no-files-found: warn

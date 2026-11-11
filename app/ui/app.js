@@ -49,7 +49,33 @@ function decodePart(value) {
   }
 }
 
+function bridged() {
+  const tauri = window.__TAURI__;
+  if (!(tauri && tauri.core && tauri.core.invoke)) return false;
+  const host = location.hostname;
+  return !((host === "127.0.0.1" || host === "localhost") && location.port === "1413");
+}
+
 async function api(path, options = {}) {
+  if (bridged()) {
+    try {
+      const result = await window.__TAURI__.core.invoke("core_http", {
+        method: options.method || "GET",
+        path,
+        body: options.body ? JSON.stringify(options.body) : "",
+      });
+      const data = JSON.parse(result.body || "{}");
+      if (result.status >= 400) throw new Error(plainError(data.error || "沒有完成"));
+      return data;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err || "");
+      if (message && !message.includes("本機核心沒有連上") && !message.includes("本機核心沒有在這台電腦上打開")) {
+        throw err instanceof Error ? err : new Error(plainError(message));
+      }
+      showRecovery("本機核心沒有連上。");
+      throw new Error("本機核心沒有連上。");
+    }
+  }
   const headers = { "content-type": "application/json" };
   if (state.csrf) headers["x-ymzz-csrf"] = state.csrf;
   let res;
@@ -81,8 +107,27 @@ function plainError(message) {
     "not paid": "要先有簽名通知，才能交付。",
     "delivery failed; payment kept, retry is safe": "交付失敗。款項還在，可以再交付。",
     "order is not refundable": "這筆沙箱訂單現在不能退。",
+    "symlink rejected": "這個位置打不開。",
+    "not a directory": "這不是資料夾。",
+    "root is not a directory": "這不是資料夾。",
+    "refusing filesystem root": "不能選整台磁碟。",
+    "download cancelled": "下載已取消。",
+    "download timed out": "辨識模型下載逾時。",
+    "live_network_disabled": "這次沒有連外。",
+    "public_connector_host_blocked_without_explicit_allow": "這個位址不會送。",
+    "tls_to_public_hosts_is_not_enabled_in_this_build": "這個位址不會送。",
+    "consent required for a live connector call": "要先勾同意。",
+    "secret length": "金鑰長度不對。",
+    "secret rejected": "這個金鑰不能存。",
+    "nothing to send": "沒有可送的內容。",
+    "invoke needs a local secret": "要先留下金鑰。",
+    "api endpoint must be https, or an explicit loopback http url": "位址要是 https，或這台電腦上的位址。",
   };
-  return table[message] || message;
+  if (table[message]) return table[message];
+  if (/^download failed/i.test(message) || /os error|No such file|Permission denied|Not a directory/i.test(message)) {
+    return "這一步沒有完成。";
+  }
+  return message;
 }
 
 function showRecovery(message) {

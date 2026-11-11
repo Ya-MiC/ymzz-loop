@@ -1,17 +1,20 @@
-//! 稟冊 window. Tauri 2 shows the local Rust core, which stays a separate process
-//! so the core can keep compiling on Rust 1.83. Phone builds compile this
-//! library, but they do not contain that desktop core.
+//! 稟冊 window. Desktop builds start the Rust core as a sidecar on 127.0.0.1.
+//! Phone builds link that same core and answer the page through one command,
+//! because a phone package cannot launch the desktop binary.
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::path::{Path, PathBuf};
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::process::{Child, Command};
+#[cfg(any(target_os = "android", target_os = "ios"))]
+use std::sync::Arc;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::sync::Mutex;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 use std::time::Duration;
+use tauri::Manager;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
-use tauri::{Manager, Url};
+use tauri::Url;
 #[cfg_attr(any(target_os = "android", target_os = "ios"), allow(unused_imports))]
 use tauri::RunEvent;
 
@@ -19,6 +22,32 @@ use tauri::RunEvent;
 const PORT: u16 = 1413;
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 static CORE: Mutex<Option<Child>> = Mutex::new(None);
+
+#[cfg(any(target_os = "android", target_os = "ios"))]
+struct PhoneCore(Arc<ymzz_vibe::engine::App>);
+
+#[derive(serde::Serialize)]
+struct CoreHttp {
+    status: u16,
+    body: String,
+}
+
+#[tauri::command]
+fn core_http(app: tauri::AppHandle, method: String, path: String, body: String) -> Result<CoreHttp, String> {
+    #[cfg(any(target_os = "android", target_os = "ios"))]
+    {
+        let state = app
+            .try_state::<PhoneCore>()
+            .ok_or_else(|| "本機核心還沒準備好。".to_string())?;
+        let (status, text) = ymzz_vibe::http::bridge(&state.0, &method, &path, &body);
+        return Ok(CoreHttp { status, body: text });
+    }
+    #[cfg(not(any(target_os = "android", target_os = "ios")))]
+    {
+        let _ = (app, method, path, body);
+        Err("這台電腦直接連本機服務。".into())
+    }
+}
 
 #[cfg(not(any(target_os = "android", target_os = "ios")))]
 fn data_dir() -> PathBuf {
@@ -109,11 +138,33 @@ fn start_core(resource_dir: Option<&Path>) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(any(target_os = "android", target_os = "ios"))]
+fn open_phone_core(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
+    let data = app.path().app_data_dir()?;
+    std::fs::create_dir_all(&data)?;
+    let core = ymzz_vibe::engine::App::open(&data, &data)
+        .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
+    eprintln!("YMZZ_SMOKE core-ready");
+    app.manage(PhoneCore(Arc::new(core)));
+    Ok(())
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
+        .invoke_handler(tauri::generate_handler![core_http])
+        .on_page_load(|webview, payload| {
+            #[cfg(any(target_os = "android", target_os = "ios"))]
+            if payload.url().as_str().contains("recovery") {
+                let _ = webview.eval("window.location.replace('index.html')");
+            }
+            #[cfg(not(any(target_os = "android", target_os = "ios")))]
+            {
+                let _ = (webview, payload);
+            }
+        })
         .setup(|app| {
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
             {
@@ -127,7 +178,7 @@ pub fn run() {
             }
             #[cfg(any(target_os = "android", target_os = "ios"))]
             {
-                let _ = app;
+                open_phone_core(app)?;
             }
             Ok(())
         })

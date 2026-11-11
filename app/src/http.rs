@@ -37,6 +37,44 @@ pub fn serve(app: Arc<App>, listener: TcpListener) {
     }
 }
 
+/// In-process call for the phone build. The Tauri window is the only caller.
+/// It uses the user session already stored on this device, never an admin token.
+pub fn bridge(app: &App, method: &str, path: &str, body: &str) -> (u16, String) {
+    if body.len() > MAX_BODY {
+        return (
+            413,
+            json!({"ok": false, "error": "body too large"}).to_string(),
+        );
+    }
+    let cfg = app.cfg.lock().expect("cfg").clone();
+    let mut headers = HashMap::new();
+    if cfg.port != 0 {
+        headers.insert("host".into(), format!("127.0.0.1:{}", cfg.port));
+    }
+    headers.insert(
+        "cookie".into(),
+        format!("ymzz_session={}", cfg.session_token),
+    );
+    headers.insert("x-ymzz-csrf".into(), cfg.csrf.clone());
+    let req = Request {
+        method: method.to_string(),
+        path: path.to_string(),
+        headers,
+        body: body.as_bytes().to_vec(),
+    };
+    let res = dispatch(app, &req);
+    if method.eq_ignore_ascii_case("GET") && path.split('?').next() == Some("/api/onboarding") {
+        eprintln!("YMZZ_SMOKE onboarding");
+    }
+    if method.eq_ignore_ascii_case("GET") && path.split('?').next() == Some("/api/dashboard") {
+        eprintln!("YMZZ_SMOKE dashboard");
+    }
+    (
+        res.status,
+        String::from_utf8_lossy(&res.body).into_owned(),
+    )
+}
+
 pub fn dispatch(app: &App, req: &Request) -> Response {
     let path = req.path.split('?').next().unwrap_or("/");
     if let Err(res) = authorize(
@@ -605,6 +643,23 @@ pub fn bind_and_serve(app: Arc<App>, port: u16) -> Result<(), String> {
 mod tests {
     use super::*;
     use crate::util;
+
+    #[test]
+    fn bridge_reads_onboarding_without_a_socket() {
+        let app = boot();
+        app.cfg.lock().unwrap().port = 0;
+        let (status, body) = bridge(&app, "GET", "/api/onboarding", "");
+        assert_eq!(status, 200);
+        assert!(body.contains("onboarding_done"));
+        let (denied, err) = bridge(
+            &app,
+            "POST",
+            "/api/onboarding",
+            "{\"nickname\":\"用戶\",\"skip_phone\":true,\"step\":2}",
+        );
+        assert_eq!(denied, 200, "{err}");
+        assert!(err.contains("用戶"));
+    }
 
     fn boot() -> App {
         let dir = std::env::temp_dir().join(format!(

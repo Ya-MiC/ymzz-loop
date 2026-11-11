@@ -6,7 +6,8 @@
     "core:default",
     "dialog:default",
     "opener:default",
-    "opener:allow-open-path"
+    "opener:allow-open-path",
+    "allow-core-http"
   ],
   "remote": {
     "urls": ["http://127.0.0.1:1413/*", "http://localhost:1413/*"]
