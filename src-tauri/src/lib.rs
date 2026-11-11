@@ -142,7 +142,9 @@ fn start_core(resource_dir: Option<&Path>) -> Result<(), String> {
 fn open_phone_core(app: &tauri::App) -> Result<(), Box<dyn std::error::Error>> {
     let data = app.path().app_data_dir()?;
     std::fs::create_dir_all(&data)?;
-    let core = ymzz_vibe::engine::App::open(&data, &data)
+    // Bundled scripts live next to the resources, not in the writable data folder.
+    let resources = app.path().resource_dir().unwrap_or_else(|_| data.clone());
+    let core = ymzz_vibe::engine::App::open(&data, &resources)
         .map_err(|err| std::io::Error::new(std::io::ErrorKind::Other, err))?;
     eprintln!("YMZZ_SMOKE core-ready");
     app.manage(PhoneCore(Arc::new(core)));
