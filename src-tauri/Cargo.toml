@@ -1,6 +1,6 @@
 [package]
 name = "ymzz-bingce"
-version = "0.21.0"
+version = "0.21.1"
 description = "稟冊 — Tauri 2 window for the ymzz local steward"
 edition = "2021"
 license = "MIT"
@@ -19,6 +19,9 @@ serde_json = "1"
 tauri = { version = "=2.12.5", features = [] }
 tauri-plugin-dialog = "2"
 tauri-plugin-opener = "2"
+
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+ymzz-vibe = { path = "../app" }
 
 [features]
 default = ["custom-protocol"]

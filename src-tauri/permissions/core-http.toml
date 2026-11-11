@@ -1,0 +1,4 @@
+[[permission]]
+identifier = "allow-core-http"
+description = "Let the window call the on-device core."
+commands.allow = ["core_http"]

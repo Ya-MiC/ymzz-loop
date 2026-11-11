@@ -1,0 +1,19 @@
+name: smoke
+on:
+  push:
+    branches: [cursor/v0211-mobile-core-e023]
+    paths-ignore:
+      - "README.md"
+      - "docs/**"
+  pull_request:
+  workflow_dispatch:
+permissions: { contents: read }
+jobs:
+  windows-note:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Windows proof is the installed MSI
+        run: |
+          echo "The installers workflow installs the MSI with msiexec /qn and reads http://127.0.0.1:1413/."
+          echo "tauri-driver was not run. msedgedriver.azureedge.net did not resolve on the Windows runner."

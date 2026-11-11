@@ -2,6 +2,17 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.21.1] — 2026-11-11
+
+### Added
+- Phone builds link `ymzz-vibe` and answer the page through the `core_http` command. Desktop builds still start the core beside the window.
+- Android emulator smoke and Windows tauri-driver smoke in GitHub Actions. macOS and Linux smoke launch the packaged app and read `127.0.0.1:1413`.
+- Draft pre-release tag `v0.21.1-preview`. The `v0.21.0-preview` draft is left as it was.
+
+### Changed
+- The local core compiles with stable Rust so it can share the Tauri 2.12 crate set. The crate, the window, and the npm and PyPI manifests are 0.21.1. The root Node package stays 0.20.4.
+- Download and connector errors that a button can show are written in Traditional Chinese.
+
 ## [0.21.0] — 2026-11-10
 
 ### Added

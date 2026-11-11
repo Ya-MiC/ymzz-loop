@@ -162,7 +162,7 @@ pub fn ensure(data_dir: &Path) -> Result<Value, String> {
         write_status(&cache, &format!("checking {id}"));
         if !digest_matches(&dest, sha)? {
             if cancel_requested(&cache) {
-                return Err("download cancelled".into());
+                return Err("下載已取消".into());
             }
             write_status(&cache, &format!("downloading {id}"));
             download_https(url, &dest, &cache)?;
@@ -377,18 +377,18 @@ fn download_https(url: &str, dest: &Path, cache: &Path) -> Result<(), String> {
         if cancel_requested(cache) {
             let _ = child.kill();
             let _ = fs::remove_file(&tmp);
-            return Err("download cancelled".into());
+            return Err("下載已取消".into());
         }
         match child.try_wait().map_err(|e| e.to_string())? {
             Some(status) if status.success() => break,
             Some(_) => {
                 let _ = fs::remove_file(&tmp);
-                return Err(format!("download failed for {url}"));
+                return Err("辨識模型沒有下載完成".into());
             }
             None if started.elapsed() > Duration::from_secs(180) => {
                 let _ = child.kill();
                 let _ = fs::remove_file(&tmp);
-                return Err("download timed out".into());
+                return Err("辨識模型下載逾時".into());
             }
             None => std::thread::sleep(Duration::from_millis(200)),
         }

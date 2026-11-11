@@ -63,7 +63,7 @@ pub fn github_comment(token: &str, repo: &str, issue: u64, body: &str) -> BuiltR
         headers: vec![
             auth_header(token),
             ("Accept".into(), "application/vnd.github+json".into()),
-            ("User-Agent".into(), "ymzz-vibe/0.21".into()),
+            ("User-Agent".into(), "ymzz-vibe/0.21.1".into()),
         ],
         body: json!({"body": body}).to_string(),
     }

@@ -1,6 +1,6 @@
 {
   "name": "ymzz",
-  "version": "0.21.0",
+  "version": "0.21.1",
   "description": "稟冊 SDK：本機稱呼與 600 日章節計算。不連外、不扣款。",
   "type": "module",
   "license": "MIT",
