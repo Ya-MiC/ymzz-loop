@@ -1,0 +1,24 @@
+{
+  "name": "ymzz",
+  "version": "0.21.0",
+  "description": "稟冊 SDK：本機稱呼與 600 日章節計算。不連外、不扣款。",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "ymzz": "./bin/ymzz.mjs"
+  },
+  "exports": {
+    ".": "./lib/steward.mjs"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "test": "node --test test.test.mjs"
+  }
+}

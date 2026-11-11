@@ -2,6 +2,17 @@
 
 格式依 [Keep a Changelog](https://keepachangelog.com/)，版本依 [SemVer](https://semver.org/)。
 
+## [0.21.0] — 2026-11-10
+
+### Added
+- Local app `ymzz-vibe` beside the Node review: loopback UI, file query, conversation archive, sandbox order flow, and a PDF text-layer extractor. Run steps are in `docs/v021-run.md`.
+- Vendored MIT modules from T3 Code v0.1.8, executed through `third_party/t3code/bridge.mjs`. The capability list keeps `parity: false`.
+- `docs/LICENSE-BOUNDARY.md`. `LICENSE` is unchanged.
+
+### Unchanged
+- Node daily review, sinks, and the 600-day chapter.
+- Package version stays **0.20.4** so the existing product checks still describe that release. The Rust crate version is 0.21.0.
+
 ## [0.20.4] — 2026-11-06
 
 ### Fixed

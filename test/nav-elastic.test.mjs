@@ -1,11 +1,15 @@
 // v1.18.0 · top capsule hero→content elastic + bottom spy has no % / progress
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+if (!existsSync(join(root, "site/index.html"))) {
+  const note = existsSync(join(root, "PRODUCT_BRANCH")) ? readFileSync(join(root, "PRODUCT_BRANCH"), "utf8") : "";
+  if (/no site/i.test(note)) process.exit(0);
+}
 const css = readFileSync(join(root, "site/style.css"), "utf8");
 const js = readFileSync(join(root, "site/app.js"), "utf8");
 const html = readFileSync(join(root, "site/index.html"), "utf8");

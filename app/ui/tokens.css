@@ -1,0 +1,268 @@
+/* ============================================================
+   晏銘湛箴 · Design Tokens v3 — 唯一真相源
+   規則：組件只准消費這裡的變量，禁止散落 magic number。
+   色彩：兩套原始色卡（雲箋/陶土）各四色封頂【鎖定】；
+        各自莫蘭迪深版（暮靄/暮林）共四表，已 WCAG 計算驗證；
+        真機三引擎複測通過後為最終鎖定（09-驗收清單 A）。
+   v3.1 修訂：淺色彩底對比度全表重算；snap 阻尼 40→72（真正的過阻尼）；
+        焦點環 halo 改主題自適應 token；補 wght-shift 消費規則；z 階梯修正 Drawer。
+   ============================================================ */
+
+:root {
+  /* ---------- 色系一「雲箋」【鎖定】 ---------- */
+  --c-cloud-paper:  #F8F6EF;  /* 暖紙白 */
+  --c-cloud-sky:    #B9DDF1;  /* 淺天空藍 */
+  --c-cloud-pink:   #F4DDE7;  /* 荷花粉 */
+  --c-cloud-violet: #CDBFE0;  /* 淡紫 */
+
+  /* ---------- 色系一深版「暮靄」【鎖定·已驗證：暖黑底上 5.99/6.26/5.06】 ---------- */
+  --c-dusk-paper:   #E6E1D5;
+  --c-dusk-blue:    #7C9DB5;
+  --c-dusk-pink:    #B394A3;
+  --c-dusk-violet:  #93879F;
+
+  /* ---------- 色系二「陶土」【鎖定】 ---------- */
+  --c-earth-oat:    #E8E3CC;  /* 燕麥米 */
+  --c-earth-sage:   #b7c8a8;  /* 鼠尾草綠 */
+  --c-earth-linen:  #CBBF9E;  /* 亞麻金 */
+  --c-earth-cocoa:  #A38E7A;  /* 可可棕 */
+
+  /* ---------- 色系二深版「暮林」【鎖定·已驗證】 ----------
+     cocoa 原值 #7C6B59 在暖黑上僅 3.35：保留作填充/邊界/裝飾；
+     文字用途一律走派生文字級變體 --c-wood-cocoa-text（bg-0 上 5.16，bg-1 上 4.63） */
+  --c-wood-oat:     #D9D3C0;
+  --c-wood-sage:    #7E8E6F;
+  --c-wood-linen:   #9E9073;
+  --c-wood-cocoa:   #7C6B59;
+  --c-wood-cocoa-text: #9D8A76;   /* 【派生·已驗證】僅暮林主題文字用 */
+
+  /* ---------- 【提案·待確認】深藤紫（v5 新增，見 docs/色卡白皮書.pdf 第三章）
+     淡紫 #CDBFE0 的功能級伴侶色：同相 265°、S28%（莫蘭迪血統，不算新色相）；
+     暖紙白上 5.34:1（正文級）、淡紫上 3.33:1（UI 邊界級）。
+     用途：鏈接、選中態、聚焦環、可讀紫色文字。拍板後本行升【鎖定】。 ---------- */
+  --c-cloud-violet-deep: #75589D;
+
+  /* ---------- 中性結構層【鎖定·已確認】
+     ink-3 實測 2.77（v2 矩陣手算 3.0 有誤，已糾）：僅佔位/禁用，不作閱讀 ---------- */
+  --ink-1: #3D3833;
+  --ink-2: #6E675E;
+  --ink-3: #9C948A;
+  --line-1: rgba(61, 56, 51, .08);
+  --scrim: rgba(61, 56, 51, .32);
+
+  /* ---------- 主題映射（淺=雲箋） ---------- */
+  --bg-0: var(--c-cloud-paper);
+  --bg-1: rgba(255, 255, 255, .62);
+  --bg-2: rgba(255, 255, 255, .80);
+  --bg-3: rgba(255, 255, 255, .95);
+  --accent: var(--c-cloud-sky);
+  --accent-soft: var(--c-cloud-pink);
+  --accent-warm: var(--c-cloud-violet);
+
+  /* ---------- 表面 ---------- */
+  --surface-0: var(--bg-0);
+  --surface-1: var(--bg-1);
+  --surface-2: var(--bg-2);
+  --surface-3: var(--bg-3);
+
+  /* ---------- 字體 ---------- */
+  --font-sans: "Noto Sans SC Variable", "Noto Sans SC", system-ui, sans-serif;
+  --wght-400: 400; --wght-500: 500; --wght-600: 600;
+  --wght-shift: 0;                    /* 深色模式 -40 */
+  --fs-body: 14px; --fs-secondary: 13px; --fs-caption: 12px;
+  --fs-h3: 20px; --fs-h2: 28px;
+  --leading-body: 1.7;
+  /* 移動端長文閱讀字號 15–16px（docs/09 驗收） */
+  --fs-body-mobile: 15px;
+
+  /* ---------- 深色字重 −40 的消費規則（僅可變字體生效） ----------
+     用法：font-variation-settings: "wght" var(--wght-body);
+     靜態字體回退：深色模式整體降一檔字重（600→500、500→400），見 §SKILL 4。 */
+  --wght-body: calc(400 + var(--wght-shift));
+
+  /* ---------- 數字鐵律 ---------- */
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- 深色主題（暮靄 + 暖黑底）【鎖定·已驗證】 ----------
+   附帶使用規則（由計算值得出，勿憑感覺放寬）：
+   · dusk-violet 在 bg-2 上降至 3.96：僅 bg-0/bg-1 上作文字，bg-2 起只作大字/邊界
+   · 暮林主題文字級 cocoa 一律用 --c-wood-cocoa-text，原值只作填充 */
+[data-theme="dark"] {
+  --bg-0: #1F1B16;                    /* 暖黑 */
+  --bg-1: #2A241D;
+  --bg-2: #352E25;
+  --bg-3: #423A2F;
+  --ink-1: #E6E1D5;
+  --ink-2: #B3AC9F;
+  --ink-3: #7A7268;
+  --line-1: rgba(230, 225, 213, .10);
+  --scrim: rgba(0, 0, 0, .50);
+  --accent: var(--c-dusk-blue);
+  --accent-soft: var(--c-dusk-pink);
+  --accent-warm: var(--c-dusk-violet);
+  --wght-shift: -40;
+}
+
+/* ---------- 陶土主題切換（可選分區） ---------- */
+[data-palette="earth"] {
+  --bg-0: var(--c-earth-oat);
+  --accent: var(--c-earth-sage);
+  --accent-soft: var(--c-earth-linen);
+  --accent-warm: var(--c-earth-cocoa);
+}
+
+/* ---------- 暮林深色主題（陶土深版） ---------- */
+[data-theme="dark"][data-palette="wood"] {
+  --accent: var(--c-wood-sage);        /* bg-0 上 4.88 */
+  --accent-soft: var(--c-wood-linen);  /* bg-0 上 5.45 */
+  --accent-warm: var(--c-wood-cocoa-text);
+}
+
+/* ---------- 溫潤陰影（暖灰黑，不用冷黑） ---------- */
+:root {
+  --shadow-rest: 0 8px 24px rgba(61, 56, 51, .10);
+  --shadow-float: 0 16px 48px rgba(61, 56, 51, .16);
+}
+
+/* ---------- 輸入框咬合感【鐵律】 ---------- */
+.input-warm {
+  box-shadow: 0 1px 2px rgba(61,56,51,.08), inset 0 1px 2px rgba(61,56,51,.06);
+}
+.input-warm:focus-within {
+  box-shadow: 0 1px 2px rgba(61,56,51,.08), inset 0 1px 2px rgba(61,56,51,.06),
+              0 0 0 3px rgba(205,191,224,.45);
+}
+
+/* ---------- 毛玻璃【鐵律 blur(6px)】 ---------- */
+.glass {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: var(--surface-2);
+}
+
+/* ---------- 熱區鐵律 ---------- */
+:root { --hit: 48px; --gap-hit: 8px; }
+
+/* 真實容器方案（首選） */
+.btn-warm { min-width: var(--hit); min-height: var(--hit); }
+
+/* 計算式外擴（僅密集場景；inset = (48 − 邊長)/2） */
+.tap-16 { position: relative; }
+.tap-16::after { content: ""; position: absolute; inset: -16px; }  /* 16px → 48 */
+.tap-20 { position: relative; }
+.tap-20::after { content: ""; position: absolute; inset: -14px; }  /* 20px → 48 */
+.tap-24 { position: relative; }
+.tap-24::after { content: ""; position: absolute; inset: -12px; }  /* 24px → 48 */
+
+/* ---------- 行內圖標【鐵律】 ---------- */
+.inline-icon { vertical-align: -0.125em; }
+
+/* ---------- 排版保護【鐵律】 ---------- */
+.prose { text-wrap: pretty; }
+.prose h1, .prose h2, .prose h3 { text-wrap: balance; }
+
+/* ---------- 展開【鐵律 grid 0fr→1fr】 ---------- */
+.collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 240ms cubic-bezier(.16,1,.3,1); }
+.collapse.open { grid-template-rows: 1fr; }
+.collapse > * { overflow: hidden; min-height: 0; }
+
+/* ---------- 水墨暈開【簽名動效】 ---------- */
+@keyframes ink-in {
+  from { filter: blur(6px); opacity: 0; }
+  to   { filter: blur(0);   opacity: 1; }
+}
+.ink-char { animation: ink-in 120ms cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--i) * 30ms); }
+
+/* ---------- 動效 token ---------- */
+:root {
+  --ease-ink: cubic-bezier(.16, 1, .3, 1);
+  --t-press: 50ms; --t-micro: 120ms; --t-panel: 240ms;
+  --t-overlay-in: 200ms; --t-overlay-out: 250ms; --t-fullscreen: 400ms;
+  /* 彈簧性格：吸附過阻尼(1200/72, ζ≈1.04)、點贊欠阻尼(500/18)、複製(600/22) */
+  --spring-snap-stiffness: 1200; --spring-snap-damping: 72;
+  --spring-like-stiffness: 500;  --spring-like-damping: 18;
+  --spring-copy-stiffness: 600;  --spring-copy-damping: 22;
+  --toast-short: 2500ms;
+}
+
+/* ---------- 浮層 z 階梯（v3.1：模態 Drawer 必須壓過自己的遮罩） ---------- */
+:root {
+  --z-sticky: 10; --z-popover: 90; --z-scrim: 110;
+  --z-drawer: 120; --z-overlay: 130; --z-toast: 200;
+}
+
+/* ---------- 安全区（Tauri 插件注入實時值；桌面默認 0） ---------- */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* ---------- 焦點環（永不裸奔；v3.1：halo 主題自適應，保證相鄰表面 ≥3:1） ---------- */
+:root { --focus-halo: rgba(61, 56, 51, .45); }        /* 淺色：暖墨環 */
+[data-theme="dark"] { --focus-halo: rgba(230, 225, 213, .45); } /* 深色：暖紙環 */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px var(--focus-halo);
+}
+
+/* ---------- 減少動態 ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+  .ink-char { animation: none; opacity: 1; filter: none; }
+}
+
+/* ============================================================
+   v7 新增（docs/12-16）：密度 / 佈局占比 / 圖標 / 音效 token
+   組件只准消費這些變量，禁止散落 magic number——規則不變。
+   ============================================================ */
+
+/* ---------- 佈局與間距（docs/12 §3） ---------- */
+:root {
+  --grid-unit: 4px;
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-6: 24px; --sp-8: 32px; --sp-12: 48px; --sp-16: 64px;
+  /* 內容占比（docs/12 §2） */
+  --content-max: 680px;        /* 閱讀型正文欄 */
+  --content-wide: 1200px;      /* 卡片流上限 */
+  --side-w: 264px;             /* 側欄展開 */
+  --side-w-min: 68px;          /* 側欄收起（48 命中 + 呼吸） */
+  --side-ratio-cap: 0.20;      /* 側欄占視口比上限 */
+  --topbar-h: 52px;
+}
+
+/* ---------- 密度兩檔（docs/12 §4） ----------
+   切換：data-density="comfortable"（默認）| "compact"
+   鐵律：密度壓視覺，不壓命中（≥48 外擴補齊）與字號下限（正文 14px） */
+:root, [data-density="comfortable"] {
+  --ctl-h: 48px;   --row-h: 56px;  --pad-card: 24px;
+  --gap-block: 24px; --leading-density: 1.7;
+}
+[data-density="compact"] {
+  --ctl-h: 40px;   --row-h: 40px;  --pad-card: 16px;
+  --gap-block: 16px; --leading-density: 1.55;
+}
+
+/* ---------- 圖標（docs/14 §2） ---------- */
+:root {
+  --icon-inline: 16px;   /* 正文行內（配 -0.125em） */
+  --icon-ctl: 20px;      /* 控件內 */
+  --icon-title: 24px;    /* 標題/導航 */
+  --icon-stroke: 1.5;    /* 全局單值【鐵律】：Lucide=1.5 / Tabler 用 2 覆寫一次 */
+}
+
+/* ---------- 音效（docs/15；JS 消費見 tokens/feedback.js） ---------- */
+:root {
+  --sound-enabled: 1;    /* 桌面默認 0；持久化由設置層管 */
+  --sound-level: 0.6;    /* 總增益 0~1 */
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --sound-enabled: 0; }  /* 感官敏感重疊人群默認靜音【規範】 */
+}

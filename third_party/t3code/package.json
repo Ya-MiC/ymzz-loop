@@ -1,0 +1,7 @@
+{
+  "name": "ymzz-t3-sidecar",
+  "private": true,
+  "type": "module",
+  "description": "Runs vendored T3 modules. effect is installed here, not in the v0.20 app.",
+  "dependencies": { "effect": "4.1.2" }
+}

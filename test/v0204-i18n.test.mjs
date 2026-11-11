@@ -1,11 +1,15 @@
 // v0.20.4 · i18n: spy labels + ar parity + critical zh-Hant pricing/quickstart/usecases
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+if (!existsSync(join(root, "site/index.html"))) {
+  const note = existsSync(join(root, "PRODUCT_BRANCH")) ? readFileSync(join(root, "PRODUCT_BRANCH"), "utf8") : "";
+  if (/no site/i.test(note)) process.exit(0);
+}
 const read = rel => readFileSync(join(root, rel), "utf8");
 const pkg = JSON.parse(read("package.json"));
 

@@ -1,6 +1,6 @@
 // 零依賴 lint：語法檢查 + 禁止 tab/行尾空白 + JSON 合法 / zero-dep lint
 import fs from "node:fs"; import path from "node:path"; import { execFileSync } from "node:child_process";
-const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name === "node_modules" || e.name.startsWith(".git") ? [] : e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
+const walk = d => fs.readdirSync(d, { withFileTypes: true }).flatMap(e => e.name === "node_modules" || e.name === "target" || e.name.startsWith(".git") ? [] : e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)]);
 let bad = 0;
 for (const f of walk(".")) {
   if (/\.(mjs|js)$/.test(f)) { try { execFileSync("node", ["--check", f]); } catch (e) { bad++; console.error(String(e.stderr)); } }

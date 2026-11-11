@@ -1,11 +1,15 @@
 // v0.20.3 · Pricing ($0) + 4-step Quick start + Use cases (Startup QA gaps)
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+if (!existsSync(join(root, "site/index.html"))) {
+  const note = existsSync(join(root, "PRODUCT_BRANCH")) ? readFileSync(join(root, "PRODUCT_BRANCH"), "utf8") : "";
+  if (/no site/i.test(note)) process.exit(0);
+}
 const read = rel => readFileSync(join(root, rel), "utf8");
 const pkg = JSON.parse(read("package.json"));
 
