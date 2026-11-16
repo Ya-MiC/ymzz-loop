@@ -16,6 +16,8 @@
 $0 · 모든 시간대 · 서버 없음 · AI 쿼터 없음 · MIT</p>
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/">웹사이트 & 설정 가이드</a> · <a href="docs/architecture.md">아키텍처</a></p>
 
+<p align="center">같은 제품의 데스크톱 앱(稟冊): <a href="https://bingce.yanmingx0215.filegear-sg.me/">Bingce 사이트</a> · <a href="https://bingce.yanmingx0215.filegear-sg.me/#onboarding">첫 실행</a></p>
+
 
 ## 순환은 이렇게 작동합니다
 

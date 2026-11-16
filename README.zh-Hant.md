@@ -18,6 +18,8 @@ $0 · 任意時區 · 無伺服器 · 無 AI 配額 · MIT</p>
 
 <p align="center"><a href="https://ya-mic.github.io/ymzz-loop/start.html">🌐 約 10 分鐘開始頁 Start guide</a> · <a href="https://ya-mic.github.io/ymzz-loop/">展示站 Showcase</a> · <a href="CREDITS.md">致謝 Credits</a> · <a href="docs/architecture.md">🧩 架構 Architecture</a> · <a href="CHANGELOG.md">📜 Changelog</a></p>
 
+<p align="center">同一產品的桌面應用（稟冊）：<a href="https://bingce.yanmingx0215.filegear-sg.me/">稟冊網站</a> · <a href="https://bingce.yanmingx0215.filegear-sg.me/#onboarding">第一次打開</a></p>
+
 ---
 
 

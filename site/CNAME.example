@@ -1,0 +1,3 @@
+# 買好網域後：把這個檔改名為 CNAME，內容只留網域一行，例如：
+# After buying a domain: rename to CNAME and keep one line, e.g.
+review.example.com
