@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="400" viewBox="0 0 1280 400" role="img" aria-label="ymzz-loop · 每日復盤 Daily Review">
+  <defs><filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="40"/></filter></defs>
+  <rect width="1280" height="400" fill="#F8F6EF"/>
+  <g filter="url(#b)" opacity=".9">
+    <circle cx="180" cy="90" r="150" fill="#B9DDF1"/><circle cx="420" cy="360" r="140" fill="#F4DDE7"/>
+    <circle cx="1060" cy="80" r="160" fill="#CDBFE0"/><circle cx="1180" cy="340" r="120" fill="#B7C8A8"/>
+    <circle cx="820" cy="380" r="110" fill="#CBBF9E"/><circle cx="700" cy="40" r="90" fill="#E8E3CC"/>
+  </g>
+  <g font-family="'Noto Serif TC','Songti TC',serif" fill="#221F14">
+    <text x="96" y="178" font-size="72" font-weight="700">每日復盤，自動就位。</text>
+    <text x="100" y="236" font-family="Inter,system-ui,sans-serif" font-size="30" fill="#4b4536">Your daily review, already waiting — Notion · Email · Sheets · Markdown</text>
+    <text x="100" y="314" font-family="Inter,system-ui,sans-serif" font-size="22" fill="#A38E7A" letter-spacing="3">YMZZ-NOTION · 晏銘湛箴 · 小軟體，大秩序</text>
+  </g>
+  <g transform="translate(100 336)"><rect width="24" height="8" rx="4" fill="#B9DDF1"/><rect x="30" width="24" height="8" rx="4" fill="#F4DDE7"/><rect x="60" width="24" height="8" rx="4" fill="#CDBFE0"/><rect x="90" width="24" height="8" rx="4" fill="#B7C8A8"/><rect x="120" width="24" height="8" rx="4" fill="#CBBF9E"/><rect x="150" width="24" height="8" rx="4" fill="#A38E7A"/></g>
+</svg>

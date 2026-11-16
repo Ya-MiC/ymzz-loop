@@ -1,0 +1,22 @@
+name: pages
+on:
+  push: { branches: [product], paths: ["site/**", ".github/workflows/pages.yml"] }
+  workflow_dispatch:
+permissions: { contents: read, pages: write, id-token: write }
+concurrency: { group: pages, cancel-in-progress: true }
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: { name: github-pages, url: "${{ steps.d.outputs.page_url }}" }
+    steps:
+      - uses: actions/checkout@v4
+      # Pages 必須先在 Settings → Pages → Source 選「GitHub Actions」；免費方案的私人倉庫不支援 Pages。
+      # Pages must be enabled (Settings → Pages → Source: GitHub Actions). Free plans need a PUBLIC repo.
+      # This workflow now lives on product and deploys the site/ tree from product.
+      # The public URL remains https://ya-mic.github.io/ymzz-loop/
+      - uses: actions/configure-pages@v5
+        with: { enablement: true }
+      - uses: actions/upload-pages-artifact@v3
+        with: { path: site }
+      - id: d
+        uses: actions/deploy-pages@v4

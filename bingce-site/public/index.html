@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>稟冊 · 晏銘湛箴 ymzz — 本機私人事務稟報 | Bingce, a local-first personal report</title>
+<meta name="description" content="稟冊是晏銘湛箴（ymzz）的本機優先私人事務稟報：檔案、AI 對話紀錄、600 日復盤都留在你的電腦，整理成一份給你看的彙報。Bingce by ymzz: a local-first desktop app that turns your files, AI chats and daily reviews into a report for you.">
+<meta property="og:title" content="稟冊 · 晏銘湛箴 ymzz">
+<meta property="og:description" content="留在本機的私人事務稟報 · A local-first personal report, by ymzz">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bingce.yanmingx0215.filegear-sg.me/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/site.css">
+</head>
+<body>
+<a class="skip" href="#main">跳到內容 / Skip to content</a>
+<header class="top">
+  <a class="brand" href="/"><img src="/favicon.svg" alt="" width="28" height="28"> <b>稟冊</b><span>晏銘湛箴 · ymzz</span></a>
+  <nav>
+    <a href="#what">是什麼</a><a href="#download">下載</a><a href="#onboarding">第一次打開</a><a href="#status">現況</a>
+    <a href="https://ya-mic.github.io/ymzz-loop/">每日復盤</a>
+    <a href="https://ya-mic.github.io/ymzz-loop/start.html">開始頁</a>
+    <a href="https://ya-mic.github.io/ymzz-loop/#quickstart">快速上手</a>
+    <a class="btn sm" href="https://github.com/Ya-MiC/ymzz-loop">GitHub</a>
+  </nav>
+</header>
+<main id="main">
+<section class="hero">
+  <p class="eyebrow">Alipay PAYATHON 2026 · Vibe Pay 賽道作品</p>
+  <h1>稟冊<br><small>把檔案、對話和復盤，收成一份給你看的彙報。</small></h1>
+  <p class="lead">稟冊是晏銘湛箴（ymzz）的本機優先私人事務稟報。它留在你這台電腦上，像員工向上級稟報一樣，每天把你的檔案、和 AI 的對話紀錄、600 日復盤進度整理好交給你。稱呼、電話和金鑰不送走。</p>
+  <p class="lead en" lang="en">Bingce (稟冊) is a local-first desktop app by ymzz. It stays on your computer and, like an assistant reporting to the boss, turns your files, AI chat history and 600-day review into one report for you. Your name, phone and keys never leave the device.</p>
+  <div class="cta">
+    <a class="btn primary" href="#download">下載說明 · Download notes</a>
+    <a class="btn" href="https://github.com/Ya-MiC/ymzz-loop">看原始碼 · Source</a>
+  </div>
+  <figure class="shot hero-shot"><img src="/img/07-dashboard.png" alt="稟冊彙報頁 / Bingce dashboard" loading="eager"></figure>
+</section>
+
+<section id="what" class="grid">
+  <h2>裡頭有什麼 <small lang="en">What's inside</small></h2>
+  <article class="card"><h3>彙報 <small lang="en">Report</small></h3><p>檔案數、對話數、復盤進度、沙箱訂單，一頁看完，每個數字都點得進去。</p><p class="en" lang="en">Files, chats, review progress and sandbox orders on one page.</p></article>
+  <article class="card"><h3>檔案整理 <small lang="en">Files</small></h3><p>選資料夾、掃描、按日期與檔案類型篩選；整理前先試跑，可以復原，每一步留紀錄。</p><p class="en" lang="en">Scan, filter by date and type, organise with dry-run, undo and audit.</p></article>
+  <article class="card"><h3>對話紀錄 <small lang="en">AI chats</small></h3><p>Codex、Claude 等本機 AI 對話留在本機，可以看、搜尋、設定保留天數。</p><p class="en" lang="en">Local AI conversations stay local, searchable, with retention.</p></article>
+  <article class="card"><h3>600 日復盤 <small lang="en">600-day review</small></h3><p>每日復盤與提醒在這台電腦上跑，不連你的帳號。</p><p class="en" lang="en">Daily review and reminders, on-device.</p></article>
+  <article class="card"><h3>文件辨識 <small lang="en">OCR</small></h3><p>有文字的 PDF 直接可搜尋；掃描圖片可在介面中下載本機 PaddleOCR，或另外選用 API。</p><p class="en" lang="en">Text PDFs are searchable; optional local PaddleOCR for scans.</p></article>
+  <article class="card"><h3>沙箱收款 <small lang="en">Vibe Pay sandbox</small></h3><p>訂單狀態只在簽名通知或簽名查單後改變；頁面跳回不算付款，不會真的扣款。</p><p class="en" lang="en">Order state changes only on signed notify or query. No real charges.</p></article>
+</section>
+
+<section id="download">
+  <h2>下載 <small lang="en">Download</small></h2>
+  <p class="note">0.21.1 與 0.21.0 的安裝檔目前都在 GitHub 的<b>草稿預發行</b>（<code>v0.21.1-preview</code>、<code>v0.21.0-preview</code>），<b>尚未公開</b>。未登入這個儲存庫的人看不到安裝檔；公開的 Releases 頁現在是空的，點進去也下載不到。<span lang="en">Desktop installers for 0.21.1 and 0.21.0 sit on unpublished draft pre-releases. They are not publicly available. The public Releases page is empty and is not a working download.</span></p>
+  <div class="dl">
+    <div class="card dlc off"><h3>Windows</h3><p><code>.msi</code> · <code>.exe</code></p><span>x64 · 草稿，需登入才看得到 · draft, sign-in required</span></div>
+    <div class="card dlc off"><h3>macOS</h3><p><code>.dmg</code></p><span>Apple 晶片 · 未簽名 unsigned · 草稿，需登入</span></div>
+    <div class="card dlc off"><h3>Linux</h3><p><code>.deb</code> · <code>.AppImage</code></p><span>amd64 · 草稿，需登入</span></div>
+    <div class="card dlc off"><h3>Android</h3><p>測試 APK</p><span>尚未上架 Google Play · not on Play yet</span></div>
+    <div class="card dlc off"><h3>iOS</h3><p>模擬器版</p><span>尚未上架 App Store · not on App Store yet</span></div>
+  </div>
+  <p class="cta"><a class="btn primary" href="https://github.com/Ya-MiC/ymzz-loop/blob/product/README.md#%E4%B8%8B%E8%BC%89">下載現況說明 · Download status</a> <a class="btn" href="https://github.com/Ya-MiC/ymzz-loop">原始碼 · Source</a></p>
+  <details><summary>macOS 被系統擋住時 · If macOS blocks it</summary><p>在 Finder 對 <code>ymzz-bingce</code> 按右鍵 →「打開」；或到「系統設定 → 隱私權與安全性」按「仍要打開」。<br><span lang="en">Right-click → Open, or System Settings → Privacy &amp; Security → Open Anyway.</span></p></details>
+</section>
+
+<section id="onboarding">
+  <h2>第一次打開：六步，不用摸瞎 <small lang="en">First run in six steps</small></h2>
+  <ol class="steps">
+    <li><figure class="shot"><img src="/img/01-nickname.png" alt="第 1 步 稱呼" loading="lazy"></figure><b>1 怎麼稱呼你</b><span>預設「用戶」＋手機末四碼，可自訂。電話只留在本機。</span></li>
+    <li><figure class="shot"><img src="/img/02-folder.png" alt="第 2 步 資料夾" loading="lazy"></figure><b>2 選一個資料夾</b><span>用系統視窗點選，不用打路徑。</span></li>
+    <li><figure class="shot"><img src="/img/03-privacy.png" alt="第 3 步 隱私" loading="lazy"></figure><b>3 東西留在這台電腦</b><span>資料預設不離開本機。</span></li>
+    <li><figure class="shot"><img src="/img/04-ocr.png" alt="第 4 步 辨識" loading="lazy"></figure><b>4 文件辨識可以以後再裝</b><span>「先跳過」不會下載。</span></li>
+    <li><figure class="shot"><img src="/img/05-connectors.png" alt="第 5 步 連接" loading="lazy"></figure><b>5 連接可以以後再設</b><span>Notion、Sheets、Git 等都是可選。</span></li>
+    <li><figure class="shot"><img src="/img/06-finish.png" alt="第 6 步 完成" loading="lazy"></figure><b>6 看彙報</b><span>進入你的第一份稟報。</span></li>
+  </ol>
+</section>
+
+<section id="status">
+  <h2>現況 <small lang="en">Status</small></h2>
+  <table>
+    <tr><th>項目</th><th>狀態</th></tr>
+    <tr><td>本機核心、彙報、檔案整理、沙箱收款</td><td>有測試，已在本機跑過</td></tr>
+    <tr><td>Windows / macOS / Linux 安裝檔</td><td>已產出，在尚未公開的草稿預發行（0.21.1 與 0.21.0）</td></tr>
+    <tr><td>Android / iOS</td><td>測試版，尚未上架</td></tr>
+    <tr><td>npm / PyPI 套件 <code>ymzz</code></td><td>已打包，尚未發佈</td></tr>
+  </table>
+</section>
+</main>
+<footer>
+  <p>© 2026 晏銘湛箴 ymzz · <a href="https://github.com/Ya-MiC/ymzz-loop">github.com/Ya-MiC/ymzz-loop</a> · 原始碼採 MIT 授權 · 同一產品的每日復盤展示與開始頁：<a href="https://ya-mic.github.io/ymzz-loop/">ymzz-loop</a> · <a href="https://ya-mic.github.io/ymzz-loop/start.html">開始頁 Start guide</a> · <a href="https://ya-mic.github.io/ymzz-loop/#quickstart">快速上手</a> · <a href="https://ya-mic.github.io/ymzz-loop/#pricing">定價</a></p>
+</footer>
+</body>
+</html>

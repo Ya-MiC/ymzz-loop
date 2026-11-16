@@ -29,17 +29,21 @@ function resolveProductRef() {
 const productRef = resolveProductRef();
 const productSkip = productRef ? false : 'product ref is not in this checkout';
 
-describe('product branch excludes showcase site', () => {
+describe('product branch is the source of truth for both official sites', () => {
   it('product ref is available', { skip: productSkip }, () => {
     assert.ok(productRef === 'product' || productRef === 'origin/product');
   });
-  it('product has no site/ tree', { skip: productSkip }, () => {
-    const files = sh(`git ls-tree -r --name-only ${productRef}`);
-    assert.equal(files.split('\n').some(f => f === 'site' || f.startsWith('site/')), false);
+  it('this checkout includes site/ and bingce-site/ plus pages.yml', () => {
+    assert.equal(existsSync('site/index.html'), true);
+    assert.equal(existsSync('bingce-site/public/index.html'), true);
+    assert.equal(existsSync('.github/workflows/pages.yml'), true);
   });
-  it('product has no pages.yml', { skip: productSkip }, () => {
-    const files = sh(`git ls-tree -r --name-only ${productRef}`);
-    assert.equal(files.includes('pages.yml'), false);
+  it('pages.yml deploys site/ from the product branch', () => {
+    const yml = readFileSync('.github/workflows/pages.yml', 'utf8');
+    assert.match(yml, /branches:\s*\[product\]/);
+    assert.match(yml, /path:\s*site/);
+    assert.match(yml, /actions\/deploy-pages/);
+    assert.doesNotMatch(yml, /branches:\s*\[main\]/);
   });
   it('product keeps automation scripts + daily-review workflow', { skip: productSkip }, () => {
     const files = sh(`git ls-tree -r --name-only ${productRef}`);
@@ -51,10 +55,13 @@ describe('product branch excludes showcase site', () => {
     assert.match(html, /ymzz-loop\/tree\/product/);
     assert.equal(html.includes('/generate'), false);
   });
-  it('docs explain product-only mechanism', () => {
+  it('docs explain the two official site faces', () => {
     assert.equal(existsSync('docs/product-only.md'), true);
     const d = readFileSync('docs/product-only.md', 'utf8');
-    assert.match(d, /no showcase site/i);
+    assert.match(d, /bingce\.yanmingx0215\.filegear-sg\.me/);
+    assert.match(d, /ya-mic\.github\.io\/ymzz-loop/);
+    assert.match(d, /one product/i);
+    assert.doesNotMatch(d, /excludes/);
   });
 });
 

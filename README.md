@@ -8,11 +8,13 @@
 
 安裝檔名是 `ymzz-bingce`。視窗標題是「稟冊」。
 
+稟冊桌面應用和每日復盤是同一個產品的兩面。桌面應用、下載現況和第一次打開（稱呼預設「用戶」加手機末四碼）在 [稟冊網站](https://bingce.yanmingx0215.filegear-sg.me/)，六步引導在 [#onboarding](https://bingce.yanmingx0215.filegear-sg.me/#onboarding)。GitHub Actions 每日復盤的展示與約 10 分鐘開始頁在 [ymzz-loop](https://ya-mic.github.io/ymzz-loop/) 和 [開始頁](https://ya-mic.github.io/ymzz-loop/start.html)。兩邊的原始碼都在這個儲存庫的 `product` 分支。
+
 ## 下載
 
 0.21.1 的安裝檔由 [安裝檔工作流程](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) 在分支 `cursor/v0211-mobile-core-e023` 上產生，掛到**新的草稿預發行** `v0.21.1-preview`。那份草稿要等工作流程成功才會出現，而且不會公開、不會收費。0.21.0 的草稿還在，沒有被這次改掉。兩份都要登入這個儲存庫才看得到：[Releases](https://github.com/Ya-MiC/ymzz-loop/releases)。
 
-GitHub 這個儲存庫的預設分支仍是 `main`，所以儲存庫首頁看到的不是這份說明。產品說明在 `product` 分支。
+這個儲存庫的預設分支是 `product`，儲存庫首頁就是這份說明。每日復盤展示站與稟冊網站的原始檔分別在 `site/` 與 `bingce-site/`。
 
 | 系統 | 你要下載的檔 | 現況 |
 | --- | --- | --- |
@@ -166,9 +168,11 @@ Bingce (稟冊) is the local steward under the ymzz brand, 晏銘湛箴, and the
 
 The product is the briefing brought to its owner, and the local record that briefing comes from.
 
+Bingce, the desktop app, and the daily-review loop are two faces of the same product. The app site, download status, and first-run guide (nickname defaults to 用戶 plus the last four digits of the phone number) are at [the Bingce site](https://bingce.yanmingx0215.filegear-sg.me/) and [#onboarding](https://bingce.yanmingx0215.filegear-sg.me/#onboarding). The GitHub Actions daily-review showcase and the ~10 minute start guide are at [ymzz-loop](https://ya-mic.github.io/ymzz-loop/) and [start.html](https://ya-mic.github.io/ymzz-loop/start.html). Both faces are sourced from the `product` branch of this repository.
+
 ## Downloads
 
-The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) on branch `cursor/v0211-mobile-core-e023` attaches 0.21.1 files to a new private draft pre-release, `v0.21.1-preview`, after that run succeeds. It does not replace the 0.21.0 draft. Drafts are free and visible only after you sign in: [Releases](https://github.com/Ya-MiC/ymzz-loop/releases). The repository default branch is still `main`, so the landing page is not this product README. The product README is on `product`.
+The [installer workflow](https://github.com/Ya-MiC/ymzz-loop/actions/workflows/installers.yml) on branch `cursor/v0211-mobile-core-e023` attaches 0.21.1 files to a new private draft pre-release, `v0.21.1-preview`, after that run succeeds. It does not replace the 0.21.0 draft. Drafts are free and visible only after you sign in: [Releases](https://github.com/Ya-MiC/ymzz-loop/releases). The repository default branch is `product`, so this README is the repository home page. The daily-review showcase lives in `site/`; the Bingce site lives in `bingce-site/`.
 
 | System | File | Status |
 | --- | --- | --- |
